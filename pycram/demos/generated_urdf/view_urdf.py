@@ -7,11 +7,16 @@ from semantic_digital_twin.adapters.urdf import URDFParser
 from semantic_digital_twin.world import World
 from semantic_digital_twin.world_description.world_entity import Body
 from semantic_digital_twin.datastructures.prefixed_name import PrefixedName
-from semantic_digital_twin.adapters.ros.visualization.viz_marker import VizMarkerPublisher
+from semantic_digital_twin.adapters.ros.visualization.viz_marker import (
+    VizMarkerPublisher,
+)
+from interactive_viz_marker import InteractiveVizMarkerPublisher
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Lade und visualisiere eine URDF-Datei.")
+    parser = argparse.ArgumentParser(
+        description="Lade und visualisiere eine URDF-Datei."
+    )
     parser.add_argument("urdf_path", type=str, help="Absoluter Pfad zur URDF-Datei")
     args = parser.parse_args()
 
@@ -37,8 +42,11 @@ def main():
 
     # VizMarkerPublisher publishes the meshes/collision shapes and TF frames
     viz = VizMarkerPublisher(_world=world, node=node).with_tf_publisher()
+    interactive_viz = InteractiveVizMarkerPublisher(_world=world, node=node)
 
-    print("URDF loaded and being published! Open RViz2 to review it. Press Ctrl+C to stop.")
+    print(
+        "URDF loaded and being published! Open RViz2 to review it. Press Ctrl+C to stop."
+    )
     try:
         # Keep the node alive to continuously broadcast TF frames
         rclpy.spin(node)
