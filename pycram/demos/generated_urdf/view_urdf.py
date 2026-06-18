@@ -1,7 +1,7 @@
 import argparse
 
 import rclpy
-
+from rclpy.executors import MultiThreadedExecutor  # Executor für flüssiges Multitasking
 
 from semantic_digital_twin.adapters.urdf import URDFParser
 from semantic_digital_twin.world import World
@@ -10,7 +10,9 @@ from semantic_digital_twin.datastructures.prefixed_name import PrefixedName
 from semantic_digital_twin.adapters.ros.visualization.viz_marker import (
     VizMarkerPublisher,
 )
-from interactive_viz_marker import InteractiveVizMarkerPublisher
+from semantic_digital_twin.adapters.ros.visualization.interactive_viz_marker import (
+    InteractiveVizMarkerPublisher,
+)
 
 
 def main():
@@ -47,9 +49,14 @@ def main():
     print(
         "URDF loaded and being published! Open RViz2 to review it. Press Ctrl+C to stop."
     )
+
+    # Erstellt einen Multi-Threaded Executor, um Lag zu vermeiden
+    executor = MultiThreadedExecutor()
+    executor.add_node(node)
+
     try:
-        # Keep the node alive to continuously broadcast TF frames
-        rclpy.spin(node)
+        # Hält den Node am Leben und läuft auf mehreren Threads
+        executor.spin()
     except KeyboardInterrupt:
         pass
     finally:
