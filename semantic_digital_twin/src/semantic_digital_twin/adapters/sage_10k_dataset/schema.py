@@ -8,22 +8,34 @@ from typing import List, Dict, Any, Self
 import numpy as np
 from typing_extensions import Optional, Tuple, assert_never
 
-from krrood.adapters.exceptions import JSON_TYPE_NAME
+from krrood.adapters.json_field import JSONField
 from krrood.adapters.json_serializer import SubclassJSONSerializer, to_json
 from krrood.utils import get_full_class_name
+from semantic_digital_twin.semantic_annotations.natural_language import (
+    NaturalLanguageWithTypeDescription,
+)
 from semantic_digital_twin.datastructures.prefixed_name import PrefixedName
+from semantic_digital_twin.datastructures.variables import SpatialVariables
 from semantic_digital_twin.semantic_annotations.semantic_annotations import (
     Floor,
     Wall,
     Door,
     Handle,
-    Hinge,
+    RoomWithWallsAndDoors,
+    DoorWithType,
+)
+from semantic_digital_twin.specifications.connections import (
+    RevoluteConnectionSpecification,
 )
 from semantic_digital_twin.spatial_types import HomogeneousTransformationMatrix, Vector3
 from semantic_digital_twin.world import World
 from semantic_digital_twin.world_description.connections import (
+    ActiveConnection1DOF,
     Connection6DoF,
     FixedConnection,
+)
+from semantic_digital_twin.world_description.degree_of_freedom import (
+    DegreeOfFreedomLimits,
 )
 from semantic_digital_twin.world_description.geometry import Mesh, Scale, Box
 from semantic_digital_twin.world_description.shape_collection import ShapeCollection
@@ -70,13 +82,13 @@ class Sage10kWithID(Sage10kBase):
         **kwargs,
     ) -> WorldEntity:
         """
-        Create the object in the world by getting its geometry from the provided information.
-        Spawn bodies, regions, connections, and semantic annotations.
+        Create the object in the world by getting its geometry from the provided
+        information. Spawn bodies, regions, connections, and semantic annotations.
 
         :param world: The world to create the instances in.
-        :param directory: The directory where the `layout*.json` and all its referenced files are found.
+        :param directory: The directory where the `layout*.json` and all its referenced
+            files are found.
         :param parent: The parent of the newly created entities
-
         :return: The relevant created body
         """
 
@@ -91,9 +103,9 @@ class HasXYZ(Sage10kBase):
     y: float
     z: float
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "x": self.x,
             "y": self.y,
             "z": self.z,
@@ -108,8 +120,8 @@ class HasXYZ(Sage10kBase):
 class Sage10kRotation(HasXYZ):
     """
     Rotations in the Sage 10k world.
-    The format is roll(x), pitch (y), and yaw (z).
-    They are given in degrees.
+
+    The format is roll(x), pitch (y), and yaw (z). They are given in degrees.
     """
 
     def as_roll_pitch_yaw_in_radians(self) -> Tuple[float, float, float]:
@@ -125,6 +137,7 @@ class Sage10kRotation(HasXYZ):
 class Sage10kPosition(HasXYZ):
     """
     Position of an entity in a Sage10k scene.
+
     It seems to always be global
     """
 
@@ -137,17 +150,17 @@ class Sage10kSize(Sage10kBase):
 
     height: float
     """
-    Scale in z
+    Scale in z.
     """
 
     length: float
     """
-    Scale in y
+    Scale in y.
     """
 
     width: float
     """
-    Scale in x
+    Scale in x.
     """
 
     @property
@@ -162,9 +175,9 @@ class Sage10kSize(Sage10kBase):
     def z(self) -> float:
         return self.height
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "height": self.height,
             "length": self.length,
             "width": self.width,
@@ -179,16 +192,18 @@ class Sage10kSize(Sage10kBase):
 class Sage10kPhysicallyBasedRendering(SubclassJSONSerializer):
     """
     Parameters for super realistic renderers.
-    Currently, we have no use of this in CRAM, but the information is provided by the dataset anyway.
-    This data is ignored when `Sage10kScene.create_world` is called but parsed from the JSON information.
+
+    Currently, we have no use of this in CRAM, but the information is provided by the
+    dataset anyway. This data is ignored when `Sage10kScene.create_world` is called but
+    parsed from the JSON information.
     """
 
     metallic: float
     roughness: float
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "metallic": self.metallic,
             "roughness": self.roughness,
         }
@@ -209,12 +224,14 @@ class Sage10kWall(Sage10kWithID):
     start_point: Sage10kPosition
     """
     The start point of the wall.
+
     Only x and y matter.
     """
 
     end_point: Sage10kPosition
     """
     The end point of the wall.
+
     Only x and y matter.
     """
 
@@ -225,20 +242,20 @@ class Sage10kWall(Sage10kWithID):
 
     height: float
     """
-    The height of the wall
+    The height of the wall.
     """
 
     thickness: float
     """
-    The thickness of the wall
+    The thickness of the wall.
     """
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "id": self.id,
-            "start_point": to_json(self.start_point),
-            "end_point": to_json(self.end_point),
+            "start_point": to_json(self.start_point, **kwargs),
+            "end_point": to_json(self.end_point, **kwargs),
             "material": self.material,
             "height": self.height,
             "thickness": self.thickness,
@@ -274,8 +291,6 @@ class Sage10kWall(Sage10kWithID):
         return wall_length, yaw
 
     def create_in_world(self, world: World, directory: Path, parent: Body) -> Wall:
-        wall_name = PrefixedName(name=self.id)
-
         wall_length, yaw = self.wall_length_and_yaw
 
         wall_scale = Scale(x=self.thickness, y=wall_length, z=self.height)
@@ -293,7 +308,7 @@ class Sage10kWall(Sage10kWithID):
 
         with world.modify_world():
             annotation = Wall.create_with_new_body_in_world(
-                name=wall_name,
+                name=self.id,
                 scale=wall_scale,
                 world=world,
                 world_root_T_self=parent_T_wall,
@@ -352,7 +367,7 @@ class Sage10kObject(Sage10kWithID):
 
     source: str
     """
-    Always generation
+    Always generation.
     """
 
     source_id: str
@@ -372,32 +387,39 @@ class Sage10kObject(Sage10kWithID):
 
     mass: float
     """
-    The weight of the object in kilograms
+    The weight of the object in kilograms.
     """
 
     position: Sage10kPosition
     """
-    The global position of the object
+    The global position of the object.
     """
 
     rotation: Sage10kRotation
     """
-    The orientation of the object
+    The orientation of the object.
     """
 
     dimensions: Sage10kSize
     """
     The scale of the object.
+
     This seems to be already incorporated in the meshes themselves, so dont use it.
     """
 
     pbr_parameters: Sage10kPhysicallyBasedRendering
     """
-    Physical rendering parameters. Currently unused
+    Physical rendering parameters.
+
+    Currently unused
     """
 
     def create_in_world(
-        self, world: World, directory: Path, parent: KinematicStructureEntity, **kwargs
+        self,
+        world: World,
+        directory: Path,
+        parent: KinematicStructureEntity,
+        **kwargs,
     ) -> Body:
         ply_file = directory / "objects" / f"{self.source_id}.ply"
         texture_file = directory / "objects" / f"{self.source_id}_texture.png"
@@ -442,11 +464,20 @@ class Sage10kObject(Sage10kWithID):
             # Add the body to the world
             world.add_body(body)
             world.add_connection(root_C_body)
+
+        # create semantic annotation
+        annotation = NaturalLanguageWithTypeDescription(
+            root=body, description=self.description, type_description=self.type
+        )
+
+        with world.modify_world():
+            world.add_semantic_annotation(annotation)
+
         return body
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "id": self.id,
             "room_id": self.room_id,
             "type": self.type,
@@ -456,10 +487,10 @@ class Sage10kObject(Sage10kWithID):
             "place_id": self.place_id,
             "place_guidance": self.place_guidance,
             "mass": self.mass,
-            "position": to_json(self.position),
-            "rotation": to_json(self.rotation),
-            "dimensions": to_json(self.dimensions),
-            "pbr_parameters": to_json(self.pbr_parameters),
+            "position": to_json(self.position, **kwargs),
+            "rotation": to_json(self.rotation, **kwargs),
+            "dimensions": to_json(self.dimensions, **kwargs),
+            "pbr_parameters": to_json(self.pbr_parameters, **kwargs),
         }
 
     @classmethod
@@ -502,7 +533,9 @@ class Sage10kDoor(Sage10kWithID):
 
     position_on_wall: float
     """
-    Position on wall w. r. t. its starting point in meters?
+    Position on wall w.
+
+    r. t. its starting point as percentage of the wall length.
     """
 
     width: float
@@ -527,7 +560,7 @@ class Sage10kDoor(Sage10kWithID):
 
     opening: bool
     """
-    No idea
+    No idea.
     """
 
     door_material: str
@@ -535,9 +568,9 @@ class Sage10kDoor(Sage10kWithID):
     The door materials filename found in the `materials` folder.
     """
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "id": self.id,
             "wall_id": self.wall_id,
             "position_on_wall": self.position_on_wall,
@@ -578,26 +611,25 @@ class Sage10kDoor(Sage10kWithID):
         :param sage_10k_wall: The sage 10k wall that is referenced by `self.wall_id`.
         :param wall_annotation: The wall annotation created in `world` before this call.
         """
-        name = PrefixedName(name=self.id, prefix=sage_10k_wall.id)
-
         scale = Scale(x=sage_10k_wall.thickness, y=self.width, z=self.height)
 
         wall_length, _ = sage_10k_wall.wall_length_and_yaw
 
         parent_T_body = HomogeneousTransformationMatrix.from_xyz_rpy(
-            y=-self.position_on_wall,
+            y=-wall_length / 2 + (self.position_on_wall * wall_length),
             z=self.height / 2,
             reference_frame=parent,
         )
         world_root_T_self = world.transform(parent_T_body, world.root)
 
         with world.modify_world():
-            annotation = Door.create_with_new_body_in_world(
-                name=name,
+            annotation = DoorWithType.create_with_new_body_in_world(
+                name=self.id,
                 scale=scale,
                 world=world,
                 world_root_T_self=world_root_T_self,
             )
+            annotation.type_description = self.door_type
 
         body = annotation.root
         door_mesh = body.collision.combined_mesh
@@ -624,10 +656,10 @@ class Sage10kDoor(Sage10kWithID):
         body.visual = geometry_with_texture
 
         with world.modify_world():
-            wall_annotation.add_aperture(annotation.entry_way)
+            wall_annotation.add(annotation.entry_way)
 
         self._create_handle_in_world(world, annotation)
-        self._create_hinge_in_world(world, annotation)
+        self._create_hinge_in_world(annotation)
         return annotation
 
     def _create_handle_in_world(self, world: World, door: Door) -> Handle:
@@ -638,42 +670,64 @@ class Sage10kDoor(Sage10kWithID):
         :param door: The door to create the handle for.
         :return: The handle of the door.
         """
+        floor = world.get_semantic_annotations_by_type(Floor)[0]
+
         door_T_handle = HomogeneousTransformationMatrix.from_xyz_rpy(
             y=0.1,
+            x=door.root.collision.min_point.x,
             reference_frame=door.root,
         )
+
+        door_T_world = world.transform(door_T_handle, world.root)
+        floor_bounding_box = floor.root.collision.as_bounding_box_collection_at_origin(
+            world.root.global_pose
+        )
+        is_handle_in_room = floor_bounding_box.event.marginal(
+            SpatialVariables.xy
+        ).contains((door_T_world.x, door_T_world.y))
+
+        if is_handle_in_room and self.opens_inward:
+            door_T_handle = HomogeneousTransformationMatrix.from_xyz_rpy(
+                y=0.1,
+                x=door.root.collision.max_point.x,
+                reference_frame=door.root,
+                yaw=np.pi,
+            )
+
         world_root_T_handle = world.transform(door_T_handle, world.root)
-        handle_name = PrefixedName(name=f"{self.id}_handle", prefix=self.id)
 
         with world.modify_world():
             handle = Handle.create_with_new_body_in_world(
-                name=handle_name,
+                name=f"{self.id}_handle",
                 world=world,
                 world_root_T_self=world_root_T_handle,
-                scale=Scale(x=0.1, y=0.1, z=0.05),
+                scale=Scale(0.05, 0.02, 0.2),
             )
-            door.add_handle(handle)
+            door.add(handle)
         return handle
 
-    def _create_hinge_in_world(self, world: World, door: Door) -> Hinge:
+    def _create_hinge_in_world(self, door: Door) -> ActiveConnection1DOF:
         """
-        Create the hinge (the joint that makes the door openable) of the door.
-        :param world: The world where the hinge is created.
+        Hang the door on the hinge that makes it openable.
+
         :param door: The door to create the hinge for.
-        :return: The hinge
+        :return: The revolute connection the door swings on.
         """
-        world_root_T_hinge = door.calculate_world_T_hinge_based_on_handle(Vector3.Z())
-
-        with world.modify_world():
-            hinge = Hinge.create_with_new_body_in_world(
-                name=PrefixedName(name="hinge", prefix=door.root.name.name),
-                world=world,
-                active_axis=Vector3.Z(),
-                world_root_T_self=world_root_T_hinge,
+        if self.opens_inward:
+            limits = DegreeOfFreedomLimits.from_position_range_and_speed(
+                lower_position=0.0, upper_position=np.pi / 2
             )
-            door.add_hinge(hinge)
+        else:
+            limits = DegreeOfFreedomLimits.from_position_range_and_speed(
+                lower_position=-np.pi / 2, upper_position=0.0
+            )
 
-        return hinge
+        return door.mount_on_movable_joint(
+            RevoluteConnectionSpecification(
+                axis=Vector3.Z(),
+                dof_limits=limits,
+            )
+        )
 
 
 @dataclass
@@ -694,7 +748,9 @@ class Sage10kRoom(Sage10kWithID):
 
     position: Sage10kPosition
     """
-    The position of the rooms lower left corner? in the scene.
+    The position of the rooms lower left corner?
+
+    in the scene.
     """
 
     floor_material: str
@@ -714,7 +770,7 @@ class Sage10kRoom(Sage10kWithID):
 
     doors: List[Sage10kDoor] = field(default_factory=list)
     """
-    The doors of the room
+    The doors of the room.
     """
 
     def _create_floor(
@@ -729,7 +785,6 @@ class Sage10kRoom(Sage10kWithID):
         :return: The annotation of the created floor.
         """
         # create the floor
-        floor_name = PrefixedName(name="floor", prefix=self.id)
         floor_mesh = Box(
             scale=Scale(x=self.dimensions.x, y=self.dimensions.y, z=0.01)
         ).mesh
@@ -755,7 +810,7 @@ class Sage10kRoom(Sage10kWithID):
             floor_annotation = Floor.create_with_new_body_in_world(
                 scale=Scale(x=self.dimensions.x, y=self.dimensions.y, z=0.01),
                 world=world,
-                name=floor_name,
+                name=f"{self.id}_floor",
                 world_root_T_self=parent_T_floor,
             )
 
@@ -779,22 +834,31 @@ class Sage10kRoom(Sage10kWithID):
         return floor_annotation
 
     def create_in_world(
-        self, world: World, directory: Path, parent: KinematicStructureEntity, **kwargs
+        self,
+        world: World,
+        directory: Path,
+        parent: KinematicStructureEntity,
+        **kwargs,
     ) -> Body:
-        self._create_floor(world, directory, parent)
+        floor_annotation = self._create_floor(world, directory, parent)
 
-        # create walls
+        walls_of_room = []
+        doors_of_room = []
+
         for wall in self.walls:
             wall_annotation = wall.create_in_world(world, directory, parent)
+            walls_of_room.append(wall_annotation)
             doors_of_this_wall = [
                 door for door in self.doors if door.wall_id == wall.id
             ]  # join doors on this wall
 
             # create doors
-            for door in doors_of_this_wall:
+            doors_of_room += [
                 door.create_in_world(
                     world, directory, wall_annotation.root, wall, wall_annotation
                 )
+                for door in doors_of_this_wall
+            ]
 
             # After all doors are added and the mesh is modified, re-project UVs and set texture
             wall_length, _ = wall.wall_length_and_yaw
@@ -822,23 +886,33 @@ class Sage10kRoom(Sage10kWithID):
             body.collision = geometry_with_texture
             body.visual = geometry_with_texture
 
+        room_annotation = RoomWithWallsAndDoors(
+            floor=floor_annotation,
+            walls=walls_of_room,
+            doors=doors_of_room,
+            room_type=self.room_type,
+        )
+
+        with world.modify_world():
+            world.add_semantic_annotation(room_annotation)
+
         # create the objects
         for sage_object in self.objects:
             sage_object.create_in_world(world, directory, parent=parent)
 
         return world.root
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            JSON_TYPE_NAME: get_full_class_name(self.__class__),
+            JSONField.TYPE: get_full_class_name(self.__class__),
             "id": self.id,
             "room_type": self.room_type,
-            "dimensions": to_json(self.dimensions),
-            "position": to_json(self.position),
+            "dimensions": to_json(self.dimensions, **kwargs),
+            "position": to_json(self.position, **kwargs),
             "floor_material": self.floor_material,
-            "objects": to_json(self.objects),
-            "walls": to_json(self.walls),
-            "doors": to_json(self.doors),
+            "objects": to_json(self.objects, **kwargs),
+            "walls": to_json(self.walls, **kwargs),
+            "doors": to_json(self.doors, **kwargs),
         }
 
     @classmethod
@@ -874,6 +948,7 @@ class Sage10kScene(Sage10kWithID):
     created_from_text: str
     """
     I think this is the entire prompt that was used to generate the scene.
+
     Usually contains just the descriptiom + 'Complete layout with doors/windows:'
     """
 
@@ -890,18 +965,19 @@ class Sage10kScene(Sage10kWithID):
     directory: Optional[Path] = None
     """
     The directory of the scenes json file.
+
     The layout files are named like `layout*.json`.
     """
 
-    def to_json(self) -> Dict[str, Any]:
+    def to_json(self, **kwargs) -> Dict[str, Any]:
         return {
-            **super().to_json(),
+            **super().to_json(**kwargs),
             "id": self.id,
             "building_style": self.building_style,
             "description": self.description,
             "created_from_text": self.created_from_text,
             "total_area": self.total_area,
-            "rooms": to_json(self.rooms),
+            "rooms": to_json(self.rooms, **kwargs),
         }
 
     @classmethod
@@ -916,13 +992,21 @@ class Sage10kScene(Sage10kWithID):
         )
 
     def create_world(self) -> World:
+        """
+        :return: The semantically annotated world.
+        """
         world = World()
 
-        root = Body(name=PrefixedName(name="root"))
+        root = Body(name=PrefixedName(name="map"))
 
         with world.modify_world():
             world.add_body(root)
 
         for room in self.rooms:
-            room.create_in_world(world=world, directory=self.directory, parent=root)
+            room.create_in_world(
+                world=world,
+                directory=self.directory,
+                parent=root,
+            )
+
         return world

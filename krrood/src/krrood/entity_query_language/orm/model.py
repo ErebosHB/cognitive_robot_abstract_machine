@@ -18,6 +18,7 @@ from krrood.ormatic.data_access_objects.alternative_mappings import (
 class SymbolGraphMapping(AlternativeMapping[SymbolGraph]):
     """
     Mapping specific for SymbolGraph.
+
     Import this class when you want to persist SymbolGraph.
     """
 
@@ -28,8 +29,8 @@ class SymbolGraphMapping(AlternativeMapping[SymbolGraph]):
     @classmethod
     def from_domain_object(cls, obj: SymbolGraph):
         return cls(
-            instances=obj.wrapped_instances,
-            predicate_relations=list(obj.relations()),
+            instances=obj.instances,
+            predicate_relations=obj.predicate_relations,
         )
 
     def to_domain_object(self) -> T:

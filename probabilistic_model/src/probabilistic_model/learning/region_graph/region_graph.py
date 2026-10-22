@@ -9,13 +9,17 @@ from sortedcontainers import SortedSet
 from typing_extensions import List, Self, Type, Iterable, Union
 
 from probabilistic_model.probabilistic_circuit.jax.inner_layer import (
-    ProductLayer,
-    DenseSumLayer,
+    DifferentiableProductLayer,
+    DifferentiableDenseSumLayer,
 )
-from probabilistic_model.probabilistic_circuit.jax.discrete_layer import DiscreteLayer
-from probabilistic_model.probabilistic_circuit.jax.gaussian_layer import GaussianLayer
+from probabilistic_model.probabilistic_circuit.jax.discrete_layer import (
+    DifferentiableDiscreteLayer,
+)
+from probabilistic_model.probabilistic_circuit.jax.gaussian_layer import (
+    DifferentiableGaussianLayer,
+)
 from probabilistic_model.probabilistic_circuit.jax.probabilistic_circuit import (
-    ProbabilisticCircuit as JPC,
+    DifferentiableLayeredCircuit,
     ClassificationCircuit,
 )
 import jax.numpy as jnp
@@ -26,9 +30,10 @@ import jax.random
 class Region:
     """
     A region in a region graph.
-    A region is a set of variables.
-    Refer to this paper https://ml-research.github.io/papers/peharz2019uai_ratspns.pdf .
 
+    A region is a set of variables. Refer to this paper
+    https://ml-research.github.io/papers/peharz2019uai_ratspns.pdf
+    .
     """
 
     variables: SortedSet
@@ -64,7 +69,9 @@ class Partition:
 
 class RegionGraph(nx.DiGraph):
     """
-    A region graph is a directed acyclic bipartite graph that represents a (potentially repeated) partition of variables.
+    A region graph is a directed acyclic bipartite graph that represents a (potentially
+    repeated) partition of variables.
+
     Bluntly speaking, a region graph is an ensemble of random Latent-Variable trees.
     """
 
@@ -76,6 +83,7 @@ class RegionGraph(nx.DiGraph):
     classes: int
     """
     The number of classes.
+
     If classes > 1, the circuit is a classifier, if 1 it is a generative model.
     """
 
@@ -92,6 +100,7 @@ class RegionGraph(nx.DiGraph):
     repetitions: int
     """
     The number of repetitions to create in the region graph.
+
     A repetition is another partitioning on the set of variables.
     """
 
@@ -178,9 +187,10 @@ class RegionGraph(nx.DiGraph):
 
     def as_probabilistic_circuit(
         self, input_units: int = 5, sum_units: int = 5, key=jax.random.PRNGKey(69)
-    ) -> Union[JPC, ClassificationCircuit]:
+    ) -> Union[DifferentiableLayeredCircuit, ClassificationCircuit]:
         """
         Convert the region graph to a jax probabilistic circuit.
+
         :param input_units: The number of input units to use in each input layer.
         :param sum_units: The number of sum units to use in each sum layer.
         :param key: The random key to use for all trainable parameters.
@@ -207,11 +217,11 @@ class RegionGraph(nx.DiGraph):
                                     key, shape=(input_units,), minval=0.5, maxval=3.0
                                 )
                             )
-                            node.layer = GaussianLayer(
+                            node.layer = DifferentiableGaussianLayer(
                                 variable_index,
                                 location=location,
                                 log_scale=log_scale,
-                                min_scale=jnp.full_like(location, 0.1),
+                                minimum_scale=jnp.full_like(location, 0.1),
                             )
                             node.layer.validate()
                         elif isinstance(variable, Symbolic):
@@ -222,7 +232,7 @@ class RegionGraph(nx.DiGraph):
                                 maxval=1.0,
                             )
                             log_probabilities = jnp.log(log_probabilities)
-                            node.layer = DiscreteLayer(
+                            node.layer = DifferentiableDiscreteLayer(
                                 variable_index, log_probabilities=log_probabilities
                             )
                         else:
@@ -245,7 +255,7 @@ class RegionGraph(nx.DiGraph):
                             )
                             for child in children
                         ]
-                        node.layer = DenseSumLayer(
+                        node.layer = DifferentiableDenseSumLayer(
                             [child.layer for child in children], log_weights=log_weights
                         )
                         node.layer.validate()
@@ -264,7 +274,7 @@ class RegionGraph(nx.DiGraph):
                     )
                     sparse_edges = BCOO.fromdense(jnp.ones_like(edges))
                     sparse_edges.data = edges.flatten()
-                    node.layer = ProductLayer(
+                    node.layer = DifferentiableProductLayer(
                         [child.layer for child in children], sparse_edges
                     )
                     node.layer.validate()
@@ -272,6 +282,6 @@ class RegionGraph(nx.DiGraph):
         if self.classes > 1:
             model = ClassificationCircuit(self.variables, root.layer)
         else:
-            model = JPC(self.variables, root.layer)
+            model = DifferentiableLayeredCircuit(self.variables, root.layer)
 
         return model

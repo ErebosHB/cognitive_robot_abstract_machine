@@ -6,8 +6,9 @@ from random_events.variable import Continuous
 
 from probabilistic_model.learning.jpt.jpt import JointProbabilityTree
 from probabilistic_model.learning.nyga_induction import NygaInduction
+from probabilistic_model.adapters.circuit_representations import CircuitRepresentations
 from probabilistic_model.probabilistic_circuit.jax.probabilistic_circuit import (
-    ProbabilisticCircuit,
+    DifferentiableLayeredCircuit,
 )
 from probabilistic_model.probabilistic_circuit.rx.probabilistic_circuit import (
     ProbabilisticCircuit as NXProbabilisticCircuit,
@@ -55,7 +56,9 @@ if not load_from_disc:
         variable, min_samples_per_quantile=min_samples_per_quantile
     )
     rustworkx_model.fit(data)
-    jax_model = ProbabilisticCircuit.from_rustworkx(rustworkx_model, True)
+    jax_model = CircuitRepresentations().convert(
+        rustworkx_model, DifferentiableLayeredCircuit
+    )
     if save_to_disc:
         with open(rustworkx_path, "w") as f:
             f.write(json.dumps(rustworkx_model.to_json()))
@@ -65,7 +68,7 @@ else:
     with open(rustworkx_path, "r") as f:
         rustworkx_model = NXProbabilisticCircuit.from_json(json.loads(f.read()))
     with open(jax_model_path, "r") as f:
-        jax_model = ProbabilisticCircuit.from_json(json.loads(f.read()))
+        jax_model = DifferentiableLayeredCircuit.from_json(json.loads(f.read()))
 
 
 print("Number of edges:", len(list(rustworkx_model.edges)))
@@ -83,14 +86,18 @@ def eval_performance(
     warmup_iterations=10,
 ):
     """
-    Evaluate the performance of two methods by running them multiple times and measuring the time taken for each run.
+    Evaluate the performance of two methods by running them multiple times and measuring
+    the time taken for each run.
+
     :param rustworkx_method: The method to be evaluated in Rustworkx.
     :param rustworkx_args: The arguments to be passed to the Rustworkx method.
     :param jax_method: The method to be evaluated in JAX.
     :param jax_args: The arguments to be passed to the JAX method.
     :param number_of_iterations: The number of iterations to be run for each method.
-    :param warmup_iterations: The number of iterations to be run before measuring the performance.
-    :return: A tuple containing the times for the Rustworkx method and the times for the JAX method.
+    :param warmup_iterations: The number of iterations to be run before measuring the
+        performance.
+    :return: A tuple containing the times for the Rustworkx method and the times for the
+        JAX method.
     """
 
     @timeit

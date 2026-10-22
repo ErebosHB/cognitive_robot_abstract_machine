@@ -17,9 +17,8 @@ The tutorial demonstrates the creation of a body and its visual and collision in
 First, let's create a world.
 
 ```{code-cell} ipython3
+from importlib.resources import files
 from pathlib import Path
-
-import semantic_digital_twin
 
 from semantic_digital_twin.datastructures.prefixed_name import PrefixedName
 from semantic_digital_twin.spatial_types.spatial_types import HomogeneousTransformationMatrix, RotationMatrix
@@ -45,7 +44,7 @@ Finally, in our kinematic structure, each entity has a name. For this we can use
 
 ```{code-cell} ipython3
 import os
-from semantic_digital_twin.spatial_types import Point3, Vector3
+from semantic_digital_twin.spatial_types import AxisAngle, Point3, Vector3
 from semantic_digital_twin.world_description.shape_collection import ShapeCollection
 from semantic_digital_twin.world_description.geometry import Box, Scale, Sphere, Cylinder, Mesh, Color
 
@@ -57,12 +56,11 @@ sphere_origin = HomogeneousTransformationMatrix.from_xyz_quaternion(pos_x=0, pos
 sphere = Sphere(origin=sphere_origin, radius=0.4)
 
 cylinder_origin = HomogeneousTransformationMatrix.from_point_rotation_matrix(point=Point3.from_iterable([1, -1, 2]),
-                                                                  rotation_matrix=RotationMatrix.from_axis_angle(
-                                                                      Vector3.from_iterable([1., 0., 0.]), 0.8, ),)
+                                                                  rotation_matrix=RotationMatrix.from_axis_angle(AxisAngle(Vector3.from_iterable([1., 0., 0.]), 0.8)),)
 cylinder = Cylinder(origin=cylinder_origin, width=0.05, height=0.5)
 
 mesh = Mesh(origin=HomogeneousTransformationMatrix(),
-            filename=Path(semantic_digital_twin.__file__).resolve().parents[2] / "resources" / "stl" / "milk.stl")
+            filename=os.path.join(Path(files("semantic_digital_twin")).parent.parent, "resources", "stl", "milk.stl"))
 
 collision = ShapeCollection([cylinder, sphere, box])
 visual = ShapeCollection([mesh])

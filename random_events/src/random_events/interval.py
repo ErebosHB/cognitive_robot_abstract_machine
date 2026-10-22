@@ -86,7 +86,7 @@ class SimpleInterval(sigma_algebra.AbstractSimpleSet):
 
     @left.setter
     def left(self, value: Bound):
-        self.cpp_object.left = value.value
+        self.cpp_object.left = rl.BorderType(value.value)
 
     @property
     def right(self) -> Bound:
@@ -97,7 +97,7 @@ class SimpleInterval(sigma_algebra.AbstractSimpleSet):
 
     @right.setter
     def right(self, value: Bound):
-        self.cpp_object.right = value.value
+        self.cpp_object.right = rl.BorderType(value.value)
 
     @classmethod
     def _from_cpp(cls, cpp_object: rl.SimpleInterval) -> Self:
@@ -126,6 +126,16 @@ class SimpleInterval(sigma_algebra.AbstractSimpleSet):
             or (self.upper == item and self.right == Bound.CLOSED)
         )
 
+    @property
+    def size(self) -> float:
+        """
+        :return: The length this interval spans, which is zero for a singleton and
+            infinite when the interval is unbounded.
+        """
+        if self.is_empty():
+            return 0.0
+        return self.upper - self.lower
+
     def non_empty_to_string(self) -> str:
         left_bracket = "[" if self.left == Bound.CLOSED else "("
         right_bracket = "]" if self.right == Bound.CLOSED else ")"
@@ -151,6 +161,23 @@ class SimpleInterval(sigma_algebra.AbstractSimpleSet):
         :return: The center point of the interval
         """
         return (self.lower + self.upper) / 2
+
+    def nearest_contained_value(self, value: float) -> float:
+        """
+        :param value: Any value.
+        :return: The value of this interval nearest to the given one. An excluded end
+            has no nearest value inside, so the next representable value past it stands
+            in for it.
+        """
+        if value <= self.lower:
+            if self.left == Bound.OPEN:
+                return math.nextafter(self.lower, math.inf)
+            return self.lower
+        if value >= self.upper:
+            if self.right == Bound.OPEN:
+                return math.nextafter(self.upper, -math.inf)
+            return self.upper
+        return value
 
     def contained_integers(self) -> Iterable[int]:
         """

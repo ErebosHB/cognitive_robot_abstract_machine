@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+import os
+from abc import abstractmethod
+from dataclasses import dataclass, field
+from typing import Optional, Set as PythonSet
+
 import numpy as np
 import numpy.typing as npt
 import plotly.graph_objects as go
 from probabilistic_model.exceptions import UndefinedOperationError
-from random_events.interval import *
+from random_events.interval import Interval, SimpleInterval, Bound, singleton, closed
 from random_events.product_algebra import Event, SimpleEvent, VariableMap
-from random_events.variable import *
 from typing_extensions import Union, Iterable, Any, Self, Dict, List, Tuple
 
 from probabilistic_model.constants import SCALING_FACTOR_FOR_EXPECTATION_IN_PLOT
@@ -17,7 +20,14 @@ from probabilistic_model.probabilistic_model import (
     MomentType,
     CenterType,
 )
-from probabilistic_model.utils import MissingDict, interval_as_array
+from probabilistic_model.utils import (
+    MissingDict,
+    interval_as_array,
+    simple_interval_as_array,
+)
+from random_events.set import SetElement, Set
+from random_events.sigma_algebra import AbstractCompositeSet
+from random_events.variable import Variable, Continuous, Symbolic, Integer
 
 
 @dataclass
@@ -69,6 +79,7 @@ class UnivariateDistribution(ProbabilisticModel):
     def composite_set_from_event(self, event: Event) -> AbstractCompositeSet:
         """
         Extract the composite set from the event that is relevant for this distribution.
+
         :param event: The event
         :return: The composite set
         """
@@ -95,6 +106,7 @@ class ContinuousDistribution(UnivariateDistribution):
     def cumulative_distribution_function(self, x: npt.NDArray) -> npt.NDArray:
         """
         Calculate the cumulative distribution function at x.
+
         :param x: The data
         :return: The cumulative distribution function at x
         """
@@ -107,14 +119,18 @@ class ContinuousDistribution(UnivariateDistribution):
         lower_bound_cdf = self.cumulative_distribution_function(points[:, (0,)])
         return (upper_bound_cdf - lower_bound_cdf).sum()
 
-    def log_truncated(self, event: Event) -> Tuple[Optional[Self], float]:
+    def log_truncated(
+        self, event: Event, singleton_allowed: bool = False
+    ) -> Tuple[Optional[ContinuousDistribution], float]:
         if event.is_empty():
             return None, -np.inf
 
         interval = self.composite_set_from_event(event)
 
         if len(interval.simple_sets) == 1:
-            return self.log_conditional_from_simple_interval(interval.simple_sets[0])
+            return self.log_conditional_from_simple_interval(
+                interval.simple_sets[0], singleton_allowed
+            )
         else:
             raise UndefinedOperationError(self)
 
@@ -137,15 +153,43 @@ class ContinuousDistribution(UnivariateDistribution):
         )
 
     def log_conditional_from_simple_interval(
-        self, interval: SimpleInterval
-    ) -> Tuple[Self, float]:
+        self, interval: SimpleInterval, singleton_allowed: bool = False
+    ) -> Tuple[Optional[ContinuousDistribution], float]:
         """
         Calculate the truncated distribution given a simple interval.
 
         :param interval: The simple interval
+        :param singleton_allowed: Whether the simple interval is allowed to be a
+            singleton.
         :return: The truncated distribution and the log-probability of the interval.
         """
-        raise NotImplementedError
+        if singleton_allowed and interval.is_singleton():
+            log_likelihood = self.log_likelihood(np.array([[interval.lower]]))[0]
+            if log_likelihood == -np.inf:
+                return None, -np.inf
+
+            return (
+                DiracDeltaDistribution(
+                    variable=self.variable,
+                    location=interval.lower,
+                    density_cap=1.0,
+                ),
+                log_likelihood,
+            )
+        else:
+            return self.log_conditional_from_simple_interval_if_not_singleton(interval)
+
+    @abstractmethod
+    def log_conditional_from_simple_interval_if_not_singleton(
+        self, interval: SimpleInterval
+    ) -> Tuple[Optional[ContinuousDistribution], float]:
+        """
+        Calculate the truncated distribution given a simple interval that is not a
+        singleton.
+
+        :param interval: The simple interval
+        :return: The truncated distribution and the log-probability of the interval.
+        """
 
 
 @dataclass(eq=False)
@@ -174,6 +218,7 @@ class ContinuousDistributionWithFiniteSupport(ContinuousDistribution):
     def left_included_condition(self, x: npt.NDArray) -> npt.NDArray:
         """
         Check if x is included in the left bound of the interval.
+
         :param x: The data
         :return: A boolean array
         """
@@ -186,6 +231,7 @@ class ContinuousDistributionWithFiniteSupport(ContinuousDistribution):
     def right_included_condition(self, x: npt.NDArray) -> npt.NDArray:
         """
         Check if x is included in the right bound of the interval.
+
         :param x: The data
         :return: A boolean array
         """
@@ -198,6 +244,7 @@ class ContinuousDistributionWithFiniteSupport(ContinuousDistribution):
     def included_condition(self, x: npt.NDArray) -> npt.NDArray:
         """
         Check if x is included in interval.
+
         :param x: The data
         :return: A boolean array
         """
@@ -215,7 +262,9 @@ class ContinuousDistributionWithFiniteSupport(ContinuousDistribution):
     @abstractmethod
     def log_likelihood_without_bounds_check(self, x: npt.NDArray) -> npt.NDArray:
         """
-        Evaluate the logarithmic likelihood function at `x` without checking the inclusion into the interval.
+        Evaluate the logarithmic likelihood function at `x` without checking the
+        inclusion into the interval.
+
         :param x: x where p(x) > 0
         :return: log(p(x))
         """
@@ -240,7 +289,7 @@ class ContinuousDistributionWithFiniteSupport(ContinuousDistribution):
         self.interval = new_interval
 
 
-@dataclass
+@dataclass(eq=False)
 class DiscreteDistribution(UnivariateDistribution):
     """
     Abstract base class for univariate discrete distributions.
@@ -261,15 +310,16 @@ class DiscreteDistribution(UnivariateDistribution):
         events = np.array([hash(e) for e in events])
         result = np.full(len(events), -np.inf)
         for x, p in self.probabilities.items():
-            result[events == hash(x)] = np.log(p)
+            result[events == x] = np.log(p)
         return result
 
     def fit(self, data: npt.NDArray) -> Self:
         """
         Fit the distribution to the data.
 
-        The probabilities are set equal to the frequencies in the data.
-        The data contains the indices of the domain elements (if symbolic) or the values (if integer).
+        The probabilities are set equal to the frequencies in the data. The data
+        contains the indices of the domain elements (if symbolic) or the values (if
+        integer).
 
         :param data: The data.
         :return: The fitted distribution
@@ -315,7 +365,9 @@ class DiscreteDistribution(UnivariateDistribution):
         for key in self.probabilities:
             self.probabilities[key] /= total
 
-    def log_truncated(self, event: Event) -> Tuple[Optional[Self], float]:
+    def log_truncated(
+        self, event: Event, singleton_allowed: bool = False
+    ) -> Tuple[Optional[Self], float]:
         # construct event
         condition = self.composite_set_from_event(event)
         return self.log_conditional_of_composite_set(condition)
@@ -455,7 +507,9 @@ class SymbolicDistribution(DiscreteDistribution):
 
     def fit_from_indices(self, data: npt.NDArray) -> Self:
         """
-        Fit the distribution to the data, where the data contains the indices of the domain elements.
+        Fit the distribution to the data, where the data contains the indices of the
+        domain elements.
+
         :param data: The data.
         :return: The fitted distribution
         """
@@ -468,17 +522,20 @@ class SymbolicDistribution(DiscreteDistribution):
         return self
 
 
-@dataclass(eq=False)
+@dataclass
 class IntegerDistribution(ContinuousDistribution, DiscreteDistribution):
     """
-    Abstract base class for integer distributions. Integer distributions also implement the methods of continuous
-    distributions.
+    Abstract base class for integer distributions.
+
+    Integer distributions also implement the methods of continuous distributions.
     """
 
     variable: Integer = field(kw_only=True)
 
-    def log_truncated(self, event: Event) -> Tuple[Optional[Self], float]:
-        return DiscreteDistribution.log_truncated(self, event)
+    def log_truncated(
+        self, event: Event, singleton_allowed: bool = False
+    ) -> Tuple[Optional[DiscreteDistribution], float]:
+        return DiscreteDistribution.log_truncated(self, event, singleton_allowed)
 
     def univariate_log_mode(self) -> Tuple[AbstractCompositeSet, float]:
         max_likelihood = max(self.probabilities.values())
@@ -490,6 +547,11 @@ class IntegerDistribution(ContinuousDistribution, DiscreteDistribution):
 
     def probabilities_for_plotting(self) -> Dict[Union[int, str], float]:
         return {x: p_x for x, p_x in self.probabilities.items() if p_x > 0}
+
+    def log_conditional_from_simple_interval_if_not_singleton(
+        self, interval: SimpleInterval
+    ) -> Tuple[Optional[ContinuousDistribution], float]:
+        raise UndefinedOperationError(self)
 
     @property
     def univariate_support(self) -> Interval:
@@ -555,6 +617,7 @@ class IntegerDistribution(ContinuousDistribution, DiscreteDistribution):
 class DiracDeltaDistribution(ContinuousDistribution):
     """
     Class for Dirac delta distributions.
+
     The Dirac measure is used whenever evidence is given as a singleton instance.
 
     https://en.wikipedia.org/wiki/Dirac_delta_function
@@ -570,12 +633,14 @@ class DiracDeltaDistribution(ContinuousDistribution):
     density_cap: float = field(default=np.inf)
     """
     The density cap of the Dirac delta distribution.
+
     This value will be used to replace infinity in likelihood.
     """
 
     tolerance: float = field(default=1e-6, compare=False)
     """
     The tolerance of deviations of the `location` of the Dirac delta distribution.
+
     This is used during calculations to take precision problems into account.
     """
 
@@ -600,25 +665,25 @@ class DiracDeltaDistribution(ContinuousDistribution):
     def univariate_support(self) -> Interval:
         return singleton(self.location)
 
-    def log_conditional_from_simple_interval(
+    def log_conditional_from_simple_interval_if_not_singleton(
         self, interval: SimpleInterval
-    ) -> Tuple[Self, float]:
-        if interval.contains(self.location):
+    ) -> Tuple[Optional[ContinuousDistribution], float]:
+        if self._reaches(interval.as_composite_set()):
             return self, 0.0
         else:
             return None, -np.inf
 
     def probability_of_simple_event(self, event: SimpleEvent) -> float:
-        interval: Interval = event[self.variable]
+        return 1.0 if self._reaches(event[self.variable]) else 0.0
 
-        return (
-            0.0
-            if (
-                closed(self.location - self.tolerance, self.location + self.tolerance)
-                & interval
-            ).is_empty()
-            else 1.0
-        )
+    def _reaches(self, interval: Interval) -> bool:
+        """
+        :param interval: An assignment of the variable of this distribution.
+        :return: Whether the assignment reaches this distribution's mass, up to
+            :attr:`tolerance`.
+        """
+        window = closed(self.location - self.tolerance, self.location + self.tolerance)
+        return not (window & interval).is_empty()
 
     def univariate_log_mode(self) -> Tuple[AbstractCompositeSet, float]:
         return self.univariate_support, np.log(self.density_cap)

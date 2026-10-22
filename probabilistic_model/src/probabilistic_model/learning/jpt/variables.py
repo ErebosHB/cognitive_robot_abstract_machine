@@ -4,7 +4,12 @@ import pandas as pd
 
 from krrood.utils import get_default_value
 from random_events.variable import Continuous, Integer, Symbolic, Variable
-from pandas.core.dtypes.common import is_integer_dtype, is_float_dtype, is_bool_dtype
+from pandas.core.dtypes.common import (
+    is_integer_dtype,
+    is_float_dtype,
+    is_bool_dtype,
+    is_string_dtype,
+)
 from random_events.set import Set
 from typing_extensions import List, Any
 
@@ -13,6 +18,7 @@ from typing_extensions import List, Any
 class AnnotatedVariable:
     """
     AnnotatedVariable is a wrapper around the variables that are used in the JPTs.
+
     They consist of an association object and some additional parameters.
     """
 
@@ -51,25 +57,35 @@ class AnnotatedVariable:
     The minimum impurity improvement for JPT learning.
     """
 
+    max_standard_deviation: Optional[float] = field(default=None)
+    """
+    The precision a JPT has to reach for this variable: a node is only split while
+    the standard deviation of some numeric target in it is above that target's
+    maximum. ``None`` sets no maximum, so this variable never stops a split.
+    """
+
     def __lt__(self, other):
         return self.variable < other.variable
 
 
 def infer_variables_from_dataframe(
-        data: pd.DataFrame,
-        minimal_distance: float = 1.0,
-        min_likelihood_improvement: float = 0.1,
-        min_samples_per_quantile: int = 10,
-        min_impurity_improvement: float = 0,
+    data: pd.DataFrame,
+    minimal_distance: float = 1.0,
+    min_likelihood_improvement: float = 0.1,
+    min_samples_per_quantile: int = 10,
+    min_impurity_improvement: float = 0,
 ) -> List[AnnotatedVariable]:
     """
     Infer the variables from a dataframe.
+
     The variables are inferred by the column names and types of the dataframe.
 
     :param data: The dataframe to infer the variables from.
     :param minimal_distance: The minimal distance between two values of the variable.
-    :param min_likelihood_improvement: The minimum likelihood improvement passed to the Continuous Variables.
-    :param min_samples_per_quantile: The minimum number of samples per quantile passed to the Continuous Variables.
+    :param min_likelihood_improvement: The minimum likelihood improvement passed to the
+        Continuous Variables.
+    :param min_samples_per_quantile: The minimum number of samples per quantile passed
+        to the Continuous Variables.
     :param min_impurity_improvement: The minimum impurity improvement for JPT learning.
     :return: The inferred variables.
     """
@@ -90,7 +106,7 @@ def infer_variables_from_dataframe(
         elif is_bool_dtype(datatype):
             variable_class = Symbolic
             domain = Set.from_iterable([True, False])
-        elif data[column].dtype == object:
+        elif data[column].dtype == object or is_string_dtype(datatype):
             unique_values = data[column].unique()
             variable_class = Symbolic
             domain = Set.from_iterable(unique_values)
@@ -99,14 +115,15 @@ def infer_variables_from_dataframe(
 
         domain = domain or get_default_value(variable_class, "domain")
         variable = variable_class(name=column, domain=domain)
-        annotated_variable = AnnotatedVariable(variable=variable,
-                                               mean=mean,
-                                               standard_deviation=standard_deviation,
-                                               minimal_distance=minimal_distance,
-                                               min_likelihood_improvement=min_likelihood_improvement,
-                                               min_samples_per_quantile=min_samples_per_quantile,
-                                               min_impurity_improvement=min_impurity_improvement, )
+        annotated_variable = AnnotatedVariable(
+            variable=variable,
+            mean=mean,
+            standard_deviation=standard_deviation,
+            minimal_distance=minimal_distance,
+            min_likelihood_improvement=min_likelihood_improvement,
+            min_samples_per_quantile=min_samples_per_quantile,
+            min_impurity_improvement=min_impurity_improvement,
+        )
 
         result.append(annotated_variable)
     return result
-

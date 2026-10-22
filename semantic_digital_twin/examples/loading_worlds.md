@@ -23,12 +23,11 @@ First, we need to compose the path to your world file.
 import logging
 import os
 
+from importlib.resources import files
 from pathlib import Path
 
-import semantic_digital_twin
-
 logging.disable(logging.CRITICAL)
-apartment = Path(semantic_digital_twin.__file__).resolve().parents[2] / "resources" / "urdf" / "apartment.urdf"
+apartment = os.path.join(Path(files("semantic_digital_twin")).parent.parent, "resources", "urdf", "apartment.urdf")
 
 ```
 

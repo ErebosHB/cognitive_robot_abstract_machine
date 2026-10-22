@@ -1,3 +1,4 @@
+import math
 import unittest
 
 from krrood.adapters.json_serializer import to_json, from_json
@@ -31,7 +32,9 @@ class SimpleIntervalTestCase(unittest.TestCase):
         complement_a = a.complement()
         self.assertEqual(
             complement_a[0],
-            SimpleInterval.from_data(-float("inf"), float("inf"), Bound.OPEN, Bound.OPEN),
+            SimpleInterval.from_data(
+                -float("inf"), float("inf"), Bound.OPEN, Bound.OPEN
+            ),
         )
         b = SimpleInterval.from_data(0, 1)
         complement_b = b.complement()
@@ -67,6 +70,34 @@ class SimpleIntervalTestCase(unittest.TestCase):
         b = SimpleInterval.from_data(0, 1)
         self.assertEqual(a, b)
 
+    def test_size(self):
+        self.assertEqual(SimpleInterval.from_data(0, 2.5).size, 2.5)
+        self.assertEqual(
+            SimpleInterval.from_data(1, 1, Bound.CLOSED, Bound.CLOSED).size, 0
+        )
+
+    def test_size_of_empty_interval(self):
+        self.assertEqual(SimpleInterval.from_data().size, 0)
+        self.assertEqual(SimpleInterval.from_data(3, 1).size, 0)
+
+    def test_size_of_unbounded_interval(self):
+        self.assertEqual(SimpleInterval.from_data(0, float("inf")).size, float("inf"))
+
+
+class NearestContainedValueTestCase(unittest.TestCase):
+    interval = SimpleInterval.from_data(0, 1, Bound.OPEN, Bound.CLOSED)
+
+    def test_a_contained_value_is_its_own_nearest(self):
+        self.assertEqual(self.interval.nearest_contained_value(0.5), 0.5)
+
+    def test_a_value_beyond_an_included_end_is_moved_onto_it(self):
+        self.assertEqual(self.interval.nearest_contained_value(2.0), 1.0)
+
+    def test_a_value_beyond_an_excluded_end_is_moved_just_inside_it(self):
+        nearest = self.interval.nearest_contained_value(-1.0)
+        self.assertEqual(nearest, math.nextafter(0.0, math.inf))
+        self.assertTrue(self.interval.contains(nearest))
+
 
 class IntervalTestCase(unittest.TestCase):
 
@@ -77,7 +108,9 @@ class IntervalTestCase(unittest.TestCase):
         d = SimpleInterval.from_data(3, 4)
         a_b = Interval.from_simple_sets(d, a, b, c)
         a_b_simplified = a_b.simplify()
-        a_b_simplified_ = Interval.from_simple_sets(SimpleInterval.from_data(0, 2), SimpleInterval.from_data(3, 4))
+        a_b_simplified_ = Interval.from_simple_sets(
+            SimpleInterval.from_data(0, 2), SimpleInterval.from_data(3, 4)
+        )
         self.assertEqual(a_b_simplified, a_b_simplified_)
 
     def test_intersection_with_self(self):
@@ -89,7 +122,9 @@ class IntervalTestCase(unittest.TestCase):
         b_c = Interval.from_simple_sets(b, c)
 
         intersection_a_d_b_c = a_d.intersection_with(b_c)
-        intersection_expected = Interval.from_simple_sets(SimpleInterval.from_data(0.5, 1))
+        intersection_expected = Interval.from_simple_sets(
+            SimpleInterval.from_data(0.5, 1)
+        )
         self.assertEqual(intersection_a_d_b_c, intersection_expected)
 
     def test_complement(self):
@@ -114,7 +149,9 @@ class IntervalTestCase(unittest.TestCase):
 
         disjoint = a_b_c_d.make_disjoint()
 
-        a_b_c_d_expected = Interval.from_simple_sets(SimpleInterval.from_data(0, 3, Bound.CLOSED, Bound.CLOSED))
+        a_b_c_d_expected = Interval.from_simple_sets(
+            SimpleInterval.from_data(0, 3, Bound.CLOSED, Bound.CLOSED)
+        )
         self.assertEqual(disjoint, a_b_c_d_expected)
 
     def test_union(self):
@@ -126,7 +163,9 @@ class IntervalTestCase(unittest.TestCase):
         b_c = Interval.from_simple_sets(b, c)
 
         union_a_d_b_c = a_d.union_with(b_c)
-        union_a_d_b_c_ = Interval.from_simple_sets(SimpleInterval.from_data(0, 2), SimpleInterval.from_data(3, 4))
+        union_a_d_b_c_ = Interval.from_simple_sets(
+            SimpleInterval.from_data(0, 2), SimpleInterval.from_data(3, 4)
+        )
         self.assertSetEqual({*union_a_d_b_c}, {*union_a_d_b_c_})
         self.assertTrue(union_a_d_b_c.is_disjoint())
 
@@ -140,6 +179,19 @@ class IntervalTestCase(unittest.TestCase):
     def test_contained_integers(self):
         a = open(2, 4) | closed_open(4.5, 6)
         self.assertEqual(list(a.contained_integers()), [3, 5])
+
+    def test_size_sums_the_simple_intervals(self):
+        a = closed(0, 1) | closed(3, 4.5)
+        self.assertEqual(a.size, 2.5)
+
+    def test_size_counts_overlapping_intervals_once(self):
+        a = Interval.from_simple_sets(
+            SimpleInterval.from_data(0, 2), SimpleInterval.from_data(1, 3)
+        )
+        self.assertEqual(a.size, 3)
+
+    def test_size_of_the_reals(self):
+        self.assertEqual(reals().size, float("inf"))
 
 
 if __name__ == "__main__":

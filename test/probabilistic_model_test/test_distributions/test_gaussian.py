@@ -1,11 +1,14 @@
 import unittest
 
 import numpy as np
+from scipy.stats import truncnorm
 
 from krrood.adapters.json_serializer import from_json, to_json
 from probabilistic_model.distributions.distributions import DiracDeltaDistribution
-from probabilistic_model.distributions.gaussian import GaussianDistribution, \
-    TruncatedGaussianDistribution
+from probabilistic_model.distributions.gaussian import (
+    GaussianDistribution,
+    TruncatedGaussianDistribution,
+)
 from random_events.interval import closed, reals, singleton, SimpleInterval, Bound
 from random_events.product_algebra import SimpleEvent, VariableMap
 import plotly.graph_objects as go
@@ -15,7 +18,9 @@ from random_events.variable import Continuous
 
 class GaussianDistributionTestCase(unittest.TestCase):
     x = Continuous("x")
-    distribution: GaussianDistribution = GaussianDistribution(location=2, scale=2, variable=x)
+    distribution: GaussianDistribution = GaussianDistribution(
+        location=2, scale=2, variable=x
+    )
 
     def test_domain(self):
         self.assertEqual(self.distribution.univariate_support, reals())
@@ -39,7 +44,9 @@ class GaussianDistributionTestCase(unittest.TestCase):
         ).as_composite_set()
         conditional, probability = self.distribution.truncated(event)
         self.assertIsInstance(conditional, TruncatedGaussianDistribution)
-        cdf = self.distribution.cumulative_distribution_function(np.array([1, 2]).reshape(-1, 1))
+        cdf = self.distribution.cumulative_distribution_function(
+            np.array([1, 2]).reshape(-1, 1)
+        )
         self.assertAlmostEqual(probability, cdf[1] - cdf[0])
         self.assertEqual(conditional.lower, 1)
         self.assertEqual(conditional.upper, 2)
@@ -120,23 +127,19 @@ class TruncatedGaussianDistributionTestCase(unittest.TestCase):
 
     def setUp(self):
         self.distribution = TruncatedGaussianDistribution(
-            variable=self.x, interval=SimpleInterval.from_data(-2, 2, Bound.CLOSED, Bound.CLOSED), location=2, scale=2.0
+            variable=self.x,
+            interval=SimpleInterval.from_data(-2, 2, Bound.CLOSED, Bound.CLOSED),
+            location=2,
+            scale=2.0,
         )
 
     def test_init(self):
         self.assertEqual(self.distribution.location, 2.0)
 
-    def test_normalization_constant(self):
-        normal_distribution = GaussianDistribution(
-            location=self.distribution.location, scale=self.distribution.scale, variable=self.x
-        )
-        self.assertAlmostEqual(
-            normal_distribution.probability(self.distribution.support),
-            self.distribution.normalizing_constant,
-        )
-
     def test_cdf(self):
-        cdf = self.distribution.cumulative_distribution_function(np.array([0, 3, -3]).reshape(-1, 1))
+        cdf = self.distribution.cumulative_distribution_function(
+            np.array([0, 3, -3]).reshape(-1, 1)
+        )
         self.assertAlmostEqual(cdf[0], 0.285, places=3)
         self.assertEqual(cdf[1], 1)
         self.assertEqual(cdf[2], 0)
@@ -159,6 +162,14 @@ class TruncatedGaussianDistributionTestCase(unittest.TestCase):
         gauss_distribution: GaussianDistribution = GaussianDistribution(
             variable=self.x, location=0, scale=1
         )
+        untruncated_distribution = GaussianDistribution(
+            variable=self.x,
+            location=self.distribution.location,
+            scale=self.distribution.scale,
+        )
+        normalizing_constant = untruncated_distribution.probability(
+            self.distribution.support
+        )
         beta = (
             self.distribution.upper - self.distribution.location
         ) / self.distribution.scale
@@ -173,7 +184,7 @@ class TruncatedGaussianDistributionTestCase(unittest.TestCase):
         offset_term = (
             -self.distribution.scale
             * (likelihood_beta - likelihood_alpha)
-            / self.distribution.normalizing_constant
+            / normalizing_constant
         )
         self.assertAlmostEqual(
             expectation[self.distribution.variable], 0 + offset_term, places=7
@@ -215,10 +226,22 @@ class TruncatedGaussianDistributionTestCase(unittest.TestCase):
         event = SimpleEvent.from_data({self.x: closed(1, 2)}).as_composite_set()
         conditional, probability = self.distribution.truncated(event)
         self.assertIsInstance(conditional, TruncatedGaussianDistribution)
-        cdf = self.distribution.cumulative_distribution_function(np.array([1, 2]).reshape(-1, 1))
+        cdf = self.distribution.cumulative_distribution_function(
+            np.array([1, 2]).reshape(-1, 1)
+        )
         self.assertEqual(probability, cdf[1] - cdf[0])
         self.assertEqual(conditional.lower, 1)
         self.assertEqual(conditional.upper, 2)
+
+    def test_conditional_on_an_interval_reaching_beyond_the_support(self):
+        event = SimpleEvent.from_data({self.x: closed(-5, 1)}).as_composite_set()
+        conditional, probability = self.distribution.truncated(event)
+        self.assertEqual(conditional.interval, closed(-2, 1).simple_sets[0])
+        points = np.linspace(-2, 1, 7).reshape(-1, 1)
+        np.testing.assert_allclose(
+            conditional.likelihood(points),
+            self.distribution.likelihood(points) / probability,
+        )
 
     def test_conditional_on_mode(self):
         mode, _ = self.distribution.mode()
@@ -243,7 +266,7 @@ class TruncatedGaussianDistributionTestCase(unittest.TestCase):
         self.assertNotEqual(self.distribution, copy)
 
     def test_sample(self):
-        samples = self.distribution.rejection_sample(100)
+        samples = self.distribution.sample(100)
         self.assertEqual(samples.shape, (100, 1))
         likelihoods = self.distribution.likelihood(samples)
         self.assertTrue(all(likelihoods > 0))
@@ -274,7 +297,9 @@ class TruncatedGaussianDistributionJapaneseManTestCase(unittest.TestCase):
         )
 
         cls.example_3, _ = cls.distribution.truncated(
-            SimpleEvent.from_data({cls.distribution.variable: closed(-1, 1)}).as_composite_set()
+            SimpleEvent.from_data(
+                {cls.distribution.variable: closed(-1, 1)}
+            ).as_composite_set()
         )
 
     def test_raw_expectation_example_2(self):
@@ -320,6 +345,30 @@ class TruncatedGaussianDistributionJapaneseManTestCase(unittest.TestCase):
         self.assertAlmostEqual(raw_moment, 0, delta=0.01)
 
 
+class TruncatedGaussianFarTailMomentTestCase(unittest.TestCase):
+    x = Continuous("x")
+    distribution = TruncatedGaussianDistribution(
+        variable=x,
+        interval=SimpleInterval.from_data(5, 6),
+        location=0,
+        scale=1,
+    )
+
+    def test_variance_is_precise_far_in_the_tail(self):
+        # a standard normal, so the interval already is in scipy's standardized units
+        lower, upper = self.distribution.lower, self.distribution.upper
+        mean = truncnorm.mean(lower, upper)
+        variance = self.distribution.moment(
+            VariableMap({self.x: 2}), VariableMap({self.x: mean})
+        )[self.x]
+        expected_variance = truncnorm.var(lower, upper)
+        # far in the tail the variance is small compared to the squared mean, so
+        # this tolerance fails any computation that cancels large raw moments
+        self.assertAlmostEqual(
+            variance, expected_variance, delta=1e-10 * expected_variance
+        )
+
+
 class TruncatedGaussianSamplingTestCase(unittest.TestCase):
     x = Continuous("x")
 
@@ -327,48 +376,12 @@ class TruncatedGaussianSamplingTestCase(unittest.TestCase):
     def setUpClass(cls):
         np.random.seed(69)
 
-    def test_with_center_in_truncation(self):
-        model = TruncatedGaussianDistribution(variable=self.x, interval=SimpleInterval.from_data(-3, 5), location=1, scale=2)
-        samples = model.robert_rejection_sample(1000).reshape(-1, 1)
-        self.assertEqual(len(samples), 1000)
-        likelihoods = model.likelihood(samples)
-        self.assertTrue(all(likelihoods > 0))
-        self.assertAlmostEqual(
-            model.expectation(model.variables)[self.x], samples.mean(), delta=0.1
-        )
-
-    def test_with_center_higher_truncation(self):
-        model = TruncatedGaussianDistribution(variable=self.x, interval=SimpleInterval.from_data(3, 10), location=1, scale=2)
-        samples = model.robert_rejection_sample(1000).reshape(-1, 1)
-        self.assertEqual(len(samples), 1000)
-        likelihoods = model.likelihood(samples)
-        self.assertTrue(all(likelihoods > 0))
-        self.assertAlmostEqual(
-            model.expectation(model.variables)[model.variable],
-            samples.mean(),
-            delta=0.1,
-        )
-
-    def test_with_center_lower_truncation(self):
-        model = TruncatedGaussianDistribution(variable=self.x, interval=SimpleInterval.from_data(-6, -2), location=1, scale=2)
-        samples = model.robert_rejection_sample(1000).reshape(-1, 1)
-        self.assertEqual(len(samples), 1000)
-        likelihoods = model.likelihood(samples)
-        self.assertTrue(all(likelihoods > 0))
-        self.assertAlmostEqual(
-            model.expectation(model.variables)[model.variable],
-            samples.mean(),
-            delta=0.1,
-        )
-
-    def test_compare_rejection_sampling_with_robert_sampling(self):
-        model = TruncatedGaussianDistribution(variable=self.x, interval=SimpleInterval.from_data(9, 11), location=0, scale=1)
-        with self.assertRaises(RecursionError):
-            model.rejection_sample(50)
-
     def test_sampling_with_infinite_bounds_smaller_0(self):
         model = TruncatedGaussianDistribution(
-            variable=self.x, interval=SimpleInterval.from_data(-1, float("inf")), location=0, scale=1
+            variable=self.x,
+            interval=SimpleInterval.from_data(-1, float("inf")),
+            location=0,
+            scale=1,
         )
         samples = model.sample(1000)
 
@@ -383,7 +396,10 @@ class TruncatedGaussianSamplingTestCase(unittest.TestCase):
 
     def test_sampling_with_infinite_bounds_greater_0(self):
         model = TruncatedGaussianDistribution(
-            variable=self.x, interval=SimpleInterval.from_data(1, float("inf")), location=0, scale=1
+            variable=self.x,
+            interval=SimpleInterval.from_data(1, float("inf")),
+            location=0,
+            scale=1,
         )
         samples = model.sample(1000)
         likelihoods = model.likelihood(samples)
@@ -396,7 +412,10 @@ class TruncatedGaussianSamplingTestCase(unittest.TestCase):
 
     def test_sampling_with_infinite_bounds_and_flipping(self):
         model = TruncatedGaussianDistribution(
-            variable=self.x, interval=SimpleInterval.from_data(-float("inf"), -1), location=0, scale=1
+            variable=self.x,
+            interval=SimpleInterval.from_data(-float("inf"), -1),
+            location=0,
+            scale=1,
         )
         samples = model.sample(1000)
         likelihoods = model.likelihood(samples)
@@ -407,23 +426,12 @@ class TruncatedGaussianSamplingTestCase(unittest.TestCase):
             delta=0.1,
         )
 
-    def test_non_standard_sampling(self):
-        model = TruncatedGaussianDistribution(
-            variable=self.x, interval=SimpleInterval.from_data(-np.inf, -0.1), location=0.5, scale=2
-        )
-        samples = model.robert_rejection_sample(1000).reshape(-1, 1)
-        self.assertAlmostEqual(max(samples), -0.1, delta=0.1)
-        likelihoods = model.likelihood(samples)
-        self.assertTrue(all(likelihoods > 0))
-        self.assertAlmostEqual(
-            model.expectation(model.variables)[model.variable],
-            samples.mean(),
-            delta=0.1,
-        )
-
     def test_with_zero_in_bound(self):
         model = TruncatedGaussianDistribution(
-            variable=self.x, interval=SimpleInterval.from_data(-0.62, 0.0), location=0.0, scale=0.5
+            variable=self.x,
+            interval=SimpleInterval.from_data(-0.62, 0.0),
+            location=0.0,
+            scale=0.5,
         )
         samples = model.sample(1000)
         self.assertEqual(len(samples), 1000)
@@ -432,9 +440,32 @@ class TruncatedGaussianSamplingTestCase(unittest.TestCase):
         self.assertAlmostEqual(mean, expectation, delta=0.1)
 
     def test_with_far_right_interval(self):
-        model = TruncatedGaussianDistribution(variable=self.x, interval=SimpleInterval.from_data(11, np.inf), location=0, scale=1)
+        model = TruncatedGaussianDistribution(
+            variable=self.x,
+            interval=SimpleInterval.from_data(11, np.inf),
+            location=0,
+            scale=1,
+        )
         samples = model.sample(1000)
         self.assertEqual(len(samples), 1000)
+
+    def test_gaussian_distribution_singleton(self):
+        x = Continuous("x")
+        dist = GaussianDistribution(variable=x, location=0, scale=1)
+
+        event = SimpleEvent.from_data({x: singleton(0)}).as_composite_set()
+
+        # singleton_allowed=False
+        conditional, probability = dist.truncated(event)
+        self.assertIsNone(conditional)
+
+        # singleton_allowed=True
+        conditional, probability = dist.truncated(event, singleton_allowed=True)
+        self.assertIsInstance(conditional, DiracDeltaDistribution)
+        self.assertEqual(conditional.location, 0.0)
+        self.assertAlmostEqual(
+            probability, np.exp(dist.log_likelihood(np.array([[0]]))[0])
+        )
 
 
 if __name__ == "__main__":
