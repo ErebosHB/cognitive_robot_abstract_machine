@@ -1,0 +1,5536 @@
+{
+ "tiles": [
+  {
+   "body": "avocado_skin_left_s0_t0",
+   "geom": "avocado_skin_left_s0_t0",
+   "equality": "avocado_skin_left_s0_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s0",
+   "index": 0,
+   "normal": [
+    -0.9521204328540911,
+    0.11679581228541627,
+    0.28253392641296743
+   ],
+   "massKg": 1.055157645168947e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t1",
+   "geom": "avocado_skin_left_s0_t1",
+   "equality": "avocado_skin_left_s0_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s0",
+   "index": 1,
+   "normal": [
+    -0.15512679135998403,
+    0.7775686123331425,
+    0.6093625617944273
+   ],
+   "massKg": 3.63426333933603e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t2",
+   "geom": "avocado_skin_left_s0_t2",
+   "equality": "avocado_skin_left_s0_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s0",
+   "index": 2,
+   "normal": [
+    -0.16663963147600355,
+    0.8303162492217558,
+    0.531795223276645
+   ],
+   "massKg": 5.0762515456881374e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t3",
+   "geom": "avocado_skin_left_s0_t3",
+   "equality": "avocado_skin_left_s0_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s0",
+   "index": 3,
+   "normal": [
+    -0.17372918170486232,
+    0.8698846967052807,
+    0.4616479024777659
+   ],
+   "massKg": 6.38875353615731e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t4",
+   "geom": "avocado_skin_left_s0_t4",
+   "equality": "avocado_skin_left_s0_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s0",
+   "index": 4,
+   "normal": [
+    -0.19288390163186256,
+    0.8974446469486694,
+    0.39672270688031974
+   ],
+   "massKg": 7.891524728620425e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t5",
+   "geom": "avocado_skin_left_s0_t5",
+   "equality": "avocado_skin_left_s0_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s0",
+   "index": 5,
+   "normal": [
+    -0.18582309973198785,
+    0.9094953916350969,
+    0.37187082192680493
+   ],
+   "massKg": 9.696878987597302e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t6",
+   "geom": "avocado_skin_left_s0_t6",
+   "equality": "avocado_skin_left_s0_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s0",
+   "index": 6,
+   "normal": [
+    -0.3316373606708696,
+    0.8777451010576404,
+    0.34580369948364065
+   ],
+   "massKg": 0.00011421211092965677
+  },
+  {
+   "body": "avocado_skin_left_s0_t7",
+   "geom": "avocado_skin_left_s0_t7",
+   "equality": "avocado_skin_left_s0_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s0",
+   "index": 7,
+   "normal": [
+    -0.18198799896196519,
+    0.9315701961199729,
+    0.314733757221584
+   ],
+   "massKg": 0.00013333020615391433
+  },
+  {
+   "body": "avocado_skin_left_s0_t8",
+   "geom": "avocado_skin_left_s0_t8",
+   "equality": "avocado_skin_left_s0_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s0",
+   "index": 8,
+   "normal": [
+    -0.3173219684563138,
+    0.9166839691825159,
+    0.24289353424658844
+   ],
+   "massKg": 0.0001403549686074257
+  },
+  {
+   "body": "avocado_skin_left_s0_t9",
+   "geom": "avocado_skin_left_s0_t9",
+   "equality": "avocado_skin_left_s0_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s0",
+   "index": 9,
+   "normal": [
+    -0.05711100702161747,
+    0.9853968331595769,
+    0.16041014330787723
+   ],
+   "massKg": 0.00015657384938094765
+  },
+  {
+   "body": "avocado_skin_left_s0_t10",
+   "geom": "avocado_skin_left_s0_t10",
+   "equality": "avocado_skin_left_s0_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s0",
+   "index": 10,
+   "normal": [
+    -0.06199682475352396,
+    0.9934081017441947,
+    0.0964195888265274
+   ],
+   "massKg": 0.00016380376473534852
+  },
+  {
+   "body": "avocado_skin_left_s0_t11",
+   "geom": "avocado_skin_left_s0_t11",
+   "equality": "avocado_skin_left_s0_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s0",
+   "index": 11,
+   "normal": [
+    -0.32453249595209827,
+    0.9446380071030847,
+    0.04834971155460785
+   ],
+   "massKg": 0.00016764839529059827
+  },
+  {
+   "body": "avocado_skin_left_s0_t12",
+   "geom": "avocado_skin_left_s0_t12",
+   "equality": "avocado_skin_left_s0_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s0",
+   "index": 12,
+   "normal": [
+    -0.1948070685829367,
+    0.9806386816562578,
+    -0.019949487953316906
+   ],
+   "massKg": 0.0001733042736304924
+  },
+  {
+   "body": "avocado_skin_left_s0_t13",
+   "geom": "avocado_skin_left_s0_t13",
+   "equality": "avocado_skin_left_s0_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s0",
+   "index": 13,
+   "normal": [
+    -0.18977243796660287,
+    0.974819721121598,
+    -0.11710223354241224
+   ],
+   "massKg": 0.0001785258064046502
+  },
+  {
+   "body": "avocado_skin_left_s0_t14",
+   "geom": "avocado_skin_left_s0_t14",
+   "equality": "avocado_skin_left_s0_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s0",
+   "index": 14,
+   "normal": [
+    -0.3382988823917393,
+    0.9009940529660525,
+    -0.27159451889223807
+   ],
+   "massKg": 0.00017754071450326592
+  },
+  {
+   "body": "avocado_skin_left_s0_t15",
+   "geom": "avocado_skin_left_s0_t15",
+   "equality": "avocado_skin_left_s0_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s0",
+   "index": 15,
+   "normal": [
+    -0.3364099491171359,
+    0.785898391275928,
+    -0.5188372237271669
+   ],
+   "massKg": 0.00017178653797600418
+  },
+  {
+   "body": "avocado_skin_left_s0_t16",
+   "geom": "avocado_skin_left_s0_t16",
+   "equality": "avocado_skin_left_s0_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s0",
+   "index": 16,
+   "normal": [
+    -0.2953308304053763,
+    0.45817328966407167,
+    -0.8383656345834277
+   ],
+   "massKg": 0.000150419378769584
+  },
+  {
+   "body": "avocado_skin_left_s0_t17",
+   "geom": "avocado_skin_left_s0_t17",
+   "equality": "avocado_skin_left_s0_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s0",
+   "index": 17,
+   "normal": [
+    -0.02047974931913366,
+    0.1027635749202744,
+    -0.9944949610417493
+   ],
+   "massKg": 0.00011390894360374659
+  },
+  {
+   "body": "avocado_skin_left_s0_t18",
+   "geom": "avocado_skin_left_s0_t18",
+   "equality": "avocado_skin_left_s0_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s0",
+   "index": 18,
+   "normal": [
+    -0.9999999999996804,
+    4.7436916665490265e-08,
+    -7.981408041984552e-07
+   ],
+   "massKg": 1.703250927675981e-05
+  },
+  {
+   "body": "avocado_skin_left_s0_t19",
+   "geom": "avocado_skin_left_s0_t19",
+   "equality": "avocado_skin_left_s0_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s0",
+   "index": 19,
+   "normal": [
+    0.008941873799414107,
+    -0.057453099744078966,
+    0.9983081609516934
+   ],
+   "massKg": 3.474351046861557e-07
+  },
+  {
+   "body": "avocado_skin_left_s1_t0",
+   "geom": "avocado_skin_left_s1_t0",
+   "equality": "avocado_skin_left_s1_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s1",
+   "index": 0,
+   "normal": [
+    -0.21587794792320186,
+    0.32298470691416886,
+    0.9214540632609071
+   ],
+   "massKg": 1.0614107850415166e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t1",
+   "geom": "avocado_skin_left_s1_t1",
+   "equality": "avocado_skin_left_s1_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s1",
+   "index": 1,
+   "normal": [
+    -0.4414633681553159,
+    0.6590226993418687,
+    0.6089328175826305
+   ],
+   "massKg": 3.626305260695517e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t2",
+   "geom": "avocado_skin_left_s1_t2",
+   "equality": "avocado_skin_left_s1_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s1",
+   "index": 2,
+   "normal": [
+    -0.48361131611916214,
+    0.7298743578934691,
+    0.48311853267193966
+   ],
+   "massKg": 5.127923213876784e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t3",
+   "geom": "avocado_skin_left_s1_t3",
+   "equality": "avocado_skin_left_s1_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s1",
+   "index": 3,
+   "normal": [
+    -0.4915690828350917,
+    0.7578865650993423,
+    0.4289146666209807
+   ],
+   "massKg": 6.560735346283764e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t4",
+   "geom": "avocado_skin_left_s1_t4",
+   "equality": "avocado_skin_left_s1_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s1",
+   "index": 4,
+   "normal": [
+    -0.5054467554924842,
+    0.7651131282435497,
+    0.39890535011640355
+   ],
+   "massKg": 8.08690456324257e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t5",
+   "geom": "avocado_skin_left_s1_t5",
+   "equality": "avocado_skin_left_s1_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s1",
+   "index": 5,
+   "normal": [
+    -0.5085516354484371,
+    0.7641202838285762,
+    0.3968569338243396
+   ],
+   "massKg": 9.848854097072035e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t6",
+   "geom": "avocado_skin_left_s1_t6",
+   "equality": "avocado_skin_left_s1_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s1",
+   "index": 6,
+   "normal": [
+    -0.5162151453806002,
+    0.7763939339768645,
+    0.36157209926045736
+   ],
+   "massKg": 0.00011127527250209823
+  },
+  {
+   "body": "avocado_skin_left_s1_t7",
+   "geom": "avocado_skin_left_s1_t7",
+   "equality": "avocado_skin_left_s1_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s1",
+   "index": 7,
+   "normal": [
+    -0.5334936755256499,
+    0.7915370448903873,
+    0.2980832178106065
+   ],
+   "massKg": 0.00012658668856602162
+  },
+  {
+   "body": "avocado_skin_left_s1_t8",
+   "geom": "avocado_skin_left_s1_t8",
+   "equality": "avocado_skin_left_s1_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s1",
+   "index": 8,
+   "normal": [
+    -0.6493059813765639,
+    0.7208756230178948,
+    0.24236352590102989
+   ],
+   "massKg": 0.000144577759783715
+  },
+  {
+   "body": "avocado_skin_left_s1_t9",
+   "geom": "avocado_skin_left_s1_t9",
+   "equality": "avocado_skin_left_s1_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s1",
+   "index": 9,
+   "normal": [
+    -0.6525560239393026,
+    0.7406560401240969,
+    0.15999770575924097
+   ],
+   "massKg": 0.00015608323155902326
+  },
+  {
+   "body": "avocado_skin_left_s1_t10",
+   "geom": "avocado_skin_left_s1_t10",
+   "equality": "avocado_skin_left_s1_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s1",
+   "index": 10,
+   "normal": [
+    -0.434708602637019,
+    0.8955076883931654,
+    0.09536462038984812
+   ],
+   "massKg": 0.00016218142991419882
+  },
+  {
+   "body": "avocado_skin_left_s1_t11",
+   "geom": "avocado_skin_left_s1_t11",
+   "equality": "avocado_skin_left_s1_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s1",
+   "index": 11,
+   "normal": [
+    -0.5529056033533178,
+    0.8318027459908537,
+    0.04898556463468548
+   ],
+   "massKg": 0.00016924485680647194
+  },
+  {
+   "body": "avocado_skin_left_s1_t12",
+   "geom": "avocado_skin_left_s1_t12",
+   "equality": "avocado_skin_left_s1_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s1",
+   "index": 12,
+   "normal": [
+    -0.43910992776414626,
+    0.8982067290434077,
+    -0.020177790763823013
+   ],
+   "massKg": 0.00017163538723252714
+  },
+  {
+   "body": "avocado_skin_left_s1_t13",
+   "geom": "avocado_skin_left_s1_t13",
+   "equality": "avocado_skin_left_s1_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s1",
+   "index": 13,
+   "normal": [
+    -0.550671240680134,
+    0.8253790820324041,
+    -0.12454138119977637
+   ],
+   "massKg": 0.0001770315138855949
+  },
+  {
+   "body": "avocado_skin_left_s1_t14",
+   "geom": "avocado_skin_left_s1_t14",
+   "equality": "avocado_skin_left_s1_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s1",
+   "index": 14,
+   "normal": [
+    -0.6583392358554169,
+    0.7015436197444742,
+    -0.27281129032561385
+   ],
+   "massKg": 0.00017750637198332697
+  },
+  {
+   "body": "avocado_skin_left_s1_t15",
+   "geom": "avocado_skin_left_s1_t15",
+   "equality": "avocado_skin_left_s1_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s1",
+   "index": 15,
+   "normal": [
+    -0.32011309984593067,
+    0.7915839979391956,
+    -0.520502043717053
+   ],
+   "massKg": 0.000169784965692088
+  },
+  {
+   "body": "avocado_skin_left_s1_t16",
+   "geom": "avocado_skin_left_s1_t16",
+   "equality": "avocado_skin_left_s1_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s1",
+   "index": 16,
+   "normal": [
+    -0.12044294720519767,
+    0.5299401067020829,
+    -0.8394384907645771
+   ],
+   "massKg": 0.00015043685561977327
+  },
+  {
+   "body": "avocado_skin_left_s1_t17",
+   "geom": "avocado_skin_left_s1_t17",
+   "equality": "avocado_skin_left_s1_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s1",
+   "index": 17,
+   "normal": [
+    -0.4528343426806622,
+    -0.08828988029897823,
+    -0.8872124633512339
+   ],
+   "massKg": 0.00011363135854480788
+  },
+  {
+   "body": "avocado_skin_left_s1_t18",
+   "geom": "avocado_skin_left_s1_t18",
+   "equality": "avocado_skin_left_s1_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s1",
+   "index": 18,
+   "normal": [
+    0.7071067581236802,
+    0.7071068042492978,
+    4.054884803392386e-07
+   ],
+   "massKg": 1.7034963093465194e-05
+  },
+  {
+   "body": "avocado_skin_left_s1_t19",
+   "geom": "avocado_skin_left_s1_t19",
+   "equality": "avocado_skin_left_s1_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s1",
+   "index": 19,
+   "normal": [
+    -0.5557201607179382,
+    0.831369414168956,
+    -1.2489830975615958e-05
+   ],
+   "massKg": 3.4737047371891094e-07
+  },
+  {
+   "body": "avocado_skin_left_s2_t0",
+   "geom": "avocado_skin_left_s2_t0",
+   "equality": "avocado_skin_left_s2_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s2",
+   "index": 0,
+   "normal": [
+    -0.7557685422338538,
+    -0.591719223163712,
+    0.2805036033783677
+   ],
+   "massKg": 1.0416866643936373e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t1",
+   "geom": "avocado_skin_left_s2_t1",
+   "equality": "avocado_skin_left_s2_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s2",
+   "index": 1,
+   "normal": [
+    -0.5942635122243575,
+    0.3968117431722805,
+    0.6995650924105254
+   ],
+   "massKg": 3.5900960938306525e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t2",
+   "geom": "avocado_skin_left_s2_t2",
+   "equality": "avocado_skin_left_s2_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s2",
+   "index": 2,
+   "normal": [
+    -0.8409971453350467,
+    0.2352325772957308,
+    0.48722626788496365
+   ],
+   "massKg": 5.134234015713446e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t3",
+   "geom": "avocado_skin_left_s2_t3",
+   "equality": "avocado_skin_left_s2_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s2",
+   "index": 3,
+   "normal": [
+    -0.7372068445525872,
+    0.4923457380541447,
+    0.4627329062912395
+   ],
+   "massKg": 6.527661753352731e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t4",
+   "geom": "avocado_skin_left_s2_t4",
+   "equality": "avocado_skin_left_s2_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s2",
+   "index": 4,
+   "normal": [
+    -0.7519180764626875,
+    0.502493943941424,
+    0.426754077415606
+   ],
+   "massKg": 8.402402454521507e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t5",
+   "geom": "avocado_skin_left_s2_t5",
+   "equality": "avocado_skin_left_s2_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s2",
+   "index": 5,
+   "normal": [
+    -0.7697122173503783,
+    0.5172280798480753,
+    0.3741900798768418
+   ],
+   "massKg": 9.801042324397713e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t6",
+   "geom": "avocado_skin_left_s2_t6",
+   "equality": "avocado_skin_left_s2_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s2",
+   "index": 6,
+   "normal": [
+    -0.6846263251081377,
+    0.6405204988495548,
+    0.3478796997849169
+   ],
+   "massKg": 0.00011544339213287458
+  },
+  {
+   "body": "avocado_skin_left_s2_t7",
+   "geom": "avocado_skin_left_s2_t7",
+   "equality": "avocado_skin_left_s2_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s2",
+   "index": 7,
+   "normal": [
+    -0.7917883537263674,
+    0.5324050784158569,
+    0.29935937496643444
+   ],
+   "massKg": 0.00012839413830079138
+  },
+  {
+   "body": "avocado_skin_left_s2_t8",
+   "geom": "avocado_skin_left_s2_t8",
+   "equality": "avocado_skin_left_s2_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s2",
+   "index": 8,
+   "normal": [
+    -0.8025950917042001,
+    0.5402641851272851,
+    0.2528946995116297
+   ],
+   "massKg": 0.00014249894593376666
+  },
+  {
+   "body": "avocado_skin_left_s2_t9",
+   "geom": "avocado_skin_left_s2_t9",
+   "equality": "avocado_skin_left_s2_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s2",
+   "index": 9,
+   "normal": [
+    -0.8195934648867198,
+    0.5508486819349382,
+    0.1575826193636927
+   ],
+   "massKg": 0.00015780702233314514
+  },
+  {
+   "body": "avocado_skin_left_s2_t10",
+   "geom": "avocado_skin_left_s2_t10",
+   "equality": "avocado_skin_left_s2_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s2",
+   "index": 10,
+   "normal": [
+    -0.8256276084906908,
+    0.5555935260936417,
+    0.09825927875155922
+   ],
+   "massKg": 0.00016494734154548496
+  },
+  {
+   "body": "avocado_skin_left_s2_t11",
+   "geom": "avocado_skin_left_s2_t11",
+   "equality": "avocado_skin_left_s2_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s2",
+   "index": 11,
+   "normal": [
+    -0.8294330761761378,
+    0.5566068983864235,
+    0.04721792894266895
+   ],
+   "massKg": 0.00017042002582456917
+  },
+  {
+   "body": "avocado_skin_left_s2_t12",
+   "geom": "avocado_skin_left_s2_t12",
+   "equality": "avocado_skin_left_s2_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s2",
+   "index": 12,
+   "normal": [
+    -0.7450750873427768,
+    0.6666086150765635,
+    -0.022272595871598314
+   ],
+   "massKg": 0.00017546066374052316
+  },
+  {
+   "body": "avocado_skin_left_s2_t13",
+   "geom": "avocado_skin_left_s2_t13",
+   "equality": "avocado_skin_left_s2_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s2",
+   "index": 13,
+   "normal": [
+    -0.8257082587613053,
+    0.549818376107558,
+    -0.12611750357432955
+   ],
+   "massKg": 0.00017651297093834728
+  },
+  {
+   "body": "avocado_skin_left_s2_t14",
+   "geom": "avocado_skin_left_s2_t14",
+   "equality": "avocado_skin_left_s2_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s2",
+   "index": 14,
+   "normal": [
+    -0.8014150807524183,
+    0.5336552520434855,
+    -0.27008506124737564
+   ],
+   "massKg": 0.0001798604498617351
+  },
+  {
+   "body": "avocado_skin_left_s2_t15",
+   "geom": "avocado_skin_left_s2_t15",
+   "equality": "avocado_skin_left_s2_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s2",
+   "index": 15,
+   "normal": [
+    -0.5978721241817685,
+    0.6089789523140448,
+    -0.5212423224996877
+   ],
+   "massKg": 0.00017046474386006594
+  },
+  {
+   "body": "avocado_skin_left_s2_t16",
+   "geom": "avocado_skin_left_s2_t16",
+   "equality": "avocado_skin_left_s2_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s2",
+   "index": 16,
+   "normal": [
+    -0.5321113755372404,
+    0.11817525213756727,
+    -0.8383866016379844
+   ],
+   "massKg": 0.00015073572285473347
+  },
+  {
+   "body": "avocado_skin_left_s2_t17",
+   "geom": "avocado_skin_left_s2_t17",
+   "equality": "avocado_skin_left_s2_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s2",
+   "index": 17,
+   "normal": [
+    -0.08726684661722998,
+    0.058227729228156645,
+    -0.9944817891899365
+   ],
+   "massKg": 0.00011356691538821906
+  },
+  {
+   "body": "avocado_skin_left_s2_t18",
+   "geom": "avocado_skin_left_s2_t18",
+   "equality": "avocado_skin_left_s2_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s2",
+   "index": 18,
+   "normal": [
+    0.382683289764249,
+    0.923879591577129,
+    -1.5777444123554344e-06
+   ],
+   "massKg": 1.702914414636325e-05
+  },
+  {
+   "body": "avocado_skin_left_s2_t19",
+   "geom": "avocado_skin_left_s2_t19",
+   "equality": "avocado_skin_left_s2_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s2",
+   "index": 19,
+   "normal": [
+    0.38268336530414926,
+    0.9238795601393961,
+    1.6617070164473055e-05
+   ],
+   "massKg": 3.475231551419711e-07
+  },
+  {
+   "body": "avocado_skin_left_s3_t0",
+   "geom": "avocado_skin_left_s3_t0",
+   "equality": "avocado_skin_left_s3_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s3",
+   "index": 0,
+   "normal": [
+    -0.1154767590042849,
+    0.9532538422021715,
+    0.2792350809920987
+   ],
+   "massKg": 1.0573739928076975e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t1",
+   "geom": "avocado_skin_left_s3_t1",
+   "equality": "avocado_skin_left_s3_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s3",
+   "index": 1,
+   "normal": [
+    -0.5982200605009936,
+    0.5342931018204562,
+    0.5972132287225921
+   ],
+   "massKg": 3.4760290873236954e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t2",
+   "geom": "avocado_skin_left_s3_t2",
+   "equality": "avocado_skin_left_s3_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s3",
+   "index": 2,
+   "normal": [
+    -0.8586011055928527,
+    0.17169094372025828,
+    0.4830386747654666
+   ],
+   "massKg": 4.952121162205003e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t3",
+   "geom": "avocado_skin_left_s3_t3",
+   "equality": "avocado_skin_left_s3_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s3",
+   "index": 3,
+   "normal": [
+    -0.8157751290185229,
+    0.38227227331984737,
+    0.43402632169683936
+   ],
+   "massKg": 6.4683030359447e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t4",
+   "geom": "avocado_skin_left_s3_t4",
+   "equality": "avocado_skin_left_s3_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s3",
+   "index": 4,
+   "normal": [
+    -0.899537781941541,
+    0.1760959746723063,
+    0.3997774212782699
+   ],
+   "massKg": 7.830328104319051e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t5",
+   "geom": "avocado_skin_left_s3_t5",
+   "equality": "avocado_skin_left_s3_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s3",
+   "index": 5,
+   "normal": [
+    -0.9244188281742939,
+    0.016372162937628665,
+    0.38102727251157364
+   ],
+   "massKg": 9.836623212322593e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t6",
+   "geom": "avocado_skin_left_s3_t6",
+   "equality": "avocado_skin_left_s3_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s3",
+   "index": 6,
+   "normal": [
+    -0.8759529452027697,
+    0.33252555994144695,
+    0.34947559253289906
+   ],
+   "massKg": 0.00011261874897172675
+  },
+  {
+   "body": "avocado_skin_left_s3_t7",
+   "geom": "avocado_skin_left_s3_t7",
+   "equality": "avocado_skin_left_s3_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s3",
+   "index": 7,
+   "normal": [
+    -0.8933844958800187,
+    0.32843106550580736,
+    0.30658959168883243
+   ],
+   "massKg": 0.0001285265461774543
+  },
+  {
+   "body": "avocado_skin_left_s3_t8",
+   "geom": "avocado_skin_left_s3_t8",
+   "equality": "avocado_skin_left_s3_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s3",
+   "index": 8,
+   "normal": [
+    -0.9678642301818806,
+    0.05507133065083928,
+    0.24536906992280316
+   ],
+   "massKg": 0.00014304224168881774
+  },
+  {
+   "body": "avocado_skin_left_s3_t9",
+   "geom": "avocado_skin_left_s3_t9",
+   "equality": "avocado_skin_left_s3_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s3",
+   "index": 9,
+   "normal": [
+    -0.9320018316785899,
+    0.325171538202135,
+    0.1601126368873201
+   ],
+   "massKg": 0.00015694253670517355
+  },
+  {
+   "body": "avocado_skin_left_s3_t10",
+   "geom": "avocado_skin_left_s3_t10",
+   "equality": "avocado_skin_left_s3_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s3",
+   "index": 10,
+   "normal": [
+    -0.93863622275922,
+    0.3324652466786958,
+    0.0918090468046466
+   ],
+   "massKg": 0.00016530751599930227
+  },
+  {
+   "body": "avocado_skin_left_s3_t11",
+   "geom": "avocado_skin_left_s3_t11",
+   "equality": "avocado_skin_left_s3_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s3",
+   "index": 11,
+   "normal": [
+    -0.9784203806622723,
+    0.20263528579382975,
+    0.04040420344403384
+   ],
+   "massKg": 0.00017106637824326754
+  },
+  {
+   "body": "avocado_skin_left_s3_t12",
+   "geom": "avocado_skin_left_s3_t12",
+   "equality": "avocado_skin_left_s3_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s3",
+   "index": 12,
+   "normal": [
+    -0.9823927073027708,
+    0.18495138392689975,
+    -0.026411251804050583
+   ],
+   "massKg": 0.000172489759279415
+  },
+  {
+   "body": "avocado_skin_left_s3_t13",
+   "geom": "avocado_skin_left_s3_t13",
+   "equality": "avocado_skin_left_s3_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s3",
+   "index": 13,
+   "normal": [
+    -0.991222637910239,
+    0.04650010699695344,
+    -0.12375549338732053
+   ],
+   "massKg": 0.00017513240163680166
+  },
+  {
+   "body": "avocado_skin_left_s3_t14",
+   "geom": "avocado_skin_left_s3_t14",
+   "equality": "avocado_skin_left_s3_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s3",
+   "index": 14,
+   "normal": [
+    -0.9018154602308341,
+    0.3329733907684115,
+    -0.27542257846595597
+   ],
+   "massKg": 0.00017658769502304494
+  },
+  {
+   "body": "avocado_skin_left_s3_t15",
+   "geom": "avocado_skin_left_s3_t15",
+   "equality": "avocado_skin_left_s3_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s3",
+   "index": 15,
+   "normal": [
+    -0.8235792173472462,
+    0.15808555738592728,
+    -0.5447258294772499
+   ],
+   "massKg": 0.00017033069161698222
+  },
+  {
+   "body": "avocado_skin_left_s3_t16",
+   "geom": "avocado_skin_left_s3_t16",
+   "equality": "avocado_skin_left_s3_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s3",
+   "index": 16,
+   "normal": [
+    -0.5391516574743289,
+    -0.0972578353918914,
+    -0.8365742069282124
+   ],
+   "massKg": 0.00014942635607440025
+  },
+  {
+   "body": "avocado_skin_left_s3_t17",
+   "geom": "avocado_skin_left_s3_t17",
+   "equality": "avocado_skin_left_s3_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s3",
+   "index": 17,
+   "normal": [
+    -0.2782879714129365,
+    0.053984999289985396,
+    -0.9589793662110426
+   ],
+   "massKg": 0.00011350315617164597
+  },
+  {
+   "body": "avocado_skin_left_s3_t18",
+   "geom": "avocado_skin_left_s3_t18",
+   "equality": "avocado_skin_left_s3_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s3",
+   "index": 18,
+   "normal": [
+    -0.9808100666329141,
+    0.19496567182569055,
+    -1.0466908298830614e-06
+   ],
+   "massKg": 1.7028591173584573e-05
+  },
+  {
+   "body": "avocado_skin_left_s3_t19",
+   "geom": "avocado_skin_left_s3_t19",
+   "equality": "avocado_skin_left_s3_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s3",
+   "index": 19,
+   "normal": [
+    -0.38268339321901584,
+    -0.9238795487159345,
+    4.338356423709265e-06
+   ],
+   "massKg": 3.4734821952042694e-07
+  },
+  {
+   "body": "avocado_skin_left_s4_t0",
+   "geom": "avocado_skin_left_s4_t0",
+   "equality": "avocado_skin_left_s4_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s4",
+   "index": 0,
+   "normal": [
+    -0.46395225456280886,
+    0.8581029460127148,
+    0.2200173618839813
+   ],
+   "massKg": 1.0600081623124424e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t1",
+   "geom": "avocado_skin_left_s4_t1",
+   "equality": "avocado_skin_left_s4_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s4",
+   "index": 1,
+   "normal": [
+    -0.7007841399771688,
+    -0.13870981660330717,
+    0.6997579409583979
+   ],
+   "massKg": 3.4709079045569524e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t2",
+   "geom": "avocado_skin_left_s4_t2",
+   "equality": "avocado_skin_left_s4_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s4",
+   "index": 2,
+   "normal": [
+    -0.8668521526750889,
+    0.09254711301241764,
+    0.48990037484740856
+   ],
+   "massKg": 5.125034658703953e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t3",
+   "geom": "avocado_skin_left_s4_t3",
+   "equality": "avocado_skin_left_s4_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s4",
+   "index": 3,
+   "normal": [
+    -0.8697728840311627,
+    -0.17318082261910395,
+    0.4620644250330078
+   ],
+   "massKg": 6.514475535368547e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t4",
+   "geom": "avocado_skin_left_s4_t4",
+   "equality": "avocado_skin_left_s4_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s4",
+   "index": 4,
+   "normal": [
+    -0.8988097716743964,
+    -0.18034270774155337,
+    0.3995215915405124
+   ],
+   "massKg": 8.040246029850096e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t5",
+   "geom": "avocado_skin_left_s4_t5",
+   "equality": "avocado_skin_left_s4_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s4",
+   "index": 5,
+   "normal": [
+    -0.8586902386699587,
+    -0.3425453019715998,
+    0.38120045922075546
+   ],
+   "massKg": 9.565817890688777e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t6",
+   "geom": "avocado_skin_left_s4_t6",
+   "equality": "avocado_skin_left_s4_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s4",
+   "index": 6,
+   "normal": [
+    -0.9189692734543261,
+    -0.18783690436170938,
+    0.3467171351500208
+   ],
+   "massKg": 0.00011270787945250049
+  },
+  {
+   "body": "avocado_skin_left_s4_t7",
+   "geom": "avocado_skin_left_s4_t7",
+   "equality": "avocado_skin_left_s4_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s4",
+   "index": 7,
+   "normal": [
+    -0.9336812434504991,
+    -0.1871271124920294,
+    0.30532405637146454
+   ],
+   "massKg": 0.0001278359559364617
+  },
+  {
+   "body": "avocado_skin_left_s4_t8",
+   "geom": "avocado_skin_left_s4_t8",
+   "equality": "avocado_skin_left_s4_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s4",
+   "index": 8,
+   "normal": [
+    -0.9489056479362351,
+    -0.18290480626148853,
+    0.25714568470258514
+   ],
+   "massKg": 0.00014441064558923244
+  },
+  {
+   "body": "avocado_skin_left_s4_t9",
+   "geom": "avocado_skin_left_s4_t9",
+   "equality": "avocado_skin_left_s4_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s4",
+   "index": 9,
+   "normal": [
+    -0.9358565102368813,
+    -0.31374192334103107,
+    0.16043253343856573
+   ],
+   "massKg": 0.00015761787653900683
+  },
+  {
+   "body": "avocado_skin_left_s4_t10",
+   "geom": "avocado_skin_left_s4_t10",
+   "equality": "avocado_skin_left_s4_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s4",
+   "index": 10,
+   "normal": [
+    -0.977933613622296,
+    -0.18982726093464303,
+    0.08724367228452017
+   ],
+   "massKg": 0.00016552716260775924
+  },
+  {
+   "body": "avocado_skin_left_s4_t11",
+   "geom": "avocado_skin_left_s4_t11",
+   "equality": "avocado_skin_left_s4_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s4",
+   "index": 11,
+   "normal": [
+    -0.9810101079608387,
+    -0.19043514073621642,
+    0.03679164648994655
+   ],
+   "massKg": 0.0001710784708848223
+  },
+  {
+   "body": "avocado_skin_left_s4_t12",
+   "geom": "avocado_skin_left_s4_t12",
+   "equality": "avocado_skin_left_s4_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s4",
+   "index": 12,
+   "normal": [
+    -0.9975995858920219,
+    -0.06070784020248517,
+    -0.033311024691769775
+   ],
+   "massKg": 0.0001699912390904501
+  },
+  {
+   "body": "avocado_skin_left_s4_t13",
+   "geom": "avocado_skin_left_s4_t13",
+   "equality": "avocado_skin_left_s4_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s4",
+   "index": 13,
+   "normal": [
+    -0.9322252727940415,
+    -0.3386082286597781,
+    -0.12767344378515938
+   ],
+   "massKg": 0.00017820844368543476
+  },
+  {
+   "body": "avocado_skin_left_s4_t14",
+   "geom": "avocado_skin_left_s4_t14",
+   "equality": "avocado_skin_left_s4_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s4",
+   "index": 14,
+   "normal": [
+    -0.9605636233224926,
+    -0.03589609976268131,
+    -0.27573355902282215
+   ],
+   "massKg": 0.00017739002942107618
+  },
+  {
+   "body": "avocado_skin_left_s4_t15",
+   "geom": "avocado_skin_left_s4_t15",
+   "equality": "avocado_skin_left_s4_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s4",
+   "index": 15,
+   "normal": [
+    -0.8419668204630733,
+    -0.1729731743028617,
+    -0.5110500505927916
+   ],
+   "massKg": 0.00016644429706502706
+  },
+  {
+   "body": "avocado_skin_left_s4_t16",
+   "geom": "avocado_skin_left_s4_t16",
+   "equality": "avocado_skin_left_s4_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s4",
+   "index": 16,
+   "normal": [
+    -0.5393693890276531,
+    -0.11127235198702554,
+    -0.8346850459084622
+   ],
+   "massKg": 0.00014846374688204378
+  },
+  {
+   "body": "avocado_skin_left_s4_t17",
+   "geom": "avocado_skin_left_s4_t17",
+   "equality": "avocado_skin_left_s4_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s4",
+   "index": 17,
+   "normal": [
+    -0.1030340887492435,
+    -0.0205555985866741,
+    -0.994465406096339
+   ],
+   "massKg": 0.00011303733481327072
+  },
+  {
+   "body": "avocado_skin_left_s4_t18",
+   "geom": "avocado_skin_left_s4_t18",
+   "equality": "avocado_skin_left_s4_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s4",
+   "index": 18,
+   "normal": [
+    -0.38268345740433507,
+    0.9238795221396299,
+    -3.3703231078240413e-07
+   ],
+   "massKg": 1.704445094219409e-05
+  },
+  {
+   "body": "avocado_skin_left_s4_t19",
+   "geom": "avocado_skin_left_s4_t19",
+   "equality": "avocado_skin_left_s4_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s4",
+   "index": 19,
+   "normal": [
+    -0.9809112721294742,
+    -0.19445584642214542,
+    -1.2584273086546072e-06
+   ],
+   "massKg": 3.4738599197225994e-07
+  },
+  {
+   "body": "avocado_skin_left_s5_t0",
+   "geom": "avocado_skin_left_s5_t0",
+   "equality": "avocado_skin_left_s5_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s5",
+   "index": 0,
+   "normal": [
+    0.2561625739134383,
+    -0.9242563502736446,
+    0.2830740798887885
+   ],
+   "massKg": 1.0606566320348065e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t1",
+   "geom": "avocado_skin_left_s5_t1",
+   "equality": "avocado_skin_left_s5_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s5",
+   "index": 1,
+   "normal": [
+    -0.35426380945461455,
+    -0.7164605123645457,
+    0.6009837664471789
+   ],
+   "massKg": 3.537393786245957e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t2",
+   "geom": "avocado_skin_left_s5_t2",
+   "equality": "avocado_skin_left_s5_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s5",
+   "index": 2,
+   "normal": [
+    -0.738847500938076,
+    -0.4700159902059685,
+    0.4828968205613519
+   ],
+   "massKg": 5.287287785904482e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t3",
+   "geom": "avocado_skin_left_s5_t3",
+   "equality": "avocado_skin_left_s5_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s5",
+   "index": 3,
+   "normal": [
+    -0.7471544098306746,
+    -0.5087687770687946,
+    0.4276851872002343
+   ],
+   "massKg": 6.534139538416639e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t4",
+   "geom": "avocado_skin_left_s5_t4",
+   "equality": "avocado_skin_left_s5_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s5",
+   "index": 4,
+   "normal": [
+    -0.8438414424783128,
+    -0.35214416701462964,
+    0.404877889731821
+   ],
+   "massKg": 8.282680209958926e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t5",
+   "geom": "avocado_skin_left_s5_t5",
+   "equality": "avocado_skin_left_s5_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s5",
+   "index": 5,
+   "normal": [
+    -0.6680241617996756,
+    -0.6379630548632619,
+    0.3830755276461488
+   ],
+   "massKg": 9.704590775072575e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t6",
+   "geom": "avocado_skin_left_s5_t6",
+   "equality": "avocado_skin_left_s5_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s5",
+   "index": 6,
+   "normal": [
+    -0.8498219205916347,
+    -0.38878828254142767,
+    0.35587409942342313
+   ],
+   "massKg": 0.00011340557102812454
+  },
+  {
+   "body": "avocado_skin_left_s5_t7",
+   "geom": "avocado_skin_left_s5_t7",
+   "equality": "avocado_skin_left_s5_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s5",
+   "index": 7,
+   "normal": [
+    -0.7868621610568284,
+    -0.5230727366517157,
+    0.3274795438934509
+   ],
+   "massKg": 0.00012764448183588684
+  },
+  {
+   "body": "avocado_skin_left_s5_t8",
+   "geom": "avocado_skin_left_s5_t8",
+   "equality": "avocado_skin_left_s5_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s5",
+   "index": 8,
+   "normal": [
+    -0.7283745281541895,
+    -0.6364931139588498,
+    0.253667228114174
+   ],
+   "massKg": 0.00014517524687107652
+  },
+  {
+   "body": "avocado_skin_left_s5_t9",
+   "geom": "avocado_skin_left_s5_t9",
+   "equality": "avocado_skin_left_s5_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s5",
+   "index": 9,
+   "normal": [
+    -0.743554439774066,
+    -0.6484432043323652,
+    0.1632427819153095
+   ],
+   "massKg": 0.00015730263839941472
+  },
+  {
+   "body": "avocado_skin_left_s5_t10",
+   "geom": "avocado_skin_left_s5_t10",
+   "equality": "avocado_skin_left_s5_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s5",
+   "index": 10,
+   "normal": [
+    -0.834491952511375,
+    -0.5441242039505227,
+    0.0869024272903977
+   ],
+   "massKg": 0.0001665174640947953
+  },
+  {
+   "body": "avocado_skin_left_s5_t11",
+   "geom": "avocado_skin_left_s5_t11",
+   "equality": "avocado_skin_left_s5_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s5",
+   "index": 11,
+   "normal": [
+    -0.8372792776439102,
+    -0.5458828354372928,
+    0.031230453135261686
+   ],
+   "massKg": 0.0001698516571195796
+  },
+  {
+   "body": "avocado_skin_left_s5_t12",
+   "geom": "avocado_skin_left_s5_t12",
+   "equality": "avocado_skin_left_s5_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s5",
+   "index": 12,
+   "normal": [
+    -0.8365226834987881,
+    -0.5465831764473187,
+    -0.038426959504307294
+   ],
+   "massKg": 0.00017681068857200444
+  },
+  {
+   "body": "avocado_skin_left_s5_t13",
+   "geom": "avocado_skin_left_s5_t13",
+   "equality": "avocado_skin_left_s5_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s5",
+   "index": 13,
+   "normal": [
+    -0.8975255217442993,
+    -0.42039420563732965,
+    -0.13310390559326923
+   ],
+   "massKg": 0.00017735605069901794
+  },
+  {
+   "body": "avocado_skin_left_s5_t14",
+   "geom": "avocado_skin_left_s5_t14",
+   "equality": "avocado_skin_left_s5_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s5",
+   "index": 14,
+   "normal": [
+    -0.7968301885068256,
+    -0.5295127098325134,
+    -0.2909947436123289
+   ],
+   "massKg": 0.00017484337149653584
+  },
+  {
+   "body": "avocado_skin_left_s5_t15",
+   "geom": "avocado_skin_left_s5_t15",
+   "equality": "avocado_skin_left_s5_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s5",
+   "index": 15,
+   "normal": [
+    -0.6978639048938192,
+    -0.4667001776886793,
+    -0.5433018630482558
+   ],
+   "massKg": 0.00016795986448414624
+  },
+  {
+   "body": "avocado_skin_left_s5_t16",
+   "geom": "avocado_skin_left_s5_t16",
+   "equality": "avocado_skin_left_s5_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s5",
+   "index": 16,
+   "normal": [
+    -0.4589884491470315,
+    -0.3062761978151439,
+    -0.8339811114176997
+   ],
+   "massKg": 0.00014728725363966078
+  },
+  {
+   "body": "avocado_skin_left_s5_t17",
+   "geom": "avocado_skin_left_s5_t17",
+   "equality": "avocado_skin_left_s5_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s5",
+   "index": 17,
+   "normal": [
+    -0.0873885009009355,
+    -0.05842442112100997,
+    -0.9944595702827551
+   ],
+   "massKg": 0.00011323138460284099
+  },
+  {
+   "body": "avocado_skin_left_s5_t18",
+   "geom": "avocado_skin_left_s5_t18",
+   "equality": "avocado_skin_left_s5_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s5",
+   "index": 18,
+   "normal": [
+    -0.7071067699987321,
+    0.7071067923743525,
+    1.2107625894011681e-07
+   ],
+   "massKg": 1.7023994587361813e-05
+  },
+  {
+   "body": "avocado_skin_left_s5_t19",
+   "geom": "avocado_skin_left_s5_t19",
+   "equality": "avocado_skin_left_s5_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s5",
+   "index": 19,
+   "normal": [
+    -0.7071068038175335,
+    0.7071067585434554,
+    4.137590142259378e-06
+   ],
+   "massKg": 3.4747256449918495e-07
+  },
+  {
+   "body": "avocado_skin_left_s6_t0",
+   "geom": "avocado_skin_left_s6_t0",
+   "equality": "avocado_skin_left_s6_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s6",
+   "index": 0,
+   "normal": [
+    -0.9246066278720203,
+    0.2573567368798881,
+    0.2808381983948541
+   ],
+   "massKg": 1.0705009117373265e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t1",
+   "geom": "avocado_skin_left_s6_t1",
+   "equality": "avocado_skin_left_s6_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s6",
+   "index": 1,
+   "normal": [
+    -0.46283057968760943,
+    -0.6406143480777617,
+    0.6126998543682998
+   ],
+   "massKg": 3.46830565831624e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t2",
+   "geom": "avocado_skin_left_s6_t2",
+   "equality": "avocado_skin_left_s6_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s6",
+   "index": 2,
+   "normal": [
+    -0.47619022640291425,
+    -0.7353403392925952,
+    0.48220063634071647
+   ],
+   "massKg": 5.019836680730805e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t3",
+   "geom": "avocado_skin_left_s6_t3",
+   "equality": "avocado_skin_left_s6_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s6",
+   "index": 3,
+   "normal": [
+    -0.5089926998383896,
+    -0.7477024768737086,
+    0.4264591863099545
+   ],
+   "massKg": 6.805263546993956e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t4",
+   "geom": "avocado_skin_left_s6_t4",
+   "equality": "avocado_skin_left_s6_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s6",
+   "index": 4,
+   "normal": [
+    -0.6446984500046306,
+    -0.6493740758337875,
+    0.40333263963711324
+   ],
+   "massKg": 7.977528002811596e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t5",
+   "geom": "avocado_skin_left_s6_t5",
+   "equality": "avocado_skin_left_s6_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s6",
+   "index": 5,
+   "normal": [
+    -0.5066094639275543,
+    -0.7762471671571249,
+    0.3752161864040179
+   ],
+   "massKg": 9.440835856366903e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t6",
+   "geom": "avocado_skin_left_s6_t6",
+   "equality": "avocado_skin_left_s6_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s6",
+   "index": 6,
+   "normal": [
+    -0.5127991881221514,
+    -0.7737119048125948,
+    0.3720307527779508
+   ],
+   "massKg": 0.00011175792315043509
+  },
+  {
+   "body": "avocado_skin_left_s6_t7",
+   "geom": "avocado_skin_left_s6_t7",
+   "equality": "avocado_skin_left_s6_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s6",
+   "index": 7,
+   "normal": [
+    -0.6368931963351331,
+    -0.7014315328373006,
+    0.31993883978587595
+   ],
+   "massKg": 0.00012849440099671483
+  },
+  {
+   "body": "avocado_skin_left_s6_t8",
+   "geom": "avocado_skin_left_s6_t8",
+   "equality": "avocado_skin_left_s6_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s6",
+   "index": 8,
+   "normal": [
+    -0.5364323524040118,
+    -0.8045921566996233,
+    0.25469941631607046
+   ],
+   "massKg": 0.00014342399663291872
+  },
+  {
+   "body": "avocado_skin_left_s6_t9",
+   "geom": "avocado_skin_left_s6_t9",
+   "equality": "avocado_skin_left_s6_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s6",
+   "index": 9,
+   "normal": [
+    -0.6524269751930043,
+    -0.7387798818744035,
+    0.16894770841342963
+   ],
+   "massKg": 0.00015621079364791512
+  },
+  {
+   "body": "avocado_skin_left_s6_t10",
+   "geom": "avocado_skin_left_s6_t10",
+   "equality": "avocado_skin_left_s6_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s6",
+   "index": 10,
+   "normal": [
+    -0.6647749882305019,
+    -0.7413952535071712,
+    0.09169129239013739
+   ],
+   "massKg": 0.00016793185204733163
+  },
+  {
+   "body": "avocado_skin_left_s6_t11",
+   "geom": "avocado_skin_left_s6_t11",
+   "equality": "avocado_skin_left_s6_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s6",
+   "index": 11,
+   "normal": [
+    -0.5625090319657566,
+    -0.8261945274767301,
+    0.031403689662999626
+   ],
+   "massKg": 0.00017240548913832754
+  },
+  {
+   "body": "avocado_skin_left_s6_t12",
+   "geom": "avocado_skin_left_s6_t12",
+   "equality": "avocado_skin_left_s6_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s6",
+   "index": 12,
+   "normal": [
+    -0.5674089018590583,
+    -0.8224122469441231,
+    -0.04105160371308695
+   ],
+   "massKg": 0.0001779094454832375
+  },
+  {
+   "body": "avocado_skin_left_s6_t13",
+   "geom": "avocado_skin_left_s6_t13",
+   "equality": "avocado_skin_left_s6_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s6",
+   "index": 13,
+   "normal": [
+    -0.5581558839226451,
+    -0.8172954683068276,
+    -0.14314372751767318
+   ],
+   "massKg": 0.00018088087381329387
+  },
+  {
+   "body": "avocado_skin_left_s6_t14",
+   "geom": "avocado_skin_left_s6_t14",
+   "equality": "avocado_skin_left_s6_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s6",
+   "index": 14,
+   "normal": [
+    -0.661429640956663,
+    -0.6943047329685624,
+    -0.2836402084356046
+   ],
+   "massKg": 0.00017838984786067158
+  },
+  {
+   "body": "avocado_skin_left_s6_t15",
+   "geom": "avocado_skin_left_s6_t15",
+   "equality": "avocado_skin_left_s6_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s6",
+   "index": 15,
+   "normal": [
+    -0.3254757236134349,
+    -0.787554865942283,
+    -0.5232808867796948
+   ],
+   "massKg": 0.00016909954138100147
+  },
+  {
+   "body": "avocado_skin_left_s6_t16",
+   "geom": "avocado_skin_left_s6_t16",
+   "equality": "avocado_skin_left_s6_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s6",
+   "index": 16,
+   "normal": [
+    -0.44730400794381153,
+    -0.3176164705891853,
+    -0.8360854633874887
+   ],
+   "massKg": 0.00014887793804518878
+  },
+  {
+   "body": "avocado_skin_left_s6_t17",
+   "geom": "avocado_skin_left_s6_t17",
+   "equality": "avocado_skin_left_s6_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s6",
+   "index": 17,
+   "normal": [
+    -0.15828399197790283,
+    -0.2353973867607746,
+    -0.9589234840120131
+   ],
+   "massKg": 0.00011284831998636946
+  },
+  {
+   "body": "avocado_skin_left_s6_t18",
+   "geom": "avocado_skin_left_s6_t18",
+   "equality": "avocado_skin_left_s6_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s6",
+   "index": 18,
+   "normal": [
+    0.7071067608983879,
+    -0.7071068014745873,
+    4.1071983627835763e-07
+   ],
+   "massKg": 1.7037806173902936e-05
+  },
+  {
+   "body": "avocado_skin_left_s6_t19",
+   "geom": "avocado_skin_left_s6_t19",
+   "equality": "avocado_skin_left_s6_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s6",
+   "index": 19,
+   "normal": [
+    -0.5557878391015105,
+    -0.8313241713560905,
+    5.097347322931267e-06
+   ],
+   "massKg": 3.474471554909542e-07
+  },
+  {
+   "body": "avocado_skin_left_s7_t0",
+   "geom": "avocado_skin_left_s7_t0",
+   "equality": "avocado_skin_left_s7_t0_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s7",
+   "index": 0,
+   "normal": [
+    -0.9523053462370663,
+    -0.11651890490644255,
+    0.2820245952531533
+   ],
+   "massKg": 1.0798913535836618e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t1",
+   "geom": "avocado_skin_left_s7_t1",
+   "equality": "avocado_skin_left_s7_t1_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s7",
+   "index": 1,
+   "normal": [
+    -0.14036230847045533,
+    -0.6995253482392103,
+    0.7006873122382455
+   ],
+   "massKg": 3.6600715247914195e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t2",
+   "geom": "avocado_skin_left_s7_t2",
+   "equality": "avocado_skin_left_s7_t2_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s7",
+   "index": 2,
+   "normal": [
+    -0.4228777852927059,
+    -0.7635930392686784,
+    0.48795496624827833
+   ],
+   "massKg": 5.058596434537321e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t3",
+   "geom": "avocado_skin_left_s7_t3",
+   "equality": "avocado_skin_left_s7_t3_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s7",
+   "index": 3,
+   "normal": [
+    -0.180012348036516,
+    -0.8871468706376339,
+    0.4249305642951956
+   ],
+   "massKg": 6.373641372192651e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t4",
+   "geom": "avocado_skin_left_s7_t4",
+   "equality": "avocado_skin_left_s7_t4_attach",
+   "flesh": "avocado_flesh_left_0",
+   "strip": "left_s7",
+   "index": 4,
+   "normal": [
+    -0.18477757728918312,
+    -0.8999565670666514,
+    0.3948865967904551
+   ],
+   "massKg": 7.970612932695076e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t5",
+   "geom": "avocado_skin_left_s7_t5",
+   "equality": "avocado_skin_left_s7_t5_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s7",
+   "index": 5,
+   "normal": [
+    -0.17804473620202793,
+    -0.9004097831955357,
+    0.396941172261733
+   ],
+   "massKg": 9.725122072268277e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t6",
+   "geom": "avocado_skin_left_s7_t6",
+   "equality": "avocado_skin_left_s7_t6_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s7",
+   "index": 6,
+   "normal": [
+    -0.17877868226088597,
+    -0.9112075382461884,
+    0.3711320587235522
+   ],
+   "massKg": 0.00010972192831104621
+  },
+  {
+   "body": "avocado_skin_left_s7_t7",
+   "geom": "avocado_skin_left_s7_t7",
+   "equality": "avocado_skin_left_s7_t7_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s7",
+   "index": 7,
+   "normal": [
+    -0.3126228337823818,
+    -0.8937241792855072,
+    0.32175154258887384
+   ],
+   "massKg": 0.00012615855666808784
+  },
+  {
+   "body": "avocado_skin_left_s7_t8",
+   "geom": "avocado_skin_left_s7_t8",
+   "equality": "avocado_skin_left_s7_t8_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s7",
+   "index": 8,
+   "normal": [
+    -0.1853595709213304,
+    -0.9442505836328953,
+    0.2720894426044443
+   ],
+   "massKg": 0.00014129704504739493
+  },
+  {
+   "body": "avocado_skin_left_s7_t9",
+   "geom": "avocado_skin_left_s7_t9",
+   "equality": "avocado_skin_left_s7_t9_attach",
+   "flesh": "avocado_flesh_left_1",
+   "strip": "left_s7",
+   "index": 9,
+   "normal": [
+    -0.31803801474478105,
+    -0.931888522849311,
+    0.1744580240600234
+   ],
+   "massKg": 0.00015557956066913903
+  },
+  {
+   "body": "avocado_skin_left_s7_t10",
+   "geom": "avocado_skin_left_s7_t10",
+   "equality": "avocado_skin_left_s7_t10_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s7",
+   "index": 10,
+   "normal": [
+    -0.19707109698405686,
+    -0.9751004234300477,
+    0.10169634683724879
+   ],
+   "massKg": 0.0001644479634705931
+  },
+  {
+   "body": "avocado_skin_left_s7_t11",
+   "geom": "avocado_skin_left_s7_t11",
+   "equality": "avocado_skin_left_s7_t11_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s7",
+   "index": 11,
+   "normal": [
+    -0.20534086808106117,
+    -0.9780047507545703,
+    0.036631071472280625
+   ],
+   "massKg": 0.0001734707475407049
+  },
+  {
+   "body": "avocado_skin_left_s7_t12",
+   "geom": "avocado_skin_left_s7_t12",
+   "equality": "avocado_skin_left_s7_t12_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s7",
+   "index": 12,
+   "normal": [
+    -0.20511586275010882,
+    -0.9778918483509547,
+    -0.04068188512141543
+   ],
+   "massKg": 0.00017653692339081317
+  },
+  {
+   "body": "avocado_skin_left_s7_t13",
+   "geom": "avocado_skin_left_s7_t13",
+   "equality": "avocado_skin_left_s7_t13_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s7",
+   "index": 13,
+   "normal": [
+    -0.05622230882847656,
+    -0.9886768077611376,
+    -0.1391302331818719
+   ],
+   "massKg": 0.00018282316159456968
+  },
+  {
+   "body": "avocado_skin_left_s7_t14",
+   "geom": "avocado_skin_left_s7_t14",
+   "equality": "avocado_skin_left_s7_t14_attach",
+   "flesh": "avocado_flesh_left_2",
+   "strip": "left_s7",
+   "index": 14,
+   "normal": [
+    -0.1964045793053728,
+    -0.9330170641891719,
+    -0.30150356409120327
+   ],
+   "massKg": 0.0001808010711101815
+  },
+  {
+   "body": "avocado_skin_left_s7_t15",
+   "geom": "avocado_skin_left_s7_t15",
+   "equality": "avocado_skin_left_s7_t15_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s7",
+   "index": 15,
+   "normal": [
+    -0.3435510437973188,
+    -0.778530731711583,
+    -0.5252262180112489
+   ],
+   "massKg": 0.00017234659753739834
+  },
+  {
+   "body": "avocado_skin_left_s7_t16",
+   "geom": "avocado_skin_left_s7_t16",
+   "equality": "avocado_skin_left_s7_t16_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s7",
+   "index": 16,
+   "normal": [
+    -0.30354150343569386,
+    -0.46062053967259114,
+    -0.8340810956518135
+   ],
+   "massKg": 0.0001484257518313825
+  },
+  {
+   "body": "avocado_skin_left_s7_t17",
+   "geom": "avocado_skin_left_s7_t17",
+   "equality": "avocado_skin_left_s7_t17_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s7",
+   "index": 17,
+   "normal": [
+    -0.4517964378766415,
+    -0.09195420987864267,
+    -0.8873693717993497
+   ],
+   "massKg": 0.00011329752305755392
+  },
+  {
+   "body": "avocado_skin_left_s7_t18",
+   "geom": "avocado_skin_left_s7_t18",
+   "equality": "avocado_skin_left_s7_t18_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s7",
+   "index": 18,
+   "normal": [
+    -0.1932157143807975,
+    -0.9811563013687388,
+    -8.572251003118946e-07
+   ],
+   "massKg": 1.7028105503413826e-05
+  },
+  {
+   "body": "avocado_skin_left_s7_t19",
+   "geom": "avocado_skin_left_s7_t19",
+   "equality": "avocado_skin_left_s7_t19_attach",
+   "flesh": "avocado_flesh_left_3",
+   "strip": "left_s7",
+   "index": 19,
+   "normal": [
+    0.9238794953510655,
+    -0.38268352196449906,
+    -9.311678445619698e-06
+   ],
+   "massKg": 3.4737769283310627e-07
+  },
+  {
+   "body": "avocado_skin_right_s0_t0",
+   "geom": "avocado_skin_right_s0_t0",
+   "equality": "avocado_skin_right_s0_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s0",
+   "index": 0,
+   "normal": [
+    -0.8343162507054072,
+    -0.4725339954973998,
+    0.2839507297193227
+   ],
+   "massKg": 1.0564647709543351e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t1",
+   "geom": "avocado_skin_right_s0_t1",
+   "equality": "avocado_skin_right_s0_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s0",
+   "index": 1,
+   "normal": [
+    0.13785771237900954,
+    -0.6995407744953903,
+    0.7011689924376404
+   ],
+   "massKg": 3.633185406215489e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t2",
+   "geom": "avocado_skin_right_s0_t2",
+   "equality": "avocado_skin_right_s0_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s0",
+   "index": 2,
+   "normal": [
+    0.4194747907156645,
+    -0.7648850588310379,
+    0.48886782132912904
+   ],
+   "massKg": 5.129980490892194e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t3",
+   "geom": "avocado_skin_right_s0_t3",
+   "equality": "avocado_skin_right_s0_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s0",
+   "index": 3,
+   "normal": [
+    0.17959476513902234,
+    -0.8870694991241688,
+    0.425268649277437
+   ],
+   "massKg": 6.5807813371066e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t4",
+   "geom": "avocado_skin_right_s0_t4",
+   "equality": "avocado_skin_right_s0_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s0",
+   "index": 4,
+   "normal": [
+    0.18131461409509078,
+    -0.9009057357722687,
+    0.39432710529226295
+   ],
+   "massKg": 8.043827256187797e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t5",
+   "geom": "avocado_skin_right_s0_t5",
+   "equality": "avocado_skin_right_s0_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s0",
+   "index": 5,
+   "normal": [
+    0.3429348853664251,
+    -0.8601724137872246,
+    0.3774905071100152
+   ],
+   "massKg": 9.600316116120666e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t6",
+   "geom": "avocado_skin_right_s0_t6",
+   "equality": "avocado_skin_right_s0_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s0",
+   "index": 6,
+   "normal": [
+    0.028406144344892074,
+    -0.9348175493594221,
+    0.35399045237562776
+   ],
+   "massKg": 0.00011008982983184978
+  },
+  {
+   "body": "avocado_skin_right_s0_t7",
+   "geom": "avocado_skin_right_s0_t7",
+   "equality": "avocado_skin_right_s0_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s0",
+   "index": 7,
+   "normal": [
+    0.18622750713120026,
+    -0.9249387409858914,
+    0.33137236005909243
+   ],
+   "massKg": 0.0001251889334525913
+  },
+  {
+   "body": "avocado_skin_right_s0_t8",
+   "geom": "avocado_skin_right_s0_t8",
+   "equality": "avocado_skin_right_s0_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s0",
+   "index": 8,
+   "normal": [
+    0.059210476883770485,
+    -0.9630522932418554,
+    0.26272495105870664
+   ],
+   "massKg": 0.0001390086254104972
+  },
+  {
+   "body": "avocado_skin_right_s0_t9",
+   "geom": "avocado_skin_right_s0_t9",
+   "equality": "avocado_skin_right_s0_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s0",
+   "index": 9,
+   "normal": [
+    0.19623929209806135,
+    -0.9632855095439032,
+    0.18322436338979203
+   ],
+   "massKg": 0.00015283252287190408
+  },
+  {
+   "body": "avocado_skin_right_s0_t10",
+   "geom": "avocado_skin_right_s0_t10",
+   "equality": "avocado_skin_right_s0_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s0",
+   "index": 10,
+   "normal": [
+    0.19807297054354106,
+    -0.974925291179443,
+    0.1014286693136402
+   ],
+   "massKg": 0.00016455237346235663
+  },
+  {
+   "body": "avocado_skin_right_s0_t11",
+   "geom": "avocado_skin_right_s0_t11",
+   "equality": "avocado_skin_right_s0_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s0",
+   "index": 11,
+   "normal": [
+    0.19870404387546428,
+    -0.9791352246826663,
+    0.04255484382725435
+   ],
+   "massKg": 0.00016991945449262857
+  },
+  {
+   "body": "avocado_skin_right_s0_t12",
+   "geom": "avocado_skin_right_s0_t12",
+   "equality": "avocado_skin_right_s0_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s0",
+   "index": 12,
+   "normal": [
+    0.1935146441160538,
+    -0.9804428538811321,
+    -0.03583144967843477
+   ],
+   "massKg": 0.00017890898743644357
+  },
+  {
+   "body": "avocado_skin_right_s0_t13",
+   "geom": "avocado_skin_right_s0_t13",
+   "equality": "avocado_skin_right_s0_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s0",
+   "index": 13,
+   "normal": [
+    0.3315793442917372,
+    -0.9332191096440918,
+    -0.13840965224344137
+   ],
+   "massKg": 0.0001802978222258389
+  },
+  {
+   "body": "avocado_skin_right_s0_t14",
+   "geom": "avocado_skin_right_s0_t14",
+   "equality": "avocado_skin_right_s0_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s0",
+   "index": 14,
+   "normal": [
+    0.18625763276198112,
+    -0.9400173409165702,
+    -0.28578924579844434
+   ],
+   "massKg": 0.00018311805615667254
+  },
+  {
+   "body": "avocado_skin_right_s0_t15",
+   "geom": "avocado_skin_right_s0_t15",
+   "equality": "avocado_skin_right_s0_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s0",
+   "index": 15,
+   "normal": [
+    -0.014632206717060304,
+    -0.8485644937599183,
+    -0.5288895900436714
+   ],
+   "massKg": 0.00017393629241269082
+  },
+  {
+   "body": "avocado_skin_right_s0_t16",
+   "geom": "avocado_skin_right_s0_t16",
+   "equality": "avocado_skin_right_s0_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s0",
+   "index": 16,
+   "normal": [
+    0.1122152124840729,
+    -0.5369399214150132,
+    -0.8361239542543879
+   ],
+   "massKg": 0.00014999412815086544
+  },
+  {
+   "body": "avocado_skin_right_s0_t17",
+   "geom": "avocado_skin_right_s0_t17",
+   "equality": "avocado_skin_right_s0_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s0",
+   "index": 17,
+   "normal": [
+    -0.3824867163017825,
+    -0.2578887779374219,
+    -0.8872413933460401
+   ],
+   "massKg": 0.00011338080366840586
+  },
+  {
+   "body": "avocado_skin_right_s0_t18",
+   "geom": "avocado_skin_right_s0_t18",
+   "equality": "avocado_skin_right_s0_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s0",
+   "index": 18,
+   "normal": [
+    0.19371759034494568,
+    -0.9810573353228682,
+    3.758268069226267e-07
+   ],
+   "massKg": 1.7031281458912417e-05
+  },
+  {
+   "body": "avocado_skin_right_s0_t19",
+   "geom": "avocado_skin_right_s0_t19",
+   "equality": "avocado_skin_right_s0_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s0",
+   "index": 19,
+   "normal": [
+    0.999999999999071,
+    -3.864610154622938e-08,
+    -1.362490845580216e-06
+   ],
+   "massKg": 3.4748453003885515e-07
+  },
+  {
+   "body": "avocado_skin_right_s1_t0",
+   "geom": "avocado_skin_right_s1_t0",
+   "equality": "avocado_skin_right_s1_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s1",
+   "index": 0,
+   "normal": [
+    -0.5905540445912063,
+    -0.7557777633424563,
+    0.28292382871374006
+   ],
+   "massKg": 1.0428385394334327e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t1",
+   "geom": "avocado_skin_right_s1_t1",
+   "equality": "avocado_skin_right_s1_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s1",
+   "index": 1,
+   "normal": [
+    0.43169634061778295,
+    -0.6608415449854589,
+    0.6139435820321333
+   ],
+   "massKg": 3.556835508788936e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t2",
+   "geom": "avocado_skin_right_s1_t2",
+   "equality": "avocado_skin_right_s1_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s1",
+   "index": 2,
+   "normal": [
+    0.2441297664560132,
+    -0.8368194588507358,
+    0.4900345400264089
+   ],
+   "massKg": 5.0343362090643495e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t3",
+   "geom": "avocado_skin_right_s1_t3",
+   "equality": "avocado_skin_right_s1_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s1",
+   "index": 3,
+   "normal": [
+    0.2967622656441578,
+    -0.8529670174925299,
+    0.4293942532913597
+   ],
+   "massKg": 6.711175228701904e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t4",
+   "geom": "avocado_skin_right_s1_t4",
+   "equality": "avocado_skin_right_s1_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s1",
+   "index": 4,
+   "normal": [
+    0.35156101904099785,
+    -0.8456843031050759,
+    0.4015257269124076
+   ],
+   "massKg": 8.018010703381151e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t5",
+   "geom": "avocado_skin_right_s1_t5",
+   "equality": "avocado_skin_right_s1_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s1",
+   "index": 5,
+   "normal": [
+    0.5069742846625829,
+    -0.7779618539763432,
+    0.37115014273007274
+   ],
+   "massKg": 9.534884156892076e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t6",
+   "geom": "avocado_skin_right_s1_t6",
+   "equality": "avocado_skin_right_s1_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s1",
+   "index": 6,
+   "normal": [
+    0.5256968902446975,
+    -0.7771903584863719,
+    0.3458582459084633
+   ],
+   "massKg": 0.00011021135287592188
+  },
+  {
+   "body": "avocado_skin_right_s1_t7",
+   "geom": "avocado_skin_right_s1_t7",
+   "equality": "avocado_skin_right_s1_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s1",
+   "index": 7,
+   "normal": [
+    0.6388054816948153,
+    -0.701734902253699,
+    0.3154293637498676
+   ],
+   "massKg": 0.00012587293167598546
+  },
+  {
+   "body": "avocado_skin_right_s1_t8",
+   "geom": "avocado_skin_right_s1_t8",
+   "equality": "avocado_skin_right_s1_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s1",
+   "index": 8,
+   "normal": [
+    0.42436932709113223,
+    -0.8677381202152594,
+    0.258730031015937
+   ],
+   "massKg": 0.00014063309936318547
+  },
+  {
+   "body": "avocado_skin_right_s1_t9",
+   "geom": "avocado_skin_right_s1_t9",
+   "equality": "avocado_skin_right_s1_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s1",
+   "index": 9,
+   "normal": [
+    0.6607861854241284,
+    -0.730061751164017,
+    0.17427408482031462
+   ],
+   "massKg": 0.0001558930380269885
+  },
+  {
+   "body": "avocado_skin_right_s1_t10",
+   "geom": "avocado_skin_right_s1_t10",
+   "equality": "avocado_skin_right_s1_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s1",
+   "index": 10,
+   "normal": [
+    0.5632618649126975,
+    -0.819958621622005,
+    0.1019996586406637
+   ],
+   "massKg": 0.0001631640043342486
+  },
+  {
+   "body": "avocado_skin_right_s1_t11",
+   "geom": "avocado_skin_right_s1_t11",
+   "equality": "avocado_skin_right_s1_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s1",
+   "index": 11,
+   "normal": [
+    0.6675534199106613,
+    -0.7431287235608118,
+    0.04617501255504545
+   ],
+   "massKg": 0.00016898255853448063
+  },
+  {
+   "body": "avocado_skin_right_s1_t12",
+   "geom": "avocado_skin_right_s1_t12",
+   "equality": "avocado_skin_right_s1_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s1",
+   "index": 12,
+   "normal": [
+    0.5594142601756805,
+    -0.8283437899131201,
+    -0.030037496974030135
+   ],
+   "massKg": 0.0001760906307026744
+  },
+  {
+   "body": "avocado_skin_right_s1_t13",
+   "geom": "avocado_skin_right_s1_t13",
+   "equality": "avocado_skin_right_s1_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s1",
+   "index": 13,
+   "normal": [
+    0.5551023923815211,
+    -0.8197228468731032,
+    -0.1411233087996701
+   ],
+   "massKg": 0.00018129593809135258
+  },
+  {
+   "body": "avocado_skin_right_s1_t14",
+   "geom": "avocado_skin_right_s1_t14",
+   "equality": "avocado_skin_right_s1_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s1",
+   "index": 14,
+   "normal": [
+    0.3973065951347206,
+    -0.871076419926052,
+    -0.2887444200521762
+   ],
+   "massKg": 0.0001786882639862597
+  },
+  {
+   "body": "avocado_skin_right_s1_t15",
+   "geom": "avocado_skin_right_s1_t15",
+   "equality": "avocado_skin_right_s1_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s1",
+   "index": 15,
+   "normal": [
+    0.31447122544911077,
+    -0.7889172768820031,
+    -0.5279369077850299
+   ],
+   "massKg": 0.00017153320368379354
+  },
+  {
+   "body": "avocado_skin_right_s1_t16",
+   "geom": "avocado_skin_right_s1_t16",
+   "equality": "avocado_skin_right_s1_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s1",
+   "index": 16,
+   "normal": [
+    0.4469027884049313,
+    -0.31269049020103706,
+    -0.8381542549278935
+   ],
+   "massKg": 0.0001514135510660708
+  },
+  {
+   "body": "avocado_skin_right_s1_t17",
+   "geom": "avocado_skin_right_s1_t17",
+   "equality": "avocado_skin_right_s1_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s1",
+   "index": 17,
+   "normal": [
+    -0.2539556712061234,
+    -0.38393044209326277,
+    -0.8877521797755943
+   ],
+   "massKg": 0.00011350265413057059
+  },
+  {
+   "body": "avocado_skin_right_s1_t18",
+   "geom": "avocado_skin_right_s1_t18",
+   "equality": "avocado_skin_right_s1_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s1",
+   "index": 18,
+   "normal": [
+    0.5561931683634834,
+    -0.8310530425103739,
+    2.0059353726244272e-07
+   ],
+   "massKg": 1.702315239526797e-05
+  },
+  {
+   "body": "avocado_skin_right_s1_t19",
+   "geom": "avocado_skin_right_s1_t19",
+   "equality": "avocado_skin_right_s1_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s1",
+   "index": 19,
+   "normal": [
+    0.9238795854381658,
+    0.3826833043813568,
+    -1.2584461594948002e-05
+   ],
+   "massKg": 3.47493369190488e-07
+  },
+  {
+   "body": "avocado_skin_right_s2_t0",
+   "geom": "avocado_skin_right_s2_t0",
+   "equality": "avocado_skin_right_s2_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s2",
+   "index": 0,
+   "normal": [
+    0.7255254368800469,
+    -0.4641644946624026,
+    0.508098575411124
+   ],
+   "massKg": 1.0444739018566906e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t1",
+   "geom": "avocado_skin_right_s2_t1",
+   "equality": "avocado_skin_right_s2_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s2",
+   "index": 1,
+   "normal": [
+    0.7998565012611845,
+    -0.04243171339909099,
+    0.5986895080826407
+   ],
+   "massKg": 3.611897409427911e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t2",
+   "geom": "avocado_skin_right_s2_t2",
+   "equality": "avocado_skin_right_s2_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s2",
+   "index": 2,
+   "normal": [
+    0.7028373941632552,
+    -0.47128420066623455,
+    0.5328328063925806
+   ],
+   "massKg": 5.0273411034140736e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t3",
+   "geom": "avocado_skin_right_s2_t3",
+   "equality": "avocado_skin_right_s2_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s2",
+   "index": 3,
+   "normal": [
+    0.6085569690095681,
+    -0.6655137536069795,
+    0.43214564585314996
+   ],
+   "massKg": 6.665074033662677e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t4",
+   "geom": "avocado_skin_right_s2_t4",
+   "equality": "avocado_skin_right_s2_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s2",
+   "index": 4,
+   "normal": [
+    0.6456763010230226,
+    -0.6498930932583766,
+    0.4009252818572137
+   ],
+   "massKg": 8.172501111403108e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t5",
+   "geom": "avocado_skin_right_s2_t5",
+   "equality": "avocado_skin_right_s2_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s2",
+   "index": 5,
+   "normal": [
+    0.6644814731215428,
+    -0.6458823541876622,
+    0.37589939668377687
+   ],
+   "massKg": 9.850175410974771e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t6",
+   "geom": "avocado_skin_right_s2_t6",
+   "equality": "avocado_skin_right_s2_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s2",
+   "index": 6,
+   "normal": [
+    0.8523801496344718,
+    -0.3895381425534336,
+    0.34886690299473266
+   ],
+   "massKg": 0.00011320605699438602
+  },
+  {
+   "body": "avocado_skin_right_s2_t7",
+   "geom": "avocado_skin_right_s2_t7",
+   "equality": "avocado_skin_right_s2_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s2",
+   "index": 7,
+   "normal": [
+    0.7892890557589358,
+    -0.5229683085118768,
+    0.32175601742841414
+   ],
+   "massKg": 0.00012551275722216815
+  },
+  {
+   "body": "avocado_skin_right_s2_t8",
+   "geom": "avocado_skin_right_s2_t8",
+   "equality": "avocado_skin_right_s2_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s2",
+   "index": 8,
+   "normal": [
+    0.8068085417502139,
+    -0.529778094179905,
+    0.2615246601871441
+   ],
+   "massKg": 0.0001406099327141419
+  },
+  {
+   "body": "avocado_skin_right_s2_t9",
+   "geom": "avocado_skin_right_s2_t9",
+   "equality": "avocado_skin_right_s2_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s2",
+   "index": 9,
+   "normal": [
+    0.7446489408775677,
+    -0.6454763672684772,
+    0.16987705597815958
+   ],
+   "massKg": 0.0001542852696729824
+  },
+  {
+   "body": "avocado_skin_right_s2_t10",
+   "geom": "avocado_skin_right_s2_t10",
+   "equality": "avocado_skin_right_s2_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s2",
+   "index": 10,
+   "normal": [
+    0.7577304234995755,
+    -0.6445634102031097,
+    0.1018951202486741
+   ],
+   "massKg": 0.00016004141070879996
+  },
+  {
+   "body": "avocado_skin_right_s2_t11",
+   "geom": "avocado_skin_right_s2_t11",
+   "equality": "avocado_skin_right_s2_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s2",
+   "index": 11,
+   "normal": [
+    0.902544581864889,
+    -0.4279942426407647,
+    0.047267388469124164
+   ],
+   "massKg": 0.00016974382742773741
+  },
+  {
+   "body": "avocado_skin_right_s2_t12",
+   "geom": "avocado_skin_right_s2_t12",
+   "equality": "avocado_skin_right_s2_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s2",
+   "index": 12,
+   "normal": [
+    0.9047712699498557,
+    -0.42505522067749824,
+    -0.026777013428097587
+   ],
+   "massKg": 0.0001739498256938532
+  },
+  {
+   "body": "avocado_skin_right_s2_t13",
+   "geom": "avocado_skin_right_s2_t13",
+   "equality": "avocado_skin_right_s2_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s2",
+   "index": 13,
+   "normal": [
+    0.8992794600515664,
+    -0.4173195978737146,
+    -0.130922900822906
+   ],
+   "massKg": 0.00017886218847706914
+  },
+  {
+   "body": "avocado_skin_right_s2_t14",
+   "geom": "avocado_skin_right_s2_t14",
+   "equality": "avocado_skin_right_s2_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s2",
+   "index": 14,
+   "normal": [
+    0.876645005045174,
+    -0.3887024908436792,
+    -0.28355583002517587
+   ],
+   "massKg": 0.00017842357920017093
+  },
+  {
+   "body": "avocado_skin_right_s2_t15",
+   "geom": "avocado_skin_right_s2_t15",
+   "equality": "avocado_skin_right_s2_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s2",
+   "index": 15,
+   "normal": [
+    0.6962979937403019,
+    -0.461597520543445,
+    -0.5496333622892395
+   ],
+   "massKg": 0.00017185350588988513
+  },
+  {
+   "body": "avocado_skin_right_s2_t16",
+   "geom": "avocado_skin_right_s2_t16",
+   "equality": "avocado_skin_right_s2_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s2",
+   "index": 16,
+   "normal": [
+    0.4574341550032735,
+    -0.3021456450732858,
+    -0.8363384500306614
+   ],
+   "massKg": 0.00014864237164147198
+  },
+  {
+   "body": "avocado_skin_right_s2_t17",
+   "geom": "avocado_skin_right_s2_t17",
+   "equality": "avocado_skin_right_s2_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s2",
+   "index": 17,
+   "normal": [
+    -0.08737787494861012,
+    -0.45117832066972874,
+    -0.8881459508026305
+   ],
+   "massKg": 0.0001134332487708889
+  },
+  {
+   "body": "avocado_skin_right_s2_t18",
+   "geom": "avocado_skin_right_s2_t18",
+   "equality": "avocado_skin_right_s2_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s2",
+   "index": 18,
+   "normal": [
+    -0.00019203658853469323,
+    -0.04212045355668674,
+    -0.9991125214479737
+   ],
+   "massKg": 1.7018584912875667e-05
+  },
+  {
+   "body": "avocado_skin_right_s2_t19",
+   "geom": "avocado_skin_right_s2_t19",
+   "equality": "avocado_skin_right_s2_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s2",
+   "index": 19,
+   "normal": [
+    0.7071067774410572,
+    0.7071067849228245,
+    -3.6096648212419487e-06
+   ],
+   "massKg": 3.473732590464351e-07
+  },
+  {
+   "body": "avocado_skin_right_s3_t0",
+   "geom": "avocado_skin_right_s3_t0",
+   "equality": "avocado_skin_right_s3_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s3",
+   "index": 0,
+   "normal": [
+    0.843396296274107,
+    -0.17081274012990424,
+    0.5094170150676481
+   ],
+   "massKg": 1.0384915185568389e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t1",
+   "geom": "avocado_skin_right_s3_t1",
+   "equality": "avocado_skin_right_s3_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s3",
+   "index": 1,
+   "normal": [
+    0.5997534408771442,
+    -0.5257900428489307,
+    0.60319204321422
+   ],
+   "massKg": 3.463264147285372e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t2",
+   "geom": "avocado_skin_right_s3_t2",
+   "equality": "avocado_skin_right_s3_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s3",
+   "index": 2,
+   "normal": [
+    0.7643815411172351,
+    -0.4177365623696963,
+    0.4911384978382263
+   ],
+   "massKg": 5.0655438826652244e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t3",
+   "geom": "avocado_skin_right_s3_t3",
+   "equality": "avocado_skin_right_s3_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s3",
+   "index": 3,
+   "normal": [
+    0.886918348612369,
+    -0.17864298687430166,
+    0.42598418531130544
+   ],
+   "massKg": 6.599268817808479e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t4",
+   "geom": "avocado_skin_right_s3_t4",
+   "equality": "avocado_skin_right_s3_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s3",
+   "index": 4,
+   "normal": [
+    0.8422963585714228,
+    -0.36201006380944284,
+    0.39935642981928327
+   ],
+   "massKg": 8.051314944168553e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t5",
+   "geom": "avocado_skin_right_s3_t5",
+   "equality": "avocado_skin_right_s3_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s3",
+   "index": 5,
+   "normal": [
+    0.9121684259054615,
+    -0.1777415896263265,
+    0.3692650675304379
+   ],
+   "massKg": 9.754949132911861e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t6",
+   "geom": "avocado_skin_right_s3_t6",
+   "equality": "avocado_skin_right_s3_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s3",
+   "index": 6,
+   "normal": [
+    0.8786708808805944,
+    -0.32938143402813125,
+    0.34560867178080507
+   ],
+   "massKg": 0.00011275905126240104
+  },
+  {
+   "body": "avocado_skin_right_s3_t7",
+   "geom": "avocado_skin_right_s3_t7",
+   "equality": "avocado_skin_right_s3_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s3",
+   "index": 7,
+   "normal": [
+    0.9347499308510739,
+    -0.19163797502236024,
+    0.2991946745903775
+   ],
+   "massKg": 0.00012752869224641472
+  },
+  {
+   "body": "avocado_skin_right_s3_t8",
+   "geom": "avocado_skin_right_s3_t8",
+   "equality": "avocado_skin_right_s3_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s3",
+   "index": 8,
+   "normal": [
+    0.9525973010173016,
+    -0.18448471677675551,
+    0.24191686871806364
+   ],
+   "massKg": 0.0001424473011866212
+  },
+  {
+   "body": "avocado_skin_right_s3_t9",
+   "geom": "avocado_skin_right_s3_t9",
+   "equality": "avocado_skin_right_s3_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s3",
+   "index": 9,
+   "normal": [
+    0.9705902243277038,
+    -0.17841867591005292,
+    0.16162113885875543
+   ],
+   "massKg": 0.0001538503565825522
+  },
+  {
+   "body": "avocado_skin_right_s3_t10",
+   "geom": "avocado_skin_right_s3_t10",
+   "equality": "avocado_skin_right_s3_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s3",
+   "index": 10,
+   "normal": [
+    0.9779699351940068,
+    -0.1845556799454722,
+    0.0975397706399528
+   ],
+   "massKg": 0.00016048278484959155
+  },
+  {
+   "body": "avocado_skin_right_s3_t11",
+   "geom": "avocado_skin_right_s3_t11",
+   "equality": "avocado_skin_right_s3_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s3",
+   "index": 11,
+   "normal": [
+    0.9814392589658232,
+    -0.18575380993882967,
+    0.04767077777658908
+   ],
+   "massKg": 0.00016706346650607884
+  },
+  {
+   "body": "avocado_skin_right_s3_t12",
+   "geom": "avocado_skin_right_s3_t12",
+   "equality": "avocado_skin_right_s3_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s3",
+   "index": 12,
+   "normal": [
+    0.9838034134713843,
+    -0.1778769849662954,
+    -0.022149985583583963
+   ],
+   "massKg": 0.00017221672169398516
+  },
+  {
+   "body": "avocado_skin_right_s3_t13",
+   "geom": "avocado_skin_right_s3_t13",
+   "equality": "avocado_skin_right_s3_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s3",
+   "index": 13,
+   "normal": [
+    0.9767409650787855,
+    -0.17570432535886207,
+    -0.1229027143197012
+   ],
+   "massKg": 0.0001784315099939704
+  },
+  {
+   "body": "avocado_skin_right_s3_t14",
+   "geom": "avocado_skin_right_s3_t14",
+   "equality": "avocado_skin_right_s3_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s3",
+   "index": 14,
+   "normal": [
+    0.943271698265712,
+    -0.187395776725703,
+    -0.2740826994107621
+   ],
+   "massKg": 0.00018001909484155476
+  },
+  {
+   "body": "avocado_skin_right_s3_t15",
+   "geom": "avocado_skin_right_s3_t15",
+   "equality": "avocado_skin_right_s3_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s3",
+   "index": 15,
+   "normal": [
+    0.8408000859974974,
+    -0.1677565021177571,
+    -0.514696970443596
+   ],
+   "massKg": 0.00016969945863820612
+  },
+  {
+   "body": "avocado_skin_right_s3_t16",
+   "geom": "avocado_skin_right_s3_t16",
+   "equality": "avocado_skin_right_s3_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s3",
+   "index": 16,
+   "normal": [
+    0.46202918740245563,
+    -0.28886806360589257,
+    -0.8385012056144038
+   ],
+   "massKg": 0.0001476819161325693
+  },
+  {
+   "body": "avocado_skin_right_s3_t17",
+   "geom": "avocado_skin_right_s3_t17",
+   "equality": "avocado_skin_right_s3_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s3",
+   "index": 17,
+   "normal": [
+    0.27769315586225596,
+    -0.056247460554942126,
+    -0.9590217590693034
+   ],
+   "massKg": 0.00011351399007253349
+  },
+  {
+   "body": "avocado_skin_right_s3_t18",
+   "geom": "avocado_skin_right_s3_t18",
+   "equality": "avocado_skin_right_s3_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s3",
+   "index": 18,
+   "normal": [
+    0.9809088401368213,
+    -0.19446811394099037,
+    -1.2922525290231799e-06
+   ],
+   "massKg": 1.7030408343998715e-05
+  },
+  {
+   "body": "avocado_skin_right_s3_t19",
+   "geom": "avocado_skin_right_s3_t19",
+   "equality": "avocado_skin_right_s3_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s3",
+   "index": 19,
+   "normal": [
+    0.9806743372443225,
+    -0.19564724392158317,
+    1.4707047007431877e-05
+   ],
+   "massKg": 3.4739068155431596e-07
+  },
+  {
+   "body": "avocado_skin_right_s4_t0",
+   "geom": "avocado_skin_right_s4_t0",
+   "equality": "avocado_skin_right_s4_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s4",
+   "index": 0,
+   "normal": [
+    0.11773110632249291,
+    0.9512301003916692,
+    0.2851327457745548
+   ],
+   "massKg": 1.0445913176226895e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t1",
+   "geom": "avocado_skin_right_s4_t1",
+   "equality": "avocado_skin_right_s4_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s4",
+   "index": 1,
+   "normal": [
+    0.7729745992811312,
+    0.15146566625250338,
+    0.6160912439021188
+   ],
+   "massKg": 3.412456135265529e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t2",
+   "geom": "avocado_skin_right_s4_t2",
+   "equality": "avocado_skin_right_s4_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s4",
+   "index": 2,
+   "normal": [
+    0.7638867193987569,
+    0.4190649484228955,
+    0.4907765774051578
+   ],
+   "massKg": 5.113717998028733e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t3",
+   "geom": "avocado_skin_right_s4_t3",
+   "equality": "avocado_skin_right_s4_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s4",
+   "index": 3,
+   "normal": [
+    0.8837645558148056,
+    0.191733802336783,
+    0.42684699709256324
+   ],
+   "massKg": 6.540498725371435e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t4",
+   "geom": "avocado_skin_right_s4_t4",
+   "equality": "avocado_skin_right_s4_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s4",
+   "index": 4,
+   "normal": [
+    0.8995212377173843,
+    0.18957248515029232,
+    0.39360362773903285
+   ],
+   "massKg": 8.278359018731862e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t5",
+   "geom": "avocado_skin_right_s4_t5",
+   "equality": "avocado_skin_right_s4_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s4",
+   "index": 5,
+   "normal": [
+    0.8626921822305484,
+    0.3391122930351217,
+    0.37518668877074507
+   ],
+   "massKg": 9.773602505447343e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t6",
+   "geom": "avocado_skin_right_s4_t6",
+   "equality": "avocado_skin_right_s4_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s4",
+   "index": 6,
+   "normal": [
+    0.9233193968523338,
+    0.18298980210913252,
+    0.3376329719092956
+   ],
+   "massKg": 0.00011443136463640258
+  },
+  {
+   "body": "avocado_skin_right_s4_t7",
+   "geom": "avocado_skin_right_s4_t7",
+   "equality": "avocado_skin_right_s4_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s4",
+   "index": 7,
+   "normal": [
+    0.8938811509678728,
+    0.3333036377579196,
+    0.29980856058773314
+   ],
+   "massKg": 0.0001282193697988987
+  },
+  {
+   "body": "avocado_skin_right_s4_t8",
+   "geom": "avocado_skin_right_s4_t8",
+   "equality": "avocado_skin_right_s4_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s4",
+   "index": 8,
+   "normal": [
+    0.9142812370942096,
+    0.3254795030820837,
+    0.24114915005224782
+   ],
+   "massKg": 0.00014050233585294336
+  },
+  {
+   "body": "avocado_skin_right_s4_t9",
+   "geom": "avocado_skin_right_s4_t9",
+   "equality": "avocado_skin_right_s4_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s4",
+   "index": 9,
+   "normal": [
+    0.9685874810726267,
+    0.19215152187536721,
+    0.15784829473378556
+   ],
+   "massKg": 0.00015149667160585523
+  },
+  {
+   "body": "avocado_skin_right_s4_t10",
+   "geom": "avocado_skin_right_s4_t10",
+   "equality": "avocado_skin_right_s4_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s4",
+   "index": 10,
+   "normal": [
+    0.9396796092972081,
+    0.32783857931752036,
+    0.09759148416801709
+   ],
+   "massKg": 0.00015928763605188578
+  },
+  {
+   "body": "avocado_skin_right_s4_t11",
+   "geom": "avocado_skin_right_s4_t11",
+   "equality": "avocado_skin_right_s4_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s4",
+   "index": 11,
+   "normal": [
+    0.9786072195570669,
+    0.19984022273167584,
+    0.04890598336953014
+   ],
+   "massKg": 0.0001650667836656794
+  },
+  {
+   "body": "avocado_skin_right_s4_t12",
+   "geom": "avocado_skin_right_s4_t12",
+   "equality": "avocado_skin_right_s4_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s4",
+   "index": 12,
+   "normal": [
+    0.9797968084869186,
+    0.19915025753272925,
+    -0.018368151880255874
+   ],
+   "massKg": 0.00017073786875698715
+  },
+  {
+   "body": "avocado_skin_right_s4_t13",
+   "geom": "avocado_skin_right_s4_t13",
+   "equality": "avocado_skin_right_s4_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s4",
+   "index": 13,
+   "normal": [
+    0.934017940789396,
+    0.33633145928588176,
+    -0.12038121023716825
+   ],
+   "massKg": 0.0001747380883898586
+  },
+  {
+   "body": "avocado_skin_right_s4_t14",
+   "geom": "avocado_skin_right_s4_t14",
+   "equality": "avocado_skin_right_s4_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s4",
+   "index": 14,
+   "normal": [
+    0.8995214207569797,
+    0.34031847019648986,
+    -0.2739426079354311
+   ],
+   "massKg": 0.00017723915516398847
+  },
+  {
+   "body": "avocado_skin_right_s4_t15",
+   "geom": "avocado_skin_right_s4_t15",
+   "equality": "avocado_skin_right_s4_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s4",
+   "index": 15,
+   "normal": [
+    0.786728510034595,
+    0.3335722243127193,
+    -0.5194110344089842
+   ],
+   "massKg": 0.00017087595188058913
+  },
+  {
+   "body": "avocado_skin_right_s4_t16",
+   "geom": "avocado_skin_right_s4_t16",
+   "equality": "avocado_skin_right_s4_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s4",
+   "index": 16,
+   "normal": [
+    0.4622581155141269,
+    0.2875404819678781,
+    -0.8388312737797803
+   ],
+   "massKg": 0.00014835067850071937
+  },
+  {
+   "body": "avocado_skin_right_s4_t17",
+   "geom": "avocado_skin_right_s4_t17",
+   "equality": "avocado_skin_right_s4_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s4",
+   "index": 17,
+   "normal": [
+    0.09186998325592248,
+    0.4506489676188163,
+    -0.8879613810074465
+   ],
+   "massKg": 0.00011348028056090698
+  },
+  {
+   "body": "avocado_skin_right_s4_t18",
+   "geom": "avocado_skin_right_s4_t18",
+   "equality": "avocado_skin_right_s4_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s4",
+   "index": 18,
+   "normal": [
+    4.8809292217624705e-08,
+    0.9999999999999185,
+    4.009148290772333e-07
+   ],
+   "massKg": 1.7040318198269233e-05
+  },
+  {
+   "body": "avocado_skin_right_s4_t19",
+   "geom": "avocado_skin_right_s4_t19",
+   "equality": "avocado_skin_right_s4_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s4",
+   "index": 19,
+   "normal": [
+    -5.8393968732319424e-08,
+    0.9999999999942608,
+    3.3874254965112984e-06
+   ],
+   "massKg": 3.4744365962069423e-07
+  },
+  {
+   "body": "avocado_skin_right_s5_t0",
+   "geom": "avocado_skin_right_s5_t0",
+   "equality": "avocado_skin_right_s5_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s5",
+   "index": 0,
+   "normal": [
+    -0.25642716323150416,
+    0.9242685601224241,
+    0.2827945167896023
+   ],
+   "massKg": 1.0471936548128724e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t1",
+   "geom": "avocado_skin_right_s5_t1",
+   "equality": "avocado_skin_right_s5_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s5",
+   "index": 1,
+   "normal": [
+    0.35040111693266507,
+    0.7182153109465468,
+    0.6011537443735139
+   ],
+   "massKg": 3.446182017796673e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t2",
+   "geom": "avocado_skin_right_s5_t2",
+   "equality": "avocado_skin_right_s5_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s5",
+   "index": 2,
+   "normal": [
+    0.7299548153709012,
+    0.48276978621697836,
+    0.4838380938215248
+   ],
+   "massKg": 5.163241075933911e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t3",
+   "geom": "avocado_skin_right_s5_t3",
+   "equality": "avocado_skin_right_s5_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s5",
+   "index": 3,
+   "normal": [
+    0.8491641865312946,
+    0.3046339797758389,
+    0.431414328318588
+   ],
+   "massKg": 6.513950211228803e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t4",
+   "geom": "avocado_skin_right_s5_t4",
+   "equality": "avocado_skin_right_s5_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s5",
+   "index": 4,
+   "normal": [
+    0.7529164156840579,
+    0.5051384690186352,
+    0.42184357066450606
+   ],
+   "massKg": 8.136124961310998e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t5",
+   "geom": "avocado_skin_right_s5_t5",
+   "equality": "avocado_skin_right_s5_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s5",
+   "index": 5,
+   "normal": [
+    0.7641369812916861,
+    0.5121665335645748,
+    0.3921480788157414
+   ],
+   "massKg": 9.646082617109641e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t6",
+   "geom": "avocado_skin_right_s5_t6",
+   "equality": "avocado_skin_right_s5_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s5",
+   "index": 6,
+   "normal": [
+    0.8555549044372558,
+    0.3881294769240179,
+    0.3426095658852013
+   ],
+   "massKg": 0.00011411040759412572
+  },
+  {
+   "body": "avocado_skin_right_s5_t7",
+   "geom": "avocado_skin_right_s5_t7",
+   "equality": "avocado_skin_right_s5_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s5",
+   "index": 7,
+   "normal": [
+    0.7913241644958661,
+    0.5359056614610923,
+    0.2942977891504941
+   ],
+   "massKg": 0.00012673463788814843
+  },
+  {
+   "body": "avocado_skin_right_s5_t8",
+   "geom": "avocado_skin_right_s5_t8",
+   "equality": "avocado_skin_right_s5_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s5",
+   "index": 8,
+   "normal": [
+    0.8050781301080117,
+    0.5380611407662654,
+    0.24967861986780654
+   ],
+   "massKg": 0.00013995816698297858
+  },
+  {
+   "body": "avocado_skin_right_s5_t9",
+   "geom": "avocado_skin_right_s5_t9",
+   "equality": "avocado_skin_right_s5_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s5",
+   "index": 9,
+   "normal": [
+    0.8889245019072608,
+    0.4289213388509752,
+    0.16074736385774796
+   ],
+   "massKg": 0.00015464289754163474
+  },
+  {
+   "body": "avocado_skin_right_s5_t10",
+   "geom": "avocado_skin_right_s5_t10",
+   "equality": "avocado_skin_right_s5_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s5",
+   "index": 10,
+   "normal": [
+    0.7494070963930514,
+    0.6546822267562364,
+    0.09889482213559754
+   ],
+   "massKg": 0.00016007563681341708
+  },
+  {
+   "body": "avocado_skin_right_s5_t11",
+   "geom": "avocado_skin_right_s5_t11",
+   "equality": "avocado_skin_right_s5_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s5",
+   "index": 11,
+   "normal": [
+    0.7504709427614549,
+    0.6588933365227113,
+    0.05150665157727063
+   ],
+   "massKg": 0.0001648150646360591
+  },
+  {
+   "body": "avocado_skin_right_s5_t12",
+   "geom": "avocado_skin_right_s5_t12",
+   "equality": "avocado_skin_right_s5_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s5",
+   "index": 12,
+   "normal": [
+    0.8337876388238861,
+    0.5518084966421429,
+    -0.017480170995360325
+   ],
+   "massKg": 0.00017074018251150846
+  },
+  {
+   "body": "avocado_skin_right_s5_t13",
+   "geom": "avocado_skin_right_s5_t13",
+   "equality": "avocado_skin_right_s5_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s5",
+   "index": 13,
+   "normal": [
+    0.8245437481512697,
+    0.5535417074787572,
+    -0.11712892668404815
+   ],
+   "massKg": 0.00017564871814101934
+  },
+  {
+   "body": "avocado_skin_right_s5_t14",
+   "geom": "avocado_skin_right_s5_t14",
+   "equality": "avocado_skin_right_s5_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s5",
+   "index": 14,
+   "normal": [
+    0.8804850413238828,
+    0.3884040319117079,
+    -0.271824207898431
+   ],
+   "massKg": 0.00017641107842791826
+  },
+  {
+   "body": "avocado_skin_right_s5_t15",
+   "geom": "avocado_skin_right_s5_t15",
+   "equality": "avocado_skin_right_s5_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s5",
+   "index": 15,
+   "normal": [
+    0.7942793312138526,
+    0.31664144799070576,
+    -0.5185157060502836
+   ],
+   "massKg": 0.00016833544941619039
+  },
+  {
+   "body": "avocado_skin_right_s5_t16",
+   "geom": "avocado_skin_right_s5_t16",
+   "equality": "avocado_skin_right_s5_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s5",
+   "index": 16,
+   "normal": [
+    0.45796774943565904,
+    0.29898253629457594,
+    -0.8371827658687796
+   ],
+   "massKg": 0.00015004162560217083
+  },
+  {
+   "body": "avocado_skin_right_s5_t17",
+   "geom": "avocado_skin_right_s5_t17",
+   "equality": "avocado_skin_right_s5_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s5",
+   "index": 17,
+   "normal": [
+    0.2356023547879271,
+    0.1582153606691891,
+    -0.9588844716996423
+   ],
+   "massKg": 0.00011372898006811738
+  },
+  {
+   "body": "avocado_skin_right_s5_t18",
+   "geom": "avocado_skin_right_s5_t18",
+   "equality": "avocado_skin_right_s5_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s5",
+   "index": 18,
+   "normal": [
+    0.8310811916084081,
+    0.556151106224373,
+    -3.930708936986365e-07
+   ],
+   "massKg": 1.7042606486938894e-05
+  },
+  {
+   "body": "avocado_skin_right_s5_t19",
+   "geom": "avocado_skin_right_s5_t19",
+   "equality": "avocado_skin_right_s5_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s5",
+   "index": 19,
+   "normal": [
+    -0.3826833546280005,
+    0.9238795647106569,
+    -8.409163225190563e-07
+   ],
+   "massKg": 3.4741384524750174e-07
+  },
+  {
+   "body": "avocado_skin_right_s6_t0",
+   "geom": "avocado_skin_right_s6_t0",
+   "equality": "avocado_skin_right_s6_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s6",
+   "index": 0,
+   "normal": [
+    0.49652289532816657,
+    0.7050587405757556,
+    0.5063172787419602
+   ],
+   "massKg": 1.0562439456407446e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t1",
+   "geom": "avocado_skin_right_s6_t1",
+   "equality": "avocado_skin_right_s6_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s6",
+   "index": 1,
+   "normal": [
+    0.45007295612335757,
+    0.649350520450816,
+    0.6130075331972981
+   ],
+   "massKg": 3.524549174471758e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t2",
+   "geom": "avocado_skin_right_s6_t2",
+   "equality": "avocado_skin_right_s6_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s6",
+   "index": 2,
+   "normal": [
+    0.6731966160792805,
+    0.5522425296874712,
+    0.4917667175641191
+   ],
+   "massKg": 4.9936144932871684e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t3",
+   "geom": "avocado_skin_right_s6_t3",
+   "equality": "avocado_skin_right_s6_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s6",
+   "index": 3,
+   "normal": [
+    0.4915641272449643,
+    0.7390773216811544,
+    0.46057509852629674
+   ],
+   "massKg": 6.708899309160188e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t4",
+   "geom": "avocado_skin_right_s6_t4",
+   "equality": "avocado_skin_right_s6_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s6",
+   "index": 4,
+   "normal": [
+    0.5026528830205101,
+    0.7543853892251672,
+    0.422188066760256
+   ],
+   "massKg": 7.943761738715693e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t5",
+   "geom": "avocado_skin_right_s6_t5",
+   "equality": "avocado_skin_right_s6_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s6",
+   "index": 5,
+   "normal": [
+    0.5188471746166137,
+    0.7709567517099791,
+    0.3693552441554806
+   ],
+   "massKg": 9.447305637877434e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t6",
+   "geom": "avocado_skin_right_s6_t6",
+   "equality": "avocado_skin_right_s6_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s6",
+   "index": 6,
+   "normal": [
+    0.5194118944488537,
+    0.7759815582152783,
+    0.35786017550831395
+   ],
+   "massKg": 0.00011298267054371536
+  },
+  {
+   "body": "avocado_skin_right_s6_t7",
+   "geom": "avocado_skin_right_s6_t7",
+   "equality": "avocado_skin_right_s6_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s6",
+   "index": 7,
+   "normal": [
+    0.5294009054517749,
+    0.7884906867384045,
+    0.31307685675188474
+   ],
+   "massKg": 0.00012737351062241942
+  },
+  {
+   "body": "avocado_skin_right_s6_t8",
+   "geom": "avocado_skin_right_s6_t8",
+   "equality": "avocado_skin_right_s6_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s6",
+   "index": 8,
+   "normal": [
+    0.5431252726540897,
+    0.8048236295841348,
+    0.2393195843792145
+   ],
+   "massKg": 0.00013863290951121598
+  },
+  {
+   "body": "avocado_skin_right_s6_t9",
+   "geom": "avocado_skin_right_s6_t9",
+   "equality": "avocado_skin_right_s6_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s6",
+   "index": 9,
+   "normal": [
+    0.4334669403223504,
+    0.8863077116481224,
+    0.16298788887720728
+   ],
+   "massKg": 0.0001597982191015035
+  },
+  {
+   "body": "avocado_skin_right_s6_t10",
+   "geom": "avocado_skin_right_s6_t10",
+   "equality": "avocado_skin_right_s6_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s6",
+   "index": 10,
+   "normal": [
+    0.6600293363985634,
+    0.7445616487273117,
+    0.09994611717190048
+   ],
+   "massKg": 0.0001633930514799431
+  },
+  {
+   "body": "avocado_skin_right_s6_t11",
+   "geom": "avocado_skin_right_s6_t11",
+   "equality": "avocado_skin_right_s6_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s6",
+   "index": 11,
+   "normal": [
+    0.44771341088955646,
+    0.8926774382512418,
+    0.051765750712605786
+   ],
+   "massKg": 0.00016634349594824016
+  },
+  {
+   "body": "avocado_skin_right_s6_t12",
+   "geom": "avocado_skin_right_s6_t12",
+   "equality": "avocado_skin_right_s6_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s6",
+   "index": 12,
+   "normal": [
+    0.4412979400868129,
+    0.8971882617074877,
+    -0.017588380523293045
+   ],
+   "massKg": 0.0001725734764477238
+  },
+  {
+   "body": "avocado_skin_right_s6_t13",
+   "geom": "avocado_skin_right_s6_t13",
+   "equality": "avocado_skin_right_s6_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s6",
+   "index": 13,
+   "normal": [
+    0.6645145634225205,
+    0.7375554240206222,
+    -0.12013488875899898
+   ],
+   "massKg": 0.00017390327411703765
+  },
+  {
+   "body": "avocado_skin_right_s6_t14",
+   "geom": "avocado_skin_right_s6_t14",
+   "equality": "avocado_skin_right_s6_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s6",
+   "index": 14,
+   "normal": [
+    0.6605063612473279,
+    0.699641402189689,
+    -0.2724578042447313
+   ],
+   "massKg": 0.0001772120886016637
+  },
+  {
+   "body": "avocado_skin_right_s6_t15",
+   "geom": "avocado_skin_right_s6_t15",
+   "equality": "avocado_skin_right_s6_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s6",
+   "index": 15,
+   "normal": [
+    0.4682078142965111,
+    0.6965372970414789,
+    -0.5437069398691121
+   ],
+   "massKg": 0.00017178045527543873
+  },
+  {
+   "body": "avocado_skin_right_s6_t16",
+   "geom": "avocado_skin_right_s6_t16",
+   "equality": "avocado_skin_right_s6_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s6",
+   "index": 16,
+   "normal": [
+    0.11800655586377333,
+    0.5311629763258244,
+    -0.8390115287371573
+   ],
+   "massKg": 0.00015140484902076423
+  },
+  {
+   "body": "avocado_skin_right_s6_t17",
+   "geom": "avocado_skin_right_s6_t17",
+   "equality": "avocado_skin_right_s6_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s6",
+   "index": 17,
+   "normal": [
+    -0.25411671216042386,
+    0.3838588171272759,
+    -0.8877370698097634
+   ],
+   "massKg": 0.00011377882037777454
+  },
+  {
+   "body": "avocado_skin_right_s6_t18",
+   "geom": "avocado_skin_right_s6_t18",
+   "equality": "avocado_skin_right_s6_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s6",
+   "index": 18,
+   "normal": [
+    0.5586298250825117,
+    0.8294170956321038,
+    1.2199260998493492e-06
+   ],
+   "massKg": 1.7036451026797295e-05
+  },
+  {
+   "body": "avocado_skin_right_s6_t19",
+   "geom": "avocado_skin_right_s6_t19",
+   "equality": "avocado_skin_right_s6_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s6",
+   "index": 19,
+   "normal": [
+    0.555677029629221,
+    0.8313982431222776,
+    8.696908142030696e-06
+   ],
+   "massKg": 3.475001904007513e-07
+  },
+  {
+   "body": "avocado_skin_right_s7_t0",
+   "geom": "avocado_skin_right_s7_t0",
+   "equality": "avocado_skin_right_s7_t0_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s7",
+   "index": 0,
+   "normal": [
+    0.15823143861906291,
+    0.8483127547347423,
+    0.5053001899731432
+   ],
+   "massKg": 1.058346879290184e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t1",
+   "geom": "avocado_skin_right_s7_t1",
+   "equality": "avocado_skin_right_s7_t1_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s7",
+   "index": 1,
+   "normal": [
+    0.5436222165819573,
+    0.5933397578827349,
+    0.593652101280015
+   ],
+   "massKg": 3.576619201339781e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t2",
+   "geom": "avocado_skin_right_s7_t2",
+   "equality": "avocado_skin_right_s7_t2_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s7",
+   "index": 2,
+   "normal": [
+    0.19406817613374291,
+    0.8534959659754733,
+    0.483613667172172
+   ],
+   "massKg": 5.103006333229132e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t3",
+   "geom": "avocado_skin_right_s7_t3",
+   "equality": "avocado_skin_right_s7_t3_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s7",
+   "index": 3,
+   "normal": [
+    0.17191506265206283,
+    0.8706226002367232,
+    0.4609354609816696
+   ],
+   "massKg": 6.43774401396513e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t4",
+   "geom": "avocado_skin_right_s7_t4",
+   "equality": "avocado_skin_right_s7_t4_attach",
+   "flesh": "avocado_flesh_right_0",
+   "strip": "right_s7",
+   "index": 4,
+   "normal": [
+    0.36186402641750604,
+    0.8416898331046285,
+    0.4007650823527581
+   ],
+   "massKg": 8.188576612155885e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t5",
+   "geom": "avocado_skin_right_s7_t5",
+   "equality": "avocado_skin_right_s7_t5_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s7",
+   "index": 5,
+   "normal": [
+    0.3448532833935185,
+    0.8600555272986484,
+    0.3760062537987277
+   ],
+   "massKg": 9.725997369969264e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t6",
+   "geom": "avocado_skin_right_s7_t6",
+   "equality": "avocado_skin_right_s7_t6_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s7",
+   "index": 6,
+   "normal": [
+    0.028562374481453805,
+    0.9383146833372709,
+    0.34460084996653495
+   ],
+   "massKg": 0.00011413508036639541
+  },
+  {
+   "body": "avocado_skin_right_s7_t7",
+   "geom": "avocado_skin_right_s7_t7",
+   "equality": "avocado_skin_right_s7_t7_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s7",
+   "index": 7,
+   "normal": [
+    0.18644485159908308,
+    0.936349765573187,
+    0.2974683744925394
+   ],
+   "massKg": 0.00012780021643266082
+  },
+  {
+   "body": "avocado_skin_right_s7_t8",
+   "geom": "avocado_skin_right_s7_t8",
+   "equality": "avocado_skin_right_s7_t8_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s7",
+   "index": 8,
+   "normal": [
+    0.05770345538723328,
+    0.9681160626144811,
+    0.2437654621643676
+   ],
+   "massKg": 0.0001396946026943624
+  },
+  {
+   "body": "avocado_skin_right_s7_t9",
+   "geom": "avocado_skin_right_s7_t9",
+   "equality": "avocado_skin_right_s7_t9_attach",
+   "flesh": "avocado_flesh_right_1",
+   "strip": "right_s7",
+   "index": 9,
+   "normal": [
+    0.19496282393238087,
+    0.9678198621393289,
+    0.15910440513361646
+   ],
+   "massKg": 0.00015483563765883446
+  },
+  {
+   "body": "avocado_skin_right_s7_t10",
+   "geom": "avocado_skin_right_s7_t10",
+   "equality": "avocado_skin_right_s7_t10_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s7",
+   "index": 10,
+   "normal": [
+    0.19641778202214638,
+    0.9757499258744444,
+    0.09660298681467694
+   ],
+   "massKg": 0.00016365382180083543
+  },
+  {
+   "body": "avocado_skin_right_s7_t11",
+   "geom": "avocado_skin_right_s7_t11",
+   "equality": "avocado_skin_right_s7_t11_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s7",
+   "index": 11,
+   "normal": [
+    0.32434469516423925,
+    0.9446294369440383,
+    0.04975686462796621
+   ],
+   "massKg": 0.00016594797489233315
+  },
+  {
+   "body": "avocado_skin_right_s7_t12",
+   "geom": "avocado_skin_right_s7_t12",
+   "equality": "avocado_skin_right_s7_t12_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s7",
+   "index": 12,
+   "normal": [
+    0.1847496563224607,
+    0.9826124781842194,
+    -0.018446739695662247
+   ],
+   "massKg": 0.00017431336164008826
+  },
+  {
+   "body": "avocado_skin_right_s7_t13",
+   "geom": "avocado_skin_right_s7_t13",
+   "equality": "avocado_skin_right_s7_t13_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s7",
+   "index": 13,
+   "normal": [
+    0.052126194889663635,
+    0.9914203912865441,
+    -0.11986854277732872
+   ],
+   "massKg": 0.00017508560267742723
+  },
+  {
+   "body": "avocado_skin_right_s7_t14",
+   "geom": "avocado_skin_right_s7_t14",
+   "equality": "avocado_skin_right_s7_t14_attach",
+   "flesh": "avocado_flesh_right_2",
+   "strip": "right_s7",
+   "index": 14,
+   "normal": [
+    0.028829031313976967,
+    0.9620504403681273,
+    -0.2713444990063186
+   ],
+   "massKg": 0.00017925392603501678
+  },
+  {
+   "body": "avocado_skin_right_s7_t15",
+   "geom": "avocado_skin_right_s7_t15",
+   "equality": "avocado_skin_right_s7_t15_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s7",
+   "index": 15,
+   "normal": [
+    0.3353212531048297,
+    0.7864737450010101,
+    -0.5186701318181844
+   ],
+   "massKg": 0.00017055125499609858
+  },
+  {
+   "body": "avocado_skin_right_s7_t16",
+   "geom": "avocado_skin_right_s7_t16",
+   "equality": "avocado_skin_right_s7_t16_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s7",
+   "index": 16,
+   "normal": [
+    0.1053503642819414,
+    0.5357080535121044,
+    -0.8378055753860405
+   ],
+   "massKg": 0.0001498668862041086
+  },
+  {
+   "body": "avocado_skin_right_s7_t17",
+   "geom": "avocado_skin_right_s7_t17",
+   "equality": "avocado_skin_right_s7_t17_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s7",
+   "index": 17,
+   "normal": [
+    0.020434581751549084,
+    0.10274820500824593,
+    -0.9944974782452808
+   ],
+   "massKg": 0.00011411039304221049
+  },
+  {
+   "body": "avocado_skin_right_s7_t18",
+   "geom": "avocado_skin_right_s7_t18",
+   "equality": "avocado_skin_right_s7_t18_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s7",
+   "index": 18,
+   "normal": [
+    0.19021149000786156,
+    0.9817431380298121,
+    -6.054377198587813e-07
+   ],
+   "massKg": 1.7034179109032266e-05
+  },
+  {
+   "body": "avocado_skin_right_s7_t19",
+   "geom": "avocado_skin_right_s7_t19",
+   "equality": "avocado_skin_right_s7_t19_attach",
+   "flesh": "avocado_flesh_right_3",
+   "strip": "right_s7",
+   "index": 19,
+   "normal": [
+    -0.9238795484607771,
+    0.38268339384445815,
+    -3.4055495007379286e-06
+   ],
+   "massKg": 3.474318361895712e-07
+  }
+ ],
+ "constraints": {
+  "cut": {
+   "equalities": [
+    "avocado_cut_0",
+    "avocado_cut_1",
+    "avocado_cut_2",
+    "avocado_cut_3"
+   ]
+  },
+  "slices": [
+   {
+    "equality": "avocado_slice_left_0",
+    "side": "left",
+    "slice": 0,
+    "bodies": [
+     "avocado_flesh_left_0",
+     "avocado_flesh_left_1"
+    ]
+   },
+   {
+    "equality": "avocado_slice_left_1",
+    "side": "left",
+    "slice": 1,
+    "bodies": [
+     "avocado_flesh_left_1",
+     "avocado_flesh_left_2"
+    ]
+   },
+   {
+    "equality": "avocado_slice_left_2",
+    "side": "left",
+    "slice": 2,
+    "bodies": [
+     "avocado_flesh_left_2",
+     "avocado_flesh_left_3"
+    ]
+   },
+   {
+    "equality": "avocado_slice_right_0",
+    "side": "right",
+    "slice": 0,
+    "bodies": [
+     "avocado_flesh_right_0",
+     "avocado_flesh_right_1"
+    ]
+   },
+   {
+    "equality": "avocado_slice_right_1",
+    "side": "right",
+    "slice": 1,
+    "bodies": [
+     "avocado_flesh_right_1",
+     "avocado_flesh_right_2"
+    ]
+   },
+   {
+    "equality": "avocado_slice_right_2",
+    "side": "right",
+    "slice": 2,
+    "bodies": [
+     "avocado_flesh_right_2",
+     "avocado_flesh_right_3"
+    ]
+   }
+  ],
+  "pit": {
+   "equality": "avocado_pit_seat",
+   "body": "avocado_pit",
+   "flesh": "avocado_flesh_right_2",
+   "side": "right"
+  }
+ },
+ "skinJoins": [
+  {
+   "equality": "avocado_skin_left_s0_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s0_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s0_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s0_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s0_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s0_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s0_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s0_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s0_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s0_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s0_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s0_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s1_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s1_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s1_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s1_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s1_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s1_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s1_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s1_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s1_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s1_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s1_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s1_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s2_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s2_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s2_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s2_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s2_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s2_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s2_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s2_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s2_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s2_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s2_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s2_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s3_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s3_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s3_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s3_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s3_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s3_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s3_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s3_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s3_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s3_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s3_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s3_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s4_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s4_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s4_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s4_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s4_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s4_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s4_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s4_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s4_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s4_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s4_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s4_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s5_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s5_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s5_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s5_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s5_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s5_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s5_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s5_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s5_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s5_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s5_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s5_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s6_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s6_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s6_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s6_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s6_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s6_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s6_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s6_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s6_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s6_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s6_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s6_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s7_t5_cut_x_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s7_t5_cut_y_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s7_t5_cut_z_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s7_t5_cut_roll_lock",
+   "side": "left",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_left_s7_t10_cut_x_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s7_t10_cut_y_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s7_t10_cut_z_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s7_t10_cut_roll_lock",
+   "side": "left",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_left_s7_t15_cut_x_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s7_t15_cut_y_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s7_t15_cut_z_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_left_s7_t15_cut_roll_lock",
+   "side": "left",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s0_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s0_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s0_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s0_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s0_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s0_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s0_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s0_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s0_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s0_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s0_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s0_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s1_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s1_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s1_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s1_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s1_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s1_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s1_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s1_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s1_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s1_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s1_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s1_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s2_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s2_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s2_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s2_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s2_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s2_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s2_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s2_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s2_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s2_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s2_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s2_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s3_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s3_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s3_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s3_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s3_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s3_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s3_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s3_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s3_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s3_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s3_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s3_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s4_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s4_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s4_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s4_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s4_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s4_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s4_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s4_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s4_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s4_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s4_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s4_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s5_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s5_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s5_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s5_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s5_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s5_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s5_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s5_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s5_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s5_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s5_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s5_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s6_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s6_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s6_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s6_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s6_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s6_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s6_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s6_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s6_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s6_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s6_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s6_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s7_t5_cut_x_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s7_t5_cut_y_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s7_t5_cut_z_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s7_t5_cut_roll_lock",
+   "side": "right",
+   "slice": 0
+  },
+  {
+   "equality": "avocado_skin_right_s7_t10_cut_x_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s7_t10_cut_y_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s7_t10_cut_z_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s7_t10_cut_roll_lock",
+   "side": "right",
+   "slice": 1
+  },
+  {
+   "equality": "avocado_skin_right_s7_t15_cut_x_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s7_t15_cut_y_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s7_t15_cut_z_lock",
+   "side": "right",
+   "slice": 2
+  },
+  {
+   "equality": "avocado_skin_right_s7_t15_cut_roll_lock",
+   "side": "right",
+   "slice": 2
+  }
+ ],
+ "flesh": {
+  "left": [
+   "avocado_flesh_left_0",
+   "avocado_flesh_left_1",
+   "avocado_flesh_left_2",
+   "avocado_flesh_left_3"
+  ],
+  "right": [
+   "avocado_flesh_right_0",
+   "avocado_flesh_right_1",
+   "avocado_flesh_right_2",
+   "avocado_flesh_right_3"
+  ]
+ },
+ "releaseCollision": {
+  "skin": 117,
+  "pit": 117
+ }
+}

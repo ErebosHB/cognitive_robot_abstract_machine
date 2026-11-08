@@ -7,8 +7,9 @@ def main() -> None:
     Run the PR2 avocado peeling demo without a viewer and exit non-zero with a traceback
     on failure.
 
-    The avocado model's folder is read from ``AVOCADO_DIRECTORY``; the PR2's meshes come
-    from ``iai_pr2_description`` in a sourced ROS 2 workspace.
+    The avocado that comes with CRAM is used, unless ``AVOCADO_DIRECTORY`` names
+    another; the PR2's meshes come from ``iai_pr2_description`` in a sourced ROS 2
+    workspace.
     """
     try:
         import pr2_demo

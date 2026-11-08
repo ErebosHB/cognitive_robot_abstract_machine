@@ -7,7 +7,8 @@ def main() -> None:
     Run the avocado peeling demo without a viewer and exit non-zero with a traceback on
     failure.
 
-    The avocado model's folder is read from ``AVOCADO_DIRECTORY``.
+    The avocado that comes with CRAM is used, unless ``AVOCADO_DIRECTORY`` names
+    another.
     """
     try:
         import demo

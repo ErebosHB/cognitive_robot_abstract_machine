@@ -205,3 +205,56 @@ class FruitNotPlaced(DataclassException):
 
     def suggest_correction(self) -> str:
         return "Lower the fruit closer to the board before letting go of it."
+
+
+@dataclass
+class ArmsCollided(DataclassException):
+    """
+    Raised when the robot's two arms touch each other.
+    """
+
+    left_body: str
+    """
+    The name of the body of the left arm that was touched.
+    """
+
+    right_body: str
+    """
+    The name of the body of the right arm that touched it.
+    """
+
+    time: float
+    """
+    The simulation time in seconds of the contact.
+    """
+
+    def error_message(self) -> str:
+        return (
+            f"The arms touched at {self.time:.2f} s: {self.left_body} and "
+            f"{self.right_body}."
+        )
+
+    def suggest_correction(self) -> str:
+        return "Move one hand out of the other's way before the other one reaches in."
+
+
+@dataclass
+class PeelNotPlaced(DataclassException):
+    """
+    Raised when the peeled strip does not end up where it was laid down.
+    """
+
+    distance: float
+    """
+    How far in metres the farthest piece of the strip came to rest from where it was
+    laid down.
+    """
+
+    def error_message(self) -> str:
+        return (
+            f"A piece of the peeled strip came to rest {self.distance * 1000:.0f} mm "
+            f"from where it was laid down."
+        )
+
+    def suggest_correction(self) -> str:
+        return "Lower the strip closer to the surface before letting go of it."

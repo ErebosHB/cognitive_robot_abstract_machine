@@ -140,10 +140,16 @@ class Pr2Arm:
     singularities.
     """
 
-    posture_gain: float = 0.05
+    posture_gain: float = 0.1
     """
     How strongly each step of the inverse kinematics pulls the arm toward
     :attr:`posture`, within the freedom the target leaves.
+    """
+
+    elbow_out_margin: float = 0.2
+    """
+    How far in radians from zero the upper arm's roll stays, on the arm's own side, so
+    the elbow points outward and away from the other arm.
     """
 
     iterations: int = 25
@@ -299,7 +305,12 @@ class Pr2Arm:
         state.qpos[:] = self.data.qpos
         state.qpos[self.qpos_addresses] = self.solution
         limited = self.model.jnt_limited[self.joint_ids].astype(bool)
-        lower, upper = self.model.jnt_range[self.joint_ids].T
+        lower, upper = self.model.jnt_range[self.joint_ids].T.copy()
+        roll = list(ArmJoint).index(ArmJoint.UPPER_ARM_ROLL)
+        if self.side == ArmSide.LEFT:
+            lower[roll] = max(lower[roll], self.elbow_out_margin)
+        else:
+            upper[roll] = min(upper[roll], -self.elbow_out_margin)
         jacobian_position = np.zeros((3, self.model.nv))
         jacobian_rotation = np.zeros((3, self.model.nv))
         for _ in range(self.iterations):
@@ -346,11 +357,22 @@ class Pr2Arm:
         low, high = self.model.actuator_ctrlrange[self.finger_actuator_id]
         self.data.ctrl[self.finger_actuator_id] = np.clip(opening, low, high)
 
-    def set_hand_collisions(self, colliding: bool) -> None:
+    def gripper_opening(self) -> float:
         """
-        :param colliding: Whether the gripper touches things, as compiled, or passes
-            through them.
+        :return: The finger angle in radians the gripper is at now.
         """
-        bits = self.hand_collision_bits if colliding else 0 * self.hand_collision_bits
+        joint = self.model.actuator_trnid[self.finger_actuator_id][0]
+        return float(self.data.qpos[self.model.jnt_qposadr[joint]])
+
+    def set_hand_collisions(self, contype: int | None, conaffinity: int = 0) -> None:
+        """
+        :param contype: The contact type the gripper's geoms take, or None for those
+            they were compiled with (and then their compiled affinity too).
+        :param conaffinity: The contact affinity they take with a given *contype*.
+        """
+        if contype is None:
+            bits = self.hand_collision_bits
+        else:
+            bits = np.tile([contype, conaffinity], (len(self.hand_geom_ids), 1))
         self.model.geom_contype[self.hand_geom_ids] = bits[:, 0]
         self.model.geom_conaffinity[self.hand_geom_ids] = bits[:, 1]

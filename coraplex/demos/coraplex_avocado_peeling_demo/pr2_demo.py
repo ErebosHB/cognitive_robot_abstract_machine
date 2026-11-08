@@ -3,25 +3,27 @@ The PR2 puts an avocado on a cutting board in the kitchen of the IAI apartment a
 a strip of its skin, in MuJoCo.
 
 The avocado starts on the kitchen island beside the board. The PR2 stands at the island,
-takes the avocado with its right hand from above and lays it on the board. Its left hand
-then holds the fruit at the base end while the right hand pinches the skin at the stem
-end of the upper half's strip facing the robot and draws it back along the fruit, tearing the strip
-off; the rest of the skin stays on.
+takes the avocado with its right hand from above and lays it on the board, stem to the
+robot's right. Its left hand then holds the fruit down at its base end, on the left. The
+right hand pinches the tip, at the stem, of the upper half's strip facing the robot, and
+pulls it out toward the robot and away from the fruit, tearing the strip off; the rest of the skin stays
+on. The right hand carries the peeled strip to the island beside the board and lays it
+down there.
 
 The PR2 is the one of the semantic digital twin, exported to MuJoCo when the
-demonstration starts; its meshes come from ``iai_pr2_description``. Run it from this
+demonstration starts; its meshes come from ``iai_pr2_description``. The avocado is seed 0
+of the peelable avocado of ``private_meshes``, which comes with CRAM. Run it from this
 folder::
 
-    python pr2_demo.py /path/to/private_meshes/objects/produce/avocado
+    python pr2_demo.py
 
-or set ``AVOCADO_DIRECTORY`` to that folder.
+or pass another avocado's folder, or set ``AVOCADO_DIRECTORY`` to it.
 """
 
 from __future__ import annotations
 
 import argparse
 import math
-import os
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -30,12 +32,14 @@ import mujoco
 import numpy as np
 from demo import (
     AvocadoPeelingDemonstration,
-    EnvironmentVariable,
     SceneConstraint,
+    avocado_folder,
 )
 from exceptions import (
+    ArmsCollided,
     FruitNotPlaced,
     NeighbouringStripsTorn,
+    PeelNotPlaced,
     SkinTornAtRest,
     StripNotPeeled,
 )
@@ -80,7 +84,13 @@ class Pr2PeelingOutcome:
 
     peeled_tiles: list[str]
     """
-    The names of the strip's tiles that came off.
+    The names of the strip's tiles that came off while it was peeled.
+    """
+
+    peel_placement_error: float
+    """
+    How far in metres from where it was laid down, on the island, the farthest piece of
+    the peeled strip came to rest.
     """
 
 
@@ -103,7 +113,14 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     fruit_heading: float = -math.pi / 2
     """
     The direction in radians, about the vertical from world x, in which the stem of the
-    lying fruit points: to the PR2's right.
+    lying fruit points: to the PR2's right, so each hand works on the end on its own
+    side, the left holding the base end and the right peeling from the stem.
+    """
+
+    peeled_side: tuple[float, float, float] = (-1.0, 0.0, 1.0)
+    """
+    The direction, in world axes, the peeled strip faces: up and toward the PR2, which
+    the right hand pulls it out to, away from the holding hand.
     """
 
     fruit_start_offset: tuple[float, float] = (0.0, -0.33)
@@ -146,8 +163,8 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
 
     initial_arm_joints: dict[ArmSide, tuple[float, ...]] = field(
         default_factory=lambda: {
-            ArmSide.RIGHT: (-0.3, -0.2, -0.5, -1.8, 0.0, -1.0, 0.0),
-            ArmSide.LEFT: (0.3, -0.2, 0.5, -1.8, 0.0, -1.0, 0.0),
+            ArmSide.RIGHT: (-0.7, -0.2, -0.5, -1.8, 0.0, -1.0, 0.0),
+            ArmSide.LEFT: (0.7, -0.2, 0.5, -1.8, 0.0, -1.0, 0.0),
         }
     )
     """
@@ -160,15 +177,10 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     The finger angle in radians of an open gripper.
     """
 
-    holding_gripper: float = 0.3
+    holding_clearance: float = 0.004
     """
-    The finger angle in radians of the left gripper around the fruit: at its skin, not
-    squeezing it, since the hold is what keeps the fruit still.
-    """
-
-    pinching_gripper: float = 0.04
-    """
-    The finger angle in radians of a gripper pinching the skin.
+    How far in metres above the skin's tiles at the top of the fruit the left hand's
+    closed fingertips stop to hold it down.
     """
 
     finger_force: float = 1.0
@@ -176,9 +188,49 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     The most force in newtons a finger closes with; enough to hold, gentle on the skin.
     """
 
-    pinching_clearance: float = 0.006
+    pinch_opening: float = 0.12
     """
-    How far in metres off the skin the fingertips stop to pinch a strip's tip.
+    The finger angle in radians the right hand comes in with to pinch the skin.
+    """
+
+    pinch_collision_bit: int = 128
+    """
+    The contact bit, unused by the scene, by which the pinching fingers touch only the
+    pinched strip.
+    """
+
+    retreat_distance: float = 0.06
+    """
+    How far in metres the right hand backs off toward the stem, and up, after letting go
+    of the strip.
+    """
+
+    peel_drop_offset: tuple[float, float] = (0.0, -0.27)
+    """
+    Where on the kitchen island, relative to the board's centre, the peeled strip is
+    laid down, in metres: beside the board, to the PR2's right.
+    """
+
+    peel_drop_height: float = 0.02
+    """
+    How far in metres above the island the fingertips let go of the peeled strip.
+    """
+
+    peel_spread_margin: float = 0.03
+    """
+    How much farther in metres than the strip is long any piece of the peeled strip may
+    come to rest from where it was laid down, on the island; the strip hangs from its
+    pinched tip, so it lies out from there.
+    """
+
+    peeled_strip_length: float = field(init=False, default=0.0)
+    """
+    The length in metres of the strip being peeled, measured on the fruit.
+    """
+
+    ready_offset: float = 0.25
+    """
+    How far in metres to its own side of the board a hand waits while the other works.
     """
 
     hover_height: float = 0.08
@@ -211,26 +263,32 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     How many simulation steps pass between two solutions of the inverse kinematics.
     """
 
-    holding_inset: float = 0.03
+    holding_inset: float = 0.015
     """
     How far in metres from the fruit's base end the left hand holds it.
     """
 
     peeling_waypoints: list[tuple[float, float, float]] = field(
         default_factory=lambda: [
-            (0.015, 0.0, 0.0),
-            (0.04, 0.04, 0.0),
-            (0.06, 0.08, 0.0),
-            (0.07, 0.12, -0.02),
-            (0.06, 0.16, 0.02),
+            (0.012, 0.0, 0.0),
+            (0.02, 0.01, 0.0),
+            (0.035, 0.018, 0.0),
+            (0.055, 0.022, 0.0),
+            (0.08, 0.026, 0.0),
+            (0.11, 0.03, 0.0),
+            (0.14, 0.033, 0.0),
+            (0.17, 0.036, 0.0),
+            (0.2, 0.04, 0.0),
         ]
     )
     """
     The points the right hand passes after pinching the skin, as distances in metres out
-    from the skin, along the fruit toward its base and down, from the pinched tile.
+    from the skin, along the fruit toward its base and down, from the pinched tile: a
+    little along the fruit, then mostly out from it, away from the holding hand, while
+    the strip tears off behind the fingers.
     """
 
-    peeling_time: float = 1.2
+    peeling_time: float = 1.0
     """
     How long in seconds the right hand takes between two peeling waypoints.
     """
@@ -244,6 +302,22 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     maximum_placement_error: float = 0.05
     """
     How far in metres from the board's centre the avocado may come to rest.
+    """
+
+    pinched_geom_ids: np.ndarray | None = field(init=False, default=None)
+    """
+    The ids of the tile geoms of the strip being pinched, while it is.
+    """
+
+    left_arm_geom_ids: np.ndarray = field(init=False)
+    """
+    The ids of the geoms of the left arm.
+    """
+
+    geom_arm_side: np.ndarray = field(init=False)
+    """
+    For every geom of the scene, -1 if it belongs to the left arm, 1 if to the right
+    arm, 0 otherwise.
     """
 
     arms: dict[ArmSide, Pr2Arm] = field(init=False)
@@ -314,6 +388,26 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
             side: Pr2Arm(self.model, self.data, side, self.robot_prefix)
             for side in ArmSide
         }
+        arm_prefixes = {
+            f"{self.robot_prefix}{ArmSide.LEFT}_": -1,
+            f"{self.robot_prefix}{ArmSide.RIGHT}_": 1,
+        }
+        self.geom_arm_side = np.array(
+            [
+                next(
+                    (
+                        side
+                        for prefix, side in arm_prefixes.items()
+                        if self.model.body(
+                            self.model.geom_bodyid[geom]
+                        ).name.startswith(prefix)
+                    ),
+                    0,
+                )
+                for geom in range(self.model.ngeom)
+            ]
+        )
+        self.left_arm_geom_ids = np.flatnonzero(self.geom_arm_side == -1)
         for side, arm in self.arms.items():
             arm.place_joints(np.array(self.initial_arm_joints[side]))
             arm.set_gripper(self.open_gripper)
@@ -352,18 +446,45 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
                 placement_error = self.put_avocado_on_board()
                 self.hold_avocado()
                 strip, peeled_tiles = self.peel_strip_facing_robot()
-                while self.viewer is not None and self.viewer.is_running():
-                    self.simulate(0.1)
+                peel_placement_error = self.put_peel_aside(strip)
+                self.linger()
         finally:
             self.model_directory.cleanup()
-        return Pr2PeelingOutcome(placement_error, strip, peeled_tiles)
+        return Pr2PeelingOutcome(
+            placement_error, strip, peeled_tiles, peel_placement_error
+        )
+
+    def after_step(self) -> None:
+        """
+        Keep the strip being pinched touchable by the fingers, also once its tiles tore
+        off, and check that the arms stay clear of each other.
+
+        :raises ArmsCollided: If a body of one arm touches a body of the other.
+        """
+        if self.pinched_geom_ids is not None:
+            self.model.geom_conaffinity[self.pinched_geom_ids] |= (
+                self.pinch_collision_bit
+            )
+        geoms = self.data.contact.geom[: self.data.ncon]
+        sides = self.geom_arm_side[geoms]
+        touching = np.flatnonzero(sides[:, 0] * sides[:, 1] == -1)
+        if len(touching):
+            first, second = geoms[touching[0]]
+            left, right = sorted(
+                (first, second), key=lambda geom: self.geom_arm_side[geom]
+            )
+            raise ArmsCollided(
+                self.model.body(self.model.geom_bodyid[left]).name,
+                self.model.body(self.model.geom_bodyid[right]).name,
+                float(self.data.time),
+            )
 
     # %% stages
 
     def put_avocado_on_board(self) -> float:
         """
         Take the avocado from above with the right hand, carry it over the board, lay it
-        down there and let go of it.
+        down there, let go of it and take the hand out of the way.
 
         :return: How far in metres from the board's centre the avocado came to rest.
         """
@@ -386,7 +507,11 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         self.release_weld(SceneConstraint.GRIP)
         torn += self.close_gripper(right, self.open_gripper)
         torn += self.move_tool(
-            right, [ToolWaypoint(drop + [0, 0, self.hover_height], self.approach_time)]
+            right,
+            [
+                ToolWaypoint(drop + [0, 0, self.hover_height], self.approach_time),
+                ToolWaypoint(self.ready_position(ArmSide.RIGHT), self.reach_time),
+            ],
         )
         if torn:
             raise NeighbouringStripsTorn([t.description.body for t in torn])
@@ -399,30 +524,35 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
 
     def hold_avocado(self) -> None:
         """
-        Take hold of the avocado's base end from above with the left hand.
+        Hold the avocado down at its base end with the left hand: the closed fingertips
+        come down onto the top of the skin, so nothing of the hand reaches round to the
+        side being peeled.
         """
         left = self.arms[ArmSide.LEFT]
-        base_end = self.fruit_end(toward_stem=False)
-        torn = self.reach_down_to(
-            left, base_end + self.holding_inset * self.fruit_axis_now()
-        )
-        torn += self.close_gripper(left, self.holding_gripper)
+        axis = self.fruit_axis_now()
+        point = self.fruit_end(toward_stem=False) + self.holding_inset * axis
+        tile_ids = [
+            self.body_id(self.fruit_prefix + t.description.body)
+            for t in self.fruit.tiles
+        ]
+        tiles = self.data.xipos[tile_ids]
+        nearby = np.abs((tiles - point) @ axis) < self.holding_inset / 2
+        point[2] = tiles[nearby, 2].max() + self.holding_clearance
+        torn = self.reach_down_to(left, point, gripper=0.0)
         self.attach(SceneConstraint.HOLD, left, self.upper_half_ids()[-1])
         if torn:
             raise NeighbouringStripsTorn([t.description.body for t in torn])
 
     def peel_strip_facing_robot(self) -> tuple[str, list[str]]:
         """
-        Pinch the stem-end tile of the strip facing the PR2 and draw it back along the
-        fruit toward the base, out and away from the skin.
+        Pinch the tip of the upper half's strip facing the PR2 at the stem between the
+        fingertips, and draw it back along the fruit toward the base, at a low angle so
+        the strip comes off a little at a time; the hand keeps holding the strip.
 
         :return: The name of the peeled strip and of its tiles that came off.
         """
         right = self.arms[ArmSide.RIGHT]
-        toward_robot = np.array(
-            [*np.array(self.robot_position) - np.array(self.countertop_spot), 0.0]
-        )
-        facing = toward_robot / np.linalg.norm(toward_robot) + [0.0, 0.0, 1.0]
+        facing = np.array(self.peeled_side)
         # A strip of the half the left hand holds.
         pinched = max(
             (
@@ -431,21 +561,51 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
                 if tile.description.index == 0
                 and tile.flesh_body_id in self.upper_half_ids()
             ),
-            key=lambda tile: self.outward_normal(tile) @ facing,
+            key=lambda tile: self.side_normal(tile) @ facing,
         )
+        strip = pinched.description.strip
         pinched_id = self.body_id(self.fruit_prefix + pinched.description.body)
         start = self.data.xipos[pinched_id].copy()
-        outward = self.outward_normal(pinched)
+        outward = self.side_normal(pinched)
         toward_base = -self.fruit_axis_now()
-        # The tips of all strips meet at the stem: come in with the fingers nearly shut,
-        # stop just off the skin and hold the pinched tip without touching the others.
-        right.set_hand_collisions(False)
-        torn = self.reach_down_to(
-            right,
-            start + self.pinching_clearance * outward,
-            gripper=self.pinching_gripper,
+        strip_ids = [
+            self.body_id(self.fruit_prefix + t.description.body)
+            for t in sorted(self.fruit.tiles, key=lambda t: t.description.index)
+            if t.description.strip == strip
+        ]
+        self.peeled_strip_length = float(
+            np.linalg.norm(np.diff(self.data.xipos[strip_ids], axis=0), axis=1).sum()
         )
+        # The fingers come in from the side the strip faces, across the fruit's axis, and
+        # close across the strip. The tips of all strips meet at the stem, so while pinching the fingers
+        # touch only the pinched strip.
+        rotation = self.pinch_grasp(outward, toward_base)
+        self.pinched_geom_ids = np.array(
+            [
+                tile.geom_id
+                for tile in self.fruit.tiles
+                if tile.description.strip == strip
+            ]
+        )
+        right.set_hand_collisions(self.pinch_collision_bit)
+        # The other arm stays solid to the pinching hand, so the arms still cannot meet.
+        self.model.geom_conaffinity[self.left_arm_geom_ids] |= self.pinch_collision_bit
+        right.set_gripper(self.pinch_opening)
+        torn = self.move_tool(
+            right,
+            [
+                ToolWaypoint(start + self.hover_height * outward, self.reach_time),
+                ToolWaypoint(start, self.approach_time),
+            ],
+            rotation,
+        )
+        torn += self.close_gripper(right, 0.0)
         self.attach(SceneConstraint.GRIP, right, pinched_id)
+        # The weld holds the strip now: the fingers stay where they closed to and stop
+        # pressing on its light tip, which they would otherwise fight the weld over.
+        right.set_gripper(right.gripper_opening())
+        self.model.geom_conaffinity[self.pinched_geom_ids] &= ~self.pinch_collision_bit
+        self.pinched_geom_ids = None
         torn += self.move_tool(
             right,
             [
@@ -455,19 +615,8 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
                 )
                 for out, along, down in self.peeling_waypoints
             ],
+            rotation,
         )
-        self.release_weld(SceneConstraint.GRIP)
-        torn += self.close_gripper(right, self.open_gripper)
-        torn += self.move_tool(
-            right,
-            [
-                ToolWaypoint(
-                    right.tool_pose()[0] + [0, 0, self.hover_height], self.approach_time
-                )
-            ],
-        )
-        right.set_hand_collisions(True)
-        strip = pinched.description.strip
         peeled = [t.description.body for t in torn if t.description.strip == strip]
         others = [t.description.body for t in torn if t.description.strip != strip]
         strip_size = sum(t.description.strip == strip for t in self.fruit.tiles)
@@ -477,7 +626,87 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
             raise NeighbouringStripsTorn(others)
         return strip, peeled
 
+    def put_peel_aside(self, strip: str) -> float:
+        """
+        Carry the peeled strip, still pinched, off the fruit, tearing off what is left
+        of it, to :attr:`peel_drop_offset` beside the board, lay it down on the island
+        and let go of it.
+
+        :param strip: The name of the strip being held.
+        :return: How far in metres from where it was laid down, on the island, the
+            farthest piece of the strip came to rest.
+        """
+        right = self.arms[ArmSide.RIGHT]
+        rotation = right.tool_pose()[1]
+        toward_base = -self.fruit_axis_now()
+        x, y = self.countertop_spot
+        dx, dy = self.peel_drop_offset
+        countertop = self.board_top - self.cutting_board_size[2]
+        drop = np.array([x + dx, y + dy, countertop + self.peel_drop_height])
+        held = right.tool_pose()[0]
+        # Back toward the stem and up first, away from the holding hand at the base.
+        torn = self.move_tool(
+            right,
+            [
+                ToolWaypoint(
+                    held
+                    - self.retreat_distance * toward_base
+                    + [0.0, 0.0, self.retreat_distance],
+                    self.approach_time,
+                )
+            ],
+            rotation,
+        )
+        # Turn the hand to point down on the way, which the arm can reach the spot with.
+        torn += self.move_tool(
+            right,
+            [ToolWaypoint(drop + [0.0, 0.0, self.hover_height], self.carry_time)],
+            rotation,
+            turn_to=self.downward_grasp(),
+        )
+        torn += self.move_tool(right, [ToolWaypoint(drop, self.approach_time)])
+        self.release_weld(SceneConstraint.GRIP)
+        torn += self.close_gripper(right, self.open_gripper)
+        torn += self.move_tool(
+            right,
+            [ToolWaypoint(drop + [0.0, 0.0, self.hover_height], self.approach_time)],
+        )
+        right.set_hand_collisions(None)
+        self.model.geom_conaffinity[self.left_arm_geom_ids] &= ~self.pinch_collision_bit
+        self.pinched_geom_ids = None
+        torn += self.move_tool(
+            right, [ToolWaypoint(self.ready_position(ArmSide.RIGHT), self.reach_time)]
+        )
+        others = [t.description.body for t in torn if t.description.strip != strip]
+        if len(others) > self.maximum_neighbouring_tiles_torn:
+            raise NeighbouringStripsTorn(others)
+        strip_ids = [
+            self.body_id(self.fruit_prefix + t.description.body)
+            for t in self.fruit.tiles
+            if t.description.strip == strip
+        ]
+        # The strip hangs from its pinched tip, so it lies out from where it was let go.
+        on_island = np.array([drop[0], drop[1], countertop])
+        distance = float(
+            np.linalg.norm(self.data.xipos[strip_ids] - on_island, axis=1).max()
+        )
+        if distance > self.peeled_strip_length + self.peel_spread_margin:
+            raise PeelNotPlaced(distance)
+        return distance
+
     # %% moving the arms
+
+    def ready_position(self, side: ArmSide) -> np.ndarray:
+        """
+        :param side: An arm.
+        :return: Where its hand waits, out of the other hand's way: above the island,
+            to its own side of the board.
+        """
+        x, y = self.countertop_spot
+        sideways = -1.0 if side == ArmSide.RIGHT else 1.0
+        return np.array(
+            [x - 0.05, y + sideways * self.ready_offset, self.board_top + 0.2]
+        )
 
     def reach_down_to(
         self, arm: Pr2Arm, point: np.ndarray, gripper: float | None = None
@@ -499,19 +728,29 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
             ],
         )
 
-    def move_tool(self, arm: Pr2Arm, waypoints: list[ToolWaypoint]) -> list[SkinTile]:
+    def move_tool(
+        self,
+        arm: Pr2Arm,
+        waypoints: list[ToolWaypoint],
+        rotation: np.ndarray | None = None,
+        turn_to: np.ndarray | None = None,
+    ) -> list[SkinTile]:
         """
-        Move a hand through waypoints in straight lines, pointing down with its fingers
-        closing across the fruit, by solving the inverse kinematics along the way.
+        Move a hand through waypoints in straight lines, by solving the inverse
+        kinematics along the way.
 
         :param arm: The arm to move.
         :param waypoints: The poses to pass.
+        :param rotation: The rotation the hand keeps, or starts from; pointing down with
+            its fingers closing across the fruit if None.
+        :param turn_to: The rotation the hand turns to evenly along the way, if any.
         :return: The skin tiles released meanwhile.
         """
         start, _ = arm.tool_pose()
         path = np.array([start, *(w.position for w in waypoints)])
         arrival_times = np.cumsum([0.0, *(w.travel_time for w in waypoints)])
-        rotation = self.downward_grasp()
+        if rotation is None:
+            rotation = self.downward_grasp()
         step = [0]
 
         def follow(elapsed: float) -> None:
@@ -519,10 +758,41 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
                 target = np.array(
                     [np.interp(elapsed, arrival_times, path[:, a]) for a in range(3)]
                 )
-                arm.command(arm.solve(target, rotation))
+                turned = rotation
+                if turn_to is not None:
+                    turned = self.turned(
+                        rotation, turn_to, min(1.0, elapsed / arrival_times[-1])
+                    )
+                arm.command(arm.solve(target, turned))
             step[0] += 1
 
         return self.simulate(arrival_times[-1] + self.settle_time, follow)
+
+    @staticmethod
+    def turned(start: np.ndarray, end: np.ndarray, share: float) -> np.ndarray:
+        """
+        :param start: A rotation matrix.
+        :param end: Another rotation matrix.
+        :param share: How far from *start* to *end*, 0 to 1.
+        :return: The rotation that far along the shortest turn between them.
+        """
+        quaternions = []
+        for matrix in (start, end):
+            quaternion = np.zeros(4)
+            mujoco.mju_mat2Quat(quaternion, matrix.flatten())
+            quaternions.append(quaternion)
+        first, last = quaternions
+        if first @ last < 0:
+            last = -last
+        angle = math.acos(min(1.0, float(first @ last)))
+        if angle < 1e-6:
+            return end
+        blend = (
+            math.sin((1 - share) * angle) * first + math.sin(share * angle) * last
+        ) / math.sin(angle)
+        matrix = np.zeros(9)
+        mujoco.mju_quat2Mat(matrix, blend / np.linalg.norm(blend))
+        return matrix.reshape(3, 3)
 
     def close_gripper(self, arm: Pr2Arm, opening: float) -> list[SkinTile]:
         """
@@ -540,6 +810,18 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         """
         approach = np.array([0.0, 0.0, -1.0])
         across = np.cross(self.fruit_axis(), approach)
+        return np.column_stack([approach, across, np.cross(approach, across)])
+
+    def pinch_grasp(self, outward: np.ndarray, along: np.ndarray) -> np.ndarray:
+        """
+        :param outward: The skin's outward normal where it is pinched.
+        :param along: The direction along the strip.
+        :return: The tool rotation pointing the fingers into the skin, closing them
+            across the strip.
+        """
+        approach = -outward / np.linalg.norm(outward)
+        across = np.cross(approach, along)
+        across /= np.linalg.norm(across)
         return np.column_stack([approach, across, np.cross(approach, across)])
 
     def attach(self, constraint: SceneConstraint, arm: Pr2Arm, body_id: int) -> None:
@@ -570,6 +852,18 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         self.data.eq_active[constraint_id] = 1
 
     # %% the fruit where it is
+
+    def side_normal(self, tile: SkinTile) -> np.ndarray:
+        """
+        :param tile: A tile of the fruit.
+        :return: The direction out of the fruit at the tile, across the fruit's axis: at
+            the tips of the strips the skin faces mostly along the axis, which would lay
+            a hand coming in along it over the whole fruit.
+        """
+        axis = self.fruit_axis_now()
+        normal = self.outward_normal(tile)
+        across = normal - (normal @ axis) * axis
+        return across / np.linalg.norm(across)
 
     def fruit_body(self, side: FruitSide, slice_index: int) -> int:
         """
@@ -631,19 +925,19 @@ def main(
     Run the demonstration and report what the PR2 achieved.
 
     :param avocado_directory: The avocado model's folder; defaults to the folder named
-        by :attr:`EnvironmentVariable.AVOCADO_DIRECTORY`.
+        by :attr:`EnvironmentVariable.AVOCADO_DIRECTORY`, or else the avocado that comes
+        with CRAM.
     :param headless: Whether the physics runs without a viewer.
     :return: What the PR2 achieved.
     """
-    if avocado_directory is None:
-        avocado_directory = Path(
-            os.environ.get(EnvironmentVariable.AVOCADO_DIRECTORY, "")
-        )
-    outcome = Pr2AvocadoPeelingDemonstration(avocado_directory, headless=headless).run()
+    outcome = Pr2AvocadoPeelingDemonstration(
+        avocado_folder(avocado_directory), headless=headless
+    ).run()
     print(
         f"The PR2 laid the avocado {outcome.placement_error * 1000:.0f} mm from the "
         f"board's centre and peeled {len(outcome.peeled_tiles)} tiles of strip "
-        f"{outcome.peeled_strip}."
+        f"{outcome.peeled_strip}, then laid the strip down beside the board, all of it "
+        f"within {outcome.peel_placement_error * 1000:.0f} mm of where it let go."
     )
     return outcome
 
@@ -653,7 +947,10 @@ if __name__ == "__main__":
         description="The PR2 puts an avocado on a cutting board and peels it, in MuJoCo."
     )
     parser.add_argument(
-        "avocado_directory", type=Path, nargs="?", help="the avocado model's folder"
+        "avocado_directory",
+        type=Path,
+        nargs="?",
+        help="the avocado model's folder; by default the one that comes with CRAM",
     )
     parser.add_argument("--headless", action="store_true", help="run without a viewer")
     arguments = parser.parse_args()

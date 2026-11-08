@@ -9,11 +9,12 @@ while the rest of the skin stays on. The fruit is then cut, its upper half laid 
 beside the lower one, the pit lifted out of its cavity and the stem slice of the lower
 half cut off and set aside.
 
-The avocado is the peelable produce model of ``private_meshes``. Run it from this folder::
+The avocado is the peelable produce model of ``private_meshes``; seed 0 comes with CRAM
+in ``coraplex/resources/objects/avocado``. Run it from this folder::
 
-    python demo.py /path/to/private_meshes/objects/produce/avocado
+    python demo.py
 
-or set ``AVOCADO_DIRECTORY`` to that folder.
+or pass another avocado's folder, or set ``AVOCADO_DIRECTORY`` to it.
 """
 
 from __future__ import annotations
@@ -61,6 +62,11 @@ class SceneFile(PathEnumeration):
     )
     """
     The IAI apartment, whose kitchen island holds the cutting board.
+    """
+
+    AVOCADO = Path(__file__).resolve().parents[2] / "resources" / "objects" / "avocado"
+    """
+    The folder of the peelable avocado, seed 0 of the generator of ``private_meshes``.
     """
 
 
@@ -187,9 +193,10 @@ class AvocadoPeelingDemonstration:
     that each stage ends as it should.
     """
 
-    avocado_directory: Path
+    avocado_directory: Path = field(default_factory=lambda: Path(SceneFile.AVOCADO))
     """
-    The folder of the avocado model, holding its :class:`FruitFile` files.
+    The folder of the avocado model, holding its :class:`FruitFile` files; the avocado
+    that comes with CRAM by default.
     """
 
     headless: bool = True
@@ -388,6 +395,11 @@ class AvocadoPeelingDemonstration:
     The avocado in the simulation.
     """
 
+    linger_time: float = 3.0
+    """
+    How long in seconds the viewer keeps showing the finished scene before it closes.
+    """
+
     viewer_shutdown_timeout: float = 5.0
     """
     How long in seconds to wait for the viewer's window to close.
@@ -412,9 +424,16 @@ class AvocadoPeelingDemonstration:
             strip, peeled_tiles = self.peel_strip_facing_up()
             pit_displacement = self.cut_and_remove_pit(strip)
             slice_displacement = self.cut_off_stem_slice(strip)
-            while self.viewer is not None and self.viewer.is_running():
-                self.simulate(0.1)
+            self.linger()
         return PeelingOutcome(strip, peeled_tiles, pit_displacement, slice_displacement)
+
+    def linger(self) -> None:
+        """
+        Keep the finished scene in the viewer for :attr:`linger_time`, so the last stage
+        can be seen before the window closes.
+        """
+        if self.viewer is not None:
+            self.simulate(self.linger_time)
 
     def viewer_context(self) -> ExitStack:
         """
@@ -701,12 +720,18 @@ class AvocadoPeelingDemonstration:
                 move_mocaps(elapsed)
             mujoco.mj_step(self.model, self.data)
             released_tiles += self.fruit.release_pulled_tiles()
+            self.after_step()
             if self.data.warning[mujoco.mjtWarning.mjWARN_BADQACC].number > 0:
                 raise UnstableSimulation(self.data.time)
             if self.viewer is not None:
                 self.viewer.sync()
                 time.sleep(max(0.0, elapsed - (time.perf_counter() - wall_clock_start)))
         return released_tiles
+
+    def after_step(self) -> None:
+        """
+        Called after every simulation step; nothing to do with mocap hands.
+        """
 
     # %% stages
 
@@ -1013,6 +1038,20 @@ class AvocadoPeelingDemonstration:
 # %% entry point
 
 
+def avocado_folder(given: Path | None) -> Path:
+    """
+    :param given: The avocado folder given on the command line, if any.
+    :return: That folder, else the one named by
+        :attr:`EnvironmentVariable.AVOCADO_DIRECTORY`, else the avocado that comes with
+        CRAM.
+    """
+    if given is not None:
+        return given
+    return Path(
+        os.environ.get(EnvironmentVariable.AVOCADO_DIRECTORY, str(SceneFile.AVOCADO))
+    )
+
+
 def main(
     avocado_directory: Path | None = None, headless: bool = False
 ) -> PeelingOutcome:
@@ -1020,14 +1059,12 @@ def main(
     Run the demonstration and report what it achieved.
 
     :param avocado_directory: The avocado model's folder; defaults to the folder named
-        by :attr:`EnvironmentVariable.AVOCADO_DIRECTORY`.
+        by :attr:`EnvironmentVariable.AVOCADO_DIRECTORY`, or else the avocado that comes
+        with CRAM.
     :param headless: Whether the physics runs without a viewer.
     :return: What the demonstration achieved.
     """
-    if avocado_directory is None:
-        avocado_directory = Path(
-            os.environ.get(EnvironmentVariable.AVOCADO_DIRECTORY, "")
-        )
+    avocado_directory = avocado_folder(avocado_directory)
     outcome = AvocadoPeelingDemonstration(avocado_directory, headless=headless).run()
     print(
         f"Peeled {len(outcome.peeled_tiles)} tiles of strip {outcome.peeled_strip}; "
@@ -1042,7 +1079,10 @@ if __name__ == "__main__":
         description="Peel, cut, pit and slice an avocado in MuJoCo."
     )
     parser.add_argument(
-        "avocado_directory", type=Path, nargs="?", help="the avocado model's folder"
+        "avocado_directory",
+        type=Path,
+        nargs="?",
+        help="the avocado model's folder; by default the one that comes with CRAM",
     )
     parser.add_argument("--headless", action="store_true", help="run without a viewer")
     arguments = parser.parse_args()
