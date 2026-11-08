@@ -258,3 +258,30 @@ class PeelNotPlaced(DataclassException):
 
     def suggest_correction(self) -> str:
         return "Lower the strip closer to the surface before letting go of it."
+
+
+@dataclass
+class UnsupportedFruitModel(DataclassException):
+    """
+    Raised when a fruit model's peeling description is of a format this demo cannot
+    read.
+    """
+
+    source: str
+    """
+    The peeling description that was read.
+    """
+
+    found_format: int | None
+    """
+    The format it declares, if any.
+    """
+
+    def error_message(self) -> str:
+        return (
+            f"{self.source} is of format {self.found_format}, which this demo cannot "
+            f"read."
+        )
+
+    def suggest_correction(self) -> str:
+        return "Regenerate the fruit with the current generator of private_meshes."

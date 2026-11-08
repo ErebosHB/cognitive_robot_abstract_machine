@@ -79,7 +79,7 @@ class Pr2PeelingOutcome:
 
     peeled_strip: str
     """
-    The name of the strip that was pulled.
+    The name of the tile the strip was pulled by.
     """
 
     peeled_tiles: list[str]
@@ -193,10 +193,10 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     The finger angle in radians the right hand comes in with to pinch the skin.
     """
 
-    pinch_collision_bit: int = 128
+    pinch_collision_bit: int = 1 << 28
     """
-    The contact bit, unused by the scene, by which the pinching fingers touch only the
-    pinched strip.
+    The contact bit, unused by the scene and the fruit, by which the pinching fingers
+    touch only the pinched tile and the other arm.
     """
 
     retreat_distance: float = 0.06
@@ -291,12 +291,6 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
     peeling_time: float = 1.0
     """
     How long in seconds the right hand takes between two peeling waypoints.
-    """
-
-    minimum_peeled_share: float = 0.6
-    """
-    The share of the pulled strip's tiles that must come off; the base end of the strip
-    stays under the holding hand.
     """
 
     maximum_placement_error: float = 0.05
@@ -445,13 +439,16 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
                     raise SkinTornAtRest([t.description.body for t in torn_tiles])
                 placement_error = self.put_avocado_on_board()
                 self.hold_avocado()
-                strip, peeled_tiles = self.peel_strip_facing_robot()
-                peel_placement_error = self.put_peel_aside(strip)
+                pinched, peeled_tiles = self.peel_strip_facing_robot()
+                peel_placement_error = self.put_peel_aside(pinched)
                 self.linger()
         finally:
             self.model_directory.cleanup()
         return Pr2PeelingOutcome(
-            placement_error, strip, peeled_tiles, peel_placement_error
+            placement_error,
+            pinched.description.body,
+            peeled_tiles,
+            peel_placement_error,
         )
 
     def after_step(self) -> None:
@@ -489,7 +486,7 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         :return: How far in metres from the board's centre the avocado came to rest.
         """
         right = self.arms[ArmSide.RIGHT]
-        held_id = self.fruit_body(self.fruit.description.pit_side, 1)
+        held_id = self.heaviest_chunk(self.fruit.description.pit.side)
         grasp = self.fruit_centre()
         torn = self.reach_down_to(right, grasp)
         torn += self.close_gripper(right, 0.0)
@@ -531,67 +528,65 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         left = self.arms[ArmSide.LEFT]
         axis = self.fruit_axis_now()
         point = self.fruit_end(toward_stem=False) + self.holding_inset * axis
-        tile_ids = [
-            self.body_id(self.fruit_prefix + t.description.body)
-            for t in self.fruit.tiles
-        ]
-        tiles = self.data.xipos[tile_ids]
+        tiles = self.data.xipos[[tile.body_id for tile in self.fruit.tiles]]
         nearby = np.abs((tiles - point) @ axis) < self.holding_inset / 2
         point[2] = tiles[nearby, 2].max() + self.holding_clearance
         torn = self.reach_down_to(left, point, gripper=0.0)
-        self.attach(SceneConstraint.HOLD, left, self.upper_half_ids()[-1])
+        upper_half = self.upper_half_ids()
+        held_id = min(
+            upper_half,
+            key=lambda body_id: np.linalg.norm(self.data.xipos[body_id] - point),
+        )
+        self.attach(SceneConstraint.HOLD, left, held_id)
         if torn:
             raise NeighbouringStripsTorn([t.description.body for t in torn])
 
-    def peel_strip_facing_robot(self) -> tuple[str, list[str]]:
+    def peel_strip_facing_robot(self) -> tuple[SkinTile, list[str]]:
         """
-        Pinch the tip of the upper half's strip facing the PR2 at the stem between the
-        fingertips, and draw it back along the fruit toward the base, at a low angle so
-        the strip comes off a little at a time; the hand keeps holding the strip.
+        Pinch a tile near the stem of the upper half's column facing the PR2 between the
+        fingertips and pull it a little along the fruit and then out from it, so a strip
+        peels off from there toward the base; the hand keeps holding the strip.
 
-        :return: The name of the peeled strip and of its tiles that came off.
+        :return: The pinched tile and the names of the tiles that came off with it.
         """
         right = self.arms[ArmSide.RIGHT]
         facing = np.array(self.peeled_side)
+        upper_half = set(self.upper_half_ids())
         # A strip of the half the left hand holds.
         pinched = max(
             (
                 tile
                 for tile in self.fruit.tiles
-                if tile.description.index == 0
-                and tile.flesh_body_id in self.upper_half_ids()
+                if tile.description.row == self.grabbed_row
+                and tile.flesh_body_id in upper_half
             ),
             key=lambda tile: self.side_normal(tile) @ facing,
         )
-        strip = pinched.description.strip
-        pinched_id = self.body_id(self.fruit_prefix + pinched.description.body)
-        start = self.data.xipos[pinched_id].copy()
+        start = self.data.xipos[pinched.body_id].copy()
         outward = self.side_normal(pinched)
         toward_base = -self.fruit_axis_now()
-        strip_ids = [
-            self.body_id(self.fruit_prefix + t.description.body)
-            for t in sorted(self.fruit.tiles, key=lambda t: t.description.index)
-            if t.description.strip == strip
-        ]
+        column = sorted(
+            (
+                tile.description.position
+                for tile in self.fruit.tiles
+                if tile.description.column == pinched.description.column
+                and tile.flesh_body_id in upper_half
+            ),
+            key=lambda position: -position[2],
+        )
         self.peeled_strip_length = float(
-            np.linalg.norm(np.diff(self.data.xipos[strip_ids], axis=0), axis=1).sum()
+            np.linalg.norm(np.diff(column, axis=0), axis=1).sum()
         )
         # The fingers come in from the side the strip faces, across the fruit's axis, and
-        # close across the strip. The tips of all strips meet at the stem, so while pinching the fingers
-        # touch only the pinched strip.
+        # close across the strip. Many tiles meet near the stem, so while pinching the
+        # fingers touch only the pinched one.
         rotation = self.pinch_grasp(outward, toward_base)
-        self.pinched_geom_ids = np.array(
-            [
-                tile.geom_id
-                for tile in self.fruit.tiles
-                if tile.description.strip == strip
-            ]
-        )
+        self.pinched_geom_ids = np.array([pinched.shell_id, pinched.geom_id])
         right.set_hand_collisions(self.pinch_collision_bit)
         # The other arm stays solid to the pinching hand, so the arms still cannot meet.
         self.model.geom_conaffinity[self.left_arm_geom_ids] |= self.pinch_collision_bit
         right.set_gripper(self.pinch_opening)
-        torn = self.move_tool(
+        self.move_tool(
             right,
             [
                 ToolWaypoint(start + self.hover_height * outward, self.reach_time),
@@ -599,14 +594,14 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
             ],
             rotation,
         )
-        torn += self.close_gripper(right, 0.0)
-        self.attach(SceneConstraint.GRIP, right, pinched_id)
+        self.close_gripper(right, 0.0)
+        self.attach(SceneConstraint.GRIP, right, pinched.body_id)
         # The weld holds the strip now: the fingers stay where they closed to and stop
-        # pressing on its light tip, which they would otherwise fight the weld over.
+        # pressing on the light tile, which they would otherwise fight the weld over.
         right.set_gripper(right.gripper_opening())
         self.model.geom_conaffinity[self.pinched_geom_ids] &= ~self.pinch_collision_bit
         self.pinched_geom_ids = None
-        torn += self.move_tool(
+        self.move_tool(
             right,
             [
                 ToolWaypoint(
@@ -617,22 +612,21 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
             ],
             rotation,
         )
-        peeled = [t.description.body for t in torn if t.description.strip == strip]
-        others = [t.description.body for t in torn if t.description.strip != strip]
-        strip_size = sum(t.description.strip == strip for t in self.fruit.tiles)
-        if len(peeled) < self.minimum_peeled_share * strip_size:
-            raise StripNotPeeled(strip, len(peeled), strip_size)
-        if len(others) > self.maximum_neighbouring_tiles_torn:
-            raise NeighbouringStripsTorn(others)
-        return strip, peeled
+        peeled = [tile.description.body for tile in self.fruit.peeled_with(pinched)]
+        if len(peeled) < self.minimum_peeled_tiles:
+            raise StripNotPeeled(
+                pinched.description.body, len(peeled), self.minimum_peeled_tiles
+            )
+        self.check_only_pulled_strip_torn(self.fruit.peeled_tiles(), pinched)
+        return pinched, peeled
 
-    def put_peel_aside(self, strip: str) -> float:
+    def put_peel_aside(self, pinched: SkinTile) -> float:
         """
         Carry the peeled strip, still pinched, off the fruit, tearing off what is left
         of it, to :attr:`peel_drop_offset` beside the board, lay it down on the island
         and let go of it.
 
-        :param strip: The name of the strip being held.
+        :param pinched: The tile the strip is held by.
         :return: How far in metres from where it was laid down, on the island, the
             farthest piece of the strip came to rest.
         """
@@ -645,7 +639,7 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         drop = np.array([x + dx, y + dy, countertop + self.peel_drop_height])
         held = right.tool_pose()[0]
         # Back toward the stem and up first, away from the holding hand at the base.
-        torn = self.move_tool(
+        self.move_tool(
             right,
             [
                 ToolWaypoint(
@@ -658,37 +652,34 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
             rotation,
         )
         # Turn the hand to point down on the way, which the arm can reach the spot with.
-        torn += self.move_tool(
+        self.move_tool(
             right,
             [ToolWaypoint(drop + [0.0, 0.0, self.hover_height], self.carry_time)],
             rotation,
             turn_to=self.downward_grasp(),
         )
-        torn += self.move_tool(right, [ToolWaypoint(drop, self.approach_time)])
+        self.move_tool(right, [ToolWaypoint(drop, self.approach_time)])
         self.release_weld(SceneConstraint.GRIP)
-        torn += self.close_gripper(right, self.open_gripper)
-        torn += self.move_tool(
+        self.close_gripper(right, self.open_gripper)
+        self.move_tool(
             right,
             [ToolWaypoint(drop + [0.0, 0.0, self.hover_height], self.approach_time)],
         )
         right.set_hand_collisions(None)
         self.model.geom_conaffinity[self.left_arm_geom_ids] &= ~self.pinch_collision_bit
-        self.pinched_geom_ids = None
-        torn += self.move_tool(
+        self.move_tool(
             right, [ToolWaypoint(self.ready_position(ArmSide.RIGHT), self.reach_time)]
         )
-        others = [t.description.body for t in torn if t.description.strip != strip]
-        if len(others) > self.maximum_neighbouring_tiles_torn:
-            raise NeighbouringStripsTorn(others)
-        strip_ids = [
-            self.body_id(self.fruit_prefix + t.description.body)
-            for t in self.fruit.tiles
-            if t.description.strip == strip
-        ]
+        self.check_only_pulled_strip_torn(self.fruit.peeled_tiles(), pinched)
+        # What still hung on the pinched tile; pieces that snapped off on the way lie
+        # wherever they fell.
+        strip = self.fruit.carried_with(pinched)
         # The strip hangs from its pinched tip, so it lies out from where it was let go.
         on_island = np.array([drop[0], drop[1], countertop])
         distance = float(
-            np.linalg.norm(self.data.xipos[strip_ids] - on_island, axis=1).max()
+            np.linalg.norm(
+                self.data.xipos[[tile.body_id for tile in strip]] - on_island, axis=1
+            ).max()
         )
         if distance > self.peeled_strip_length + self.peel_spread_margin:
             raise PeelNotPlaced(distance)
@@ -865,38 +856,25 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         across = normal - (normal @ axis) * axis
         return across / np.linalg.norm(across)
 
-    def fruit_body(self, side: FruitSide, slice_index: int) -> int:
+    def heaviest_chunk(self, side: FruitSide) -> int:
         """
         :param side: A half of the fruit.
-        :param slice_index: The slice's position from the stem; negative from the base.
-        :return: The id of the flesh slice.
+        :return: The id of the half's heaviest flesh chunk, deep in the flesh near the
+            middle of the fruit.
         """
-        name = self.fruit.description.flesh_slices[side][slice_index]
-        return self.body_id(self.fruit_prefix + name)
-
-    def flesh_ids(self) -> list[int]:
-        """
-        :return: The ids of all flesh slices.
-        """
-        return [
-            self.body_id(self.fruit_prefix + name)
-            for names in self.fruit.description.flesh_slices.values()
-            for name in names
-        ]
+        heaviest = max(
+            (chunk for chunk in self.fruit.description.flesh if chunk.side == side),
+            key=lambda chunk: chunk.mass,
+        )
+        return self.body_id(self.fruit_prefix + heaviest.body)
 
     def fruit_centre(self) -> np.ndarray:
         """
         :return: The fruit's centre of mass, in world coordinates.
         """
-        ids = self.flesh_ids()
+        ids = self.fruit.flesh_body_ids
         masses = self.model.body_mass[ids]
         return masses @ self.data.xipos[ids] / masses.sum()
-
-    def fruit_axis_now(self) -> np.ndarray:
-        """
-        :return: The direction from base to stem of the fruit as it lies now.
-        """
-        return self.data.xmat[self.flesh_ids()[0]].reshape(3, 3)[:, 2].copy()
 
     def fruit_end(self, toward_stem: bool) -> np.ndarray:
         """
@@ -905,12 +883,7 @@ class Pr2AvocadoPeelingDemonstration(AvocadoPeelingDemonstration):
         """
         axis = self.fruit_axis_now()
         centre = self.fruit_centre()
-        points = self.data.xipos[
-            [
-                self.body_id(self.fruit_prefix + t.description.body)
-                for t in self.fruit.tiles
-            ]
-        ]
+        points = self.data.xipos[[tile.body_id for tile in self.fruit.tiles]]
         reach = (points - centre) @ axis
         return centre + axis * (reach.max() if toward_stem else reach.min())
 
@@ -935,7 +908,7 @@ def main(
     ).run()
     print(
         f"The PR2 laid the avocado {outcome.placement_error * 1000:.0f} mm from the "
-        f"board's centre and peeled {len(outcome.peeled_tiles)} tiles of strip "
+        f"board's centre and peeled a strip of {len(outcome.peeled_tiles)} tiles at "
         f"{outcome.peeled_strip}, then laid the strip down beside the board, all of it "
         f"within {outcome.peel_placement_error * 1000:.0f} mm of where it let go."
     )

@@ -24,15 +24,15 @@ of the board. It takes the avocado from above with its right hand, lays it on th
 board with the stem to the robot's right and moves its hand aside. Its left hand then
 holds the fruit down at the base end, on the left, its closed fingertips on top of the
 skin, so nothing of it reaches round to the side being peeled. The right hand comes in
-across the fruit onto the tip, at the stem, of the upper half's strip facing the robot
+across the fruit onto a tile near the stem of the upper half's column facing the robot
 and pinches it between its fingertips. It draws the strip a little along the fruit and
 then mostly out from it, toward the robot and away from the holding hand, and the
 strip tears off tile by tile behind the fingers while the rest of the skin stays on.
 Still holding the strip, the right hand backs off, turns to point down, carries the
 strip to the island beside the board and lays it down there. Each hand works on the
 end on its own side. The run checks that the avocado comes to rest within 5 cm of the
-board's centre, that at least 60 % of the strip comes off, that the whole strip lies
-within its own length, plus 3 cm, of where it was let go, that no other skin comes off
+board's centre, that at least 8 tiles come off as one strip, that what still hangs on
+the pinched tile lies within the column's length, plus 3 cm, of where it was let go, that no other skin comes off
 and that the two arms never touch.
 
 The PR2 is the one of the semantic digital twin. `pr2.py` exports it to MuJoCo when
@@ -43,32 +43,41 @@ counterbalanced arms are, and they move by damped least-squares inverse kinemati
 on their servos, each elbow kept on its own side. The hands move in straight lines.
 The waiting hand stays to its own side of the board. A hand takes hold with a weld
 switched on where it is; the fingers close around what it holds with 1 N at most.
-The tips of all strips meet at the stem, so while pinching, the right hand's fingers
-touch only the pinched strip and the other arm, which they must not meet. A headless run takes 2.5 to 5 minutes, depending on
-the machine's load, for about 40 s of simulated time; the viewer plays at about a
-quarter of real time or slower.
+Many tiles meet near the stem, so while pinching, the right hand's fingers touch only
+the pinched tile and the other arm, which they must not meet. A headless run takes
+about 7 minutes for about 40 s of simulated time; the viewer plays at roughly a tenth
+of real time.
 
 ## Mocap hands peel, cut, pit and slice the avocado (`demo.py`)
 
 The avocado lies on the cutting board, the half holding the pit down, and is held
-by its upper half. A gripper grabs the skin at the stem end of the upper half's
-strip facing up and draws it back over the fruit, tearing that strip off. The
-avocado is then cut, and its halves are parted along the cut. The upper half is laid
-on its cut face beside the lower one, and the pit is lifted out onto the board. Then
-the lower half is cut into its slices and its stem slice is carried away. The
-gripper and the holder are mocap bodies. The run checks that at least three
-quarters of the strip and no other skin come off, that the pit leaves its cavity by
-2 cm, and that the stem slice comes away without its neighbour. A headless run
-takes about 40 s.
+by its upper half. A gripper grabs a tile near the stem of the upper half's column
+facing up and draws it back over the fruit, so a strip peels off from there toward
+the base. The avocado is then halved, and its halves are parted along the cut. The
+upper half is laid on its cut face beside the lower one, and the pit is lifted out
+onto the board. Then the fruit is sliced across near the stem and the lower half's
+stem-side piece is carried away. The gripper and the holder are 50 g hands that a
+soft weld drags after mocap targets, and that grip with a stiff weld. The run checks
+that at least 8 tiles come off as one strip and no other skin comes off, that the pit
+leaves its cavity by 2 cm, and that the stem-side piece comes away without the rest
+of the half. A headless run takes about 75 s.
 
 ## The avocado
 
-Its skin is 16 strips of 20 tiles, each tile held to the flesh by an equality
-constraint. `peeling.py` releases a tile once it stays lifted 1.5 mm off its seat or
-dragged 3 mm along it for 5 steps. The tiles themselves are hidden; each strip is
-drawn as one MuJoCo skin per flesh slice that bends with its tiles. The flesh is two
-halves of 4 welded slices each; `PeelableFruit.slice` cuts flesh and skin between
-slices. The pit collides with the flesh all along. The fruit is attached without a
-name prefix, because MuJoCo 3.x does not prefix the bodies a skin follows.
+The avocado is made of free bodies held together by equality constraints: 168 flesh
+chunks (14 slabs across the fruit, 12 wedges around it) welded to their neighbours,
+708 skin tiles each welded to the chunk under it, and the pit welded into its seat.
+`peeling.py` switches these constraints, since MuJoCo has none that break. A tile
+comes off when its weld stays loaded past the skin's hold on the flesh, about 0.2 N
+pulling outward at an edge. Neighbouring tiles are linked by hinges that switch on
+once one of them is off and tear past their strength; links along a column, stem to
+base, are stronger than links across, so a peel runs as a strip. `PeelableFruit.cut`,
+`halve` and `slice` cut the flesh and skin along a knife plane, landing on the
+nearest boundary between chunks, and every separate piece then collides with the
+others. The pit collides with the flesh all along. Grab tiles with a dynamic body,
+such as a robot finger or a dragged hand, never a mocap body welded straight to a
+0.05 g tile. The scene uses elliptic friction cones, which the fruit asks for. With
+about 5300 degrees of freedom the fruit alone simulates at about a fifth of real
+time.
 
 Both demos are in the CI matrix of `examples_and_demos.yml`.
