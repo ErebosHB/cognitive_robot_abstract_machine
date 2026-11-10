@@ -280,16 +280,18 @@ class AvocadoPeelingDemonstration:
 
     peeling_path: list[GripperWaypoint] = field(
         default_factory=lambda: [
-            GripperWaypoint(outward=0.02, toward_base=0.0, down=0.0, travel_time=0.5),
-            GripperWaypoint(outward=0.04, toward_base=0.06, down=0.0, travel_time=1.0),
-            GripperWaypoint(outward=0.05, toward_base=0.14, down=0.0, travel_time=1.5),
-            GripperWaypoint(outward=0.0, toward_base=0.2, down=0.02, travel_time=1.0),
-            GripperWaypoint(outward=0.0, toward_base=0.24, down=0.05, travel_time=0.8),
+            GripperWaypoint(outward=0.015, toward_base=0.0, down=0.0, travel_time=0.5),
+            GripperWaypoint(outward=0.035, toward_base=0.02, down=0.0, travel_time=0.8),
+            GripperWaypoint(outward=0.05, toward_base=0.05, down=0.0, travel_time=1.0),
+            GripperWaypoint(outward=0.05, toward_base=0.09, down=0.0, travel_time=1.0),
+            GripperWaypoint(outward=0.05, toward_base=0.13, down=0.0, travel_time=1.0),
+            GripperWaypoint(outward=0.04, toward_base=0.17, down=0.0, travel_time=1.0),
+            GripperWaypoint(outward=0.0, toward_base=0.22, down=0.0, travel_time=1.0),
         ]
     )
     """
-    The points the gripper passes after grabbing the tile: off the skin, back over the
-    fruit and down past its base.
+    The points the gripper passes after grabbing the tile: off the skin, then back over
+    the fruit, steeply enough to peel rather than drag the skin along, to past its base.
     """
 
     parting_distance: float = 0.02
@@ -380,14 +382,24 @@ class AvocadoPeelingDemonstration:
     How long in seconds the scene settles after something is let go.
     """
 
-    grabbed_row: int = 1
+    grabbed_row: int = 4
     """
-    The row of skin tiles, counted from the stem, the strip is grabbed by.
+    The row of skin tiles, counted from the stem, the strip is grabbed by: below the
+    first rows, whose tiles each run into two columns, so the strip does not fork.
     """
 
-    minimum_peeled_tiles: int = 8
+    skin_toughness: float = 30.0
     """
-    How many tiles, the grabbed one included, must come off as one strip.
+    The strength in newtons per metre of edge of the links between skin tiles: a ripe
+    avocado whose skin comes off in long strips.
+
+    (The model's own default, 10 N/m, lets a strip snap after a few tiles.)
+    """
+
+    minimum_peeled_tiles: int = 15
+    """
+    How many tiles, the grabbed one included, must still hang together on the gripper
+    at the end of the peel: a strip, not tiles that snapped off one by one.
     """
 
     maximum_neighbouring_tiles_torn: int = 0
@@ -538,7 +550,11 @@ class AvocadoPeelingDemonstration:
         self.model = spec.compile()
         self.data = mujoco.MjData(self.model)
         self.fruit = PeelableFruit(
-            self.model, self.data, description, name_prefix=self.fruit_prefix
+            self.model,
+            self.data,
+            description,
+            name_prefix=self.fruit_prefix,
+            tear_strength=self.skin_toughness,
         )
         self.prepare_hands()
         self.lower_fruit_onto(self.fruit_resting_height())
@@ -607,7 +623,9 @@ class AvocadoPeelingDemonstration:
         ):
             position = [x, y, self.board_top + 0.3]
             spec.worldbody.add_body(name=target_name, mocap=True, pos=position)
-            hand = spec.worldbody.add_body(name=hand_name, pos=position)
+            # Gravity-compensated, as a robot's controller holds its hand up: the hand's
+            # own weight would otherwise hang on the light skin it grips.
+            hand = spec.worldbody.add_body(name=hand_name, pos=position, gravcomp=1.0)
             hand.add_freejoint()
             hand.add_geom(
                 type=mujoco.mjtGeom.mjGEOM_SPHERE,
@@ -847,14 +865,15 @@ class AvocadoPeelingDemonstration:
             points,
             [waypoint.travel_time for waypoint in self.peeling_path],
         )
+        carried_tiles = self.fruit.carried_with(grabbed_tile)
         self.release_weld(SceneConstraint.GRIP)
         peeled_tiles = [
             tile.description.body for tile in self.fruit.peeled_with(grabbed_tile)
         ]
-        if len(peeled_tiles) < self.minimum_peeled_tiles:
+        if len(carried_tiles) < self.minimum_peeled_tiles:
             raise StripNotPeeled(
                 grabbed_tile.description.body,
-                len(peeled_tiles),
+                len(carried_tiles),
                 self.minimum_peeled_tiles,
             )
         self.check_only_pulled_strip_torn(released_tiles, grabbed_tile)

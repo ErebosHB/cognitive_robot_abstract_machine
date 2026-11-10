@@ -93,32 +93,32 @@ class SkinTornAtRest(DataclassException):
 @dataclass
 class StripNotPeeled(DataclassException):
     """
-    Raised when pulling a strip leaves too much of it on the fruit.
+    Raised when pulling a skin tile does not peel a long enough strip.
     """
 
     strip: str
     """
-    The name of the pulled strip.
+    The name of the tile the strip was pulled by.
     """
 
     peeled_tile_count: int
     """
-    How many of the strip's tiles came off.
+    How many tiles came off with it as one strip.
     """
 
     strip_tile_count: int
     """
-    How many tiles the strip has.
+    How many tiles were needed.
     """
 
     def error_message(self) -> str:
         return (
-            f"Only {self.peeled_tile_count} of the {self.strip_tile_count} tiles of strip "
-            f"{self.strip} came off."
+            f"Only {self.peeled_tile_count} tiles came off with {self.strip} as one "
+            f"strip; {self.strip_tile_count} were needed."
         )
 
     def suggest_correction(self) -> str:
-        return "Pull further along the fruit, or lower the release distances."
+        return "Pull more slowly and back along the fruit, or toughen the skin's links."
 
 
 @dataclass
@@ -236,28 +236,6 @@ class ArmsCollided(DataclassException):
 
     def suggest_correction(self) -> str:
         return "Move one hand out of the other's way before the other one reaches in."
-
-
-@dataclass
-class PeelNotPlaced(DataclassException):
-    """
-    Raised when the peeled strip does not end up where it was laid down.
-    """
-
-    distance: float
-    """
-    How far in metres the farthest piece of the strip came to rest from where it was
-    laid down.
-    """
-
-    def error_message(self) -> str:
-        return (
-            f"A piece of the peeled strip came to rest {self.distance * 1000:.0f} mm "
-            f"from where it was laid down."
-        )
-
-    def suggest_correction(self) -> str:
-        return "Lower the strip closer to the surface before letting go of it."
 
 
 @dataclass
