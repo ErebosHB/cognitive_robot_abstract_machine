@@ -57,9 +57,8 @@ class AnalysisEngine(AnalysisEngineInterface):
         """
         camera = CollectionReaderDescriptorFactory.create_descriptor("hsr_ros2")
         yolo = YoloAnnotator.Descriptor()
-        yolo.parameters.pretrained_model = "yolov8m.pt"
+        yolo.parameters.pretrained_model = "ultimate_model_v8_1.26.2.pt"
         yolo.parameters.threshold = 0.6
-        yolo.parameters.ignored_class_names = ["person", "dining table"]
 
         pipeline = Pipeline("LiveYOLO")
         pipeline.add_children(
