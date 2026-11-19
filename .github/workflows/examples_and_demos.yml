@@ -33,6 +33,10 @@ jobs:
           - script: semantic_digital_twin/scripts/test_notebook_examples.sh
           - script: semantic_digital_twin/scripts/test_exercises.sh
           - script: semantic_digital_twin/scripts/test_quizzes.sh
+          - script: coraplex/demos/coraplex_solid_avocado_demo/test_cutting_demo.py
+          - script: coraplex/demos/coraplex_solid_avocado_demo/test_scooping_demo.py
+          - script: coraplex/demos/coraplex_solid_avocado_demo/test_skin_peeling_demo.py
+          - script: coraplex/demos/coraplex_solid_avocado_demo/test_slicing_demo.py
           - script: coraplex/demos/coraplex_bullet_world_demo/test_demo.py
           - script: coraplex/demos/coraplex_failure_handling_demo/test_demo.py
           - script: coraplex/demos/coraplex_garmi_clean_up_demo/test_demo.py

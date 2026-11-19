@@ -1,0 +1,47 @@
+<mujoco model="solid_avocado">
+  <!-- An avocado of three solid parts in one body: skin, flesh and pit. It is whole until
+       cutting.py of the cram avocado demos cuts it. -->
+  <compiler angle="radian" meshdir="assets" />
+  <option timestep="0.002" integrator="implicitfast" cone="elliptic" impratio="10" />
+  <default>
+    <default class="avocado">
+      <mesh inertia="exact" />
+      <!-- The parts are only seen and weighed; a piece collides through the convex shapes
+           of class avocado_collision. -->
+      <geom type="mesh" contype="0" conaffinity="0" group="2" />
+      <default class="avocado_skin">
+        <geom material="avocado_skin" density="1050" />
+      </default>
+      <default class="avocado_flesh">
+        <geom material="avocado_flesh" density="960" />
+      </default>
+      <default class="avocado_pit">
+        <!-- The pit is close to convex and collides as it is. -->
+        <geom material="avocado_pit" density="1150" contype="1" conaffinity="1"
+              friction="0.3 0.01 0.001" solref="0.004 1" solimp="0.99 0.999 0.0005" />
+      </default>
+      <default class="avocado_collision">
+        <geom contype="1" conaffinity="1" group="3" mass="0" condim="6" friction="0.6 0.01 0.002"
+              solref="0.004 1" solimp="0.99 0.999 0.0005" rgba="0.78 0.82 0.36 0.4" />
+      </default>
+    </default>
+  </default>
+  <asset>
+    <material name="avocado_skin" rgba="0.16 0.24 0.09 1" specular="0.3" shininess="0.5" />
+    <material name="avocado_flesh" rgba="0.80 0.84 0.38 1" specular="0.25" shininess="0.35" />
+    <material name="avocado_pit" rgba="0.45 0.27 0.15 1" specular="0.4" shininess="0.6" />
+    <mesh name="avocado_skin" class="avocado" file="skin.obj" />
+    <mesh name="avocado_flesh" class="avocado" file="flesh.obj" />
+    <mesh name="avocado_pit" class="avocado" file="pit.obj" />
+  </asset>
+  <worldbody>
+    <!-- The fruit's frame: origin at the base, z along the long axis to the stem. -->
+    <body name="avocado">
+      <freejoint name="avocado_free" />
+      <geom name="avocado_skin" class="avocado_skin" mesh="avocado_skin" />
+      <geom name="avocado_flesh" class="avocado_flesh" mesh="avocado_flesh" />
+      <geom name="avocado_pit" class="avocado_pit" mesh="avocado_pit" />
+      <geom name="avocado_collision_0" class="avocado_collision" mesh="avocado_skin" />
+    </body>
+  </worldbody>
+</mujoco>
