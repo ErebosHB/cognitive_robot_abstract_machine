@@ -54,6 +54,7 @@ from semantic_digital_twin.semantic_annotations.mixins import (
     HasGraspCandidates,
     HasRim,
     HasDrawnGraspsByDefault,
+    HasAvocadoParts,
 )
 from semantic_digital_twin.grasping.grasp_candidates import GraspCandidate
 from semantic_digital_twin.grasping.grasp_strategies import (
@@ -1237,6 +1238,42 @@ class Banana(Fruit):
 class Orange(Fruit):
     """
     An orange.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Avocado(HasAvocadoParts, Fruit):
+    """
+    A whole avocado, not cut yet.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class AvocadoPiece(HasAvocadoParts, Food):
+    """
+    A piece cut or taken out of an avocado, such as a half, a slice, a strip of skin or
+    the pit.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class AvocadoSkin(HasRootBody):
+    """
+    The skin of an avocado, or the part of it a piece has.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class AvocadoFlesh(HasRootBody):
+    """
+    The flesh of an avocado, or the part of it a piece has.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class AvocadoPit(HasRootBody):
+    """
+    The pit of an avocado; it is never cut.
     """
 
 

@@ -114,6 +114,9 @@ if TYPE_CHECKING:
         Wall,
         CounterTop,
         Cabinet,
+        AvocadoSkin,
+        AvocadoFlesh,
+        AvocadoPit,
     )
     from semantic_digital_twin.world import World
     from semantic_digital_twin.world_description.graph_of_convex_sets.boxes import (
@@ -904,6 +907,35 @@ class HasRim(HasDrawnGraspsByDefault, PartWholeRelationship, Mixin):
         :return: Pinching the top of the container's own wall, as its rim would be.
         """
         return PinchTheTopOfAWall()
+
+
+@dataclass(eq=False, kw_only=True)
+class HasAvocadoParts(PartWholeRelationship, Mixin):
+    """
+    A mixin class for an avocado, or a piece cut from one, made of the parts of its
+    skin, flesh and pit it has.
+    """
+
+    skin: AvocadoSkin | None = field(
+        default=None, metadata=IsPartWholeRelationship().as_dict()
+    )
+    """
+    The skin; None if it has none, as a slice of flesh scooped out.
+    """
+
+    flesh: AvocadoFlesh | None = field(
+        default=None, metadata=IsPartWholeRelationship().as_dict()
+    )
+    """
+    The flesh; None if it has none, as a pit taken out.
+    """
+
+    pit: AvocadoPit | None = field(
+        default=None, metadata=IsPartWholeRelationship().as_dict()
+    )
+    """
+    The pit; None if it has none, as a half the pit was taken out of.
+    """
 
 
 @dataclass(eq=False)

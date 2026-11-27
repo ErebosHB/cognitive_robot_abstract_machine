@@ -14,6 +14,17 @@ import manifold3d
 import mujoco
 import numpy as np
 import pytest
+from krrood.ormatic.data_access_objects.helper import to_dao
+from krrood.ormatic.utils import create_engine
+from semantic_digital_twin.semantic_annotations.semantic_annotations import (
+    Avocado,
+    AvocadoFlesh,
+    AvocadoPiece,
+    AvocadoPit,
+    AvocadoSkin,
+)
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from typing_extensions import Any, Iterator
 
 # %% the demo's modules and the scene
@@ -1084,9 +1095,9 @@ def test_world_holds_a_body_for_each_piece_and_its_parts(
     a piece that was cut leaves the world with its parts.
     """
     mirror = fruit_world.FruitWorld()
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     fruit.cut(slanted_plane)
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     for piece in fruit.pieces:
         body = mirror.body_of(piece)
         assert body.name.name == piece.body_name
@@ -1104,9 +1115,9 @@ def test_piece_bodies_are_where_the_pieces_are(fruit_world, fruit, slanted_plane
     """
     fruit.cut(slanted_plane)
     mirror = fruit_world.FruitWorld()
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     move_every_piece(fruit)
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     for piece in fruit.pieces:
         pose = fruit.pose_of(piece)
         transform = mirror.world.compute_forward_kinematics_np(
@@ -1122,7 +1133,7 @@ def test_part_bodies_look_like_the_parts(fruit_world, fruit, slanted_plane):
     """
     fruit.cut(slanted_plane)
     mirror = fruit_world.FruitWorld()
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     for piece in fruit.pieces:
         bodies = {
             body.name.name: body
@@ -1143,7 +1154,7 @@ def test_piece_bodies_collide_as_the_pieces_do_in_mujoco(
     """
     fruit.cut(slanted_plane)
     mirror = fruit_world.FruitWorld()
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     model = fruit.model
     for piece in fruit.pieces:
         body_id = fruit.body_id(piece)
@@ -1189,13 +1200,129 @@ def test_piece_bodies_weigh_what_the_pieces_weigh(fruit_world, fruit, slanted_pl
     """
     fruit.cut(slanted_plane)
     mirror = fruit_world.FruitWorld()
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     for piece in fruit.pieces:
         inertial = mirror.body_of(piece).inertial
         distribution = piece.mass_distribution()
         assert inertial.mass == pytest.approx(distribution.mass)
         assert inertial.center_of_mass.to_np()[:3] == pytest.approx(distribution.centre)
         assert inertial.inertia.data == pytest.approx(distribution.inertia)
+
+
+# %% what the pieces are
+
+
+def parts_annotated(cutting: ModuleType, annotation: Any) -> dict[Any, Any]:
+    """
+    :param annotation: The annotation of an avocado or of a piece of one.
+    :return: The annotation of each part it has, by the part's material.
+    """
+    parts = {
+        cutting.FruitMaterial.SKIN: annotation.skin,
+        cutting.FruitMaterial.FLESH: annotation.flesh,
+        cutting.FruitMaterial.PIT: annotation.pit,
+    }
+    return {material: part for material, part in parts.items() if part is not None}
+
+
+def test_whole_avocado_is_an_avocado_of_skin_flesh_and_pit(cutting, fruit_world, fruit):
+    """
+    Before it is cut, the avocado's body is an avocado whose parts are the bodies of
+    its skin, flesh and pit.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    (piece,) = fruit.pieces
+    (avocado,) = mirror.world.get_semantic_annotations_by_type(Avocado)
+    assert avocado.root is mirror.body_of(piece)
+    parts = parts_annotated(cutting, avocado)
+    assert {material: type(part) for material, part in parts.items()} == {
+        cutting.FruitMaterial.SKIN: AvocadoSkin,
+        cutting.FruitMaterial.FLESH: AvocadoFlesh,
+        cutting.FruitMaterial.PIT: AvocadoPit,
+    }
+    assert {material: part.root.name.name for material, part in parts.items()} == {
+        part.material: f"{piece.body_name}_{part.material}" for part in piece.parts
+    }
+    assert mirror.world.get_semantic_annotations_by_type(AvocadoPiece) == []
+
+
+def test_pieces_cut_from_the_avocado_are_avocado_pieces_of_their_parts(
+    cutting, fruit_world, fruit
+):
+    """
+    Once the pit is taken out, there is no whole avocado any more, but an avocado
+    piece for each piece, whose parts are the bodies of the parts the piece has.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    fruit.separate(fruit.pieces[0], cutting.FruitMaterial.PIT)
+    mirror.update(fruit=fruit)
+    assert mirror.world.get_semantic_annotations_by_type(Avocado) == []
+    annotations = {
+        annotation.root: annotation
+        for annotation in mirror.world.get_semantic_annotations_by_type(AvocadoPiece)
+    }
+    assert len(annotations) == len(fruit.pieces)
+    for piece in fruit.pieces:
+        parts = parts_annotated(cutting, annotations[mirror.body_of(piece)])
+        assert {material: part.root.name.name for material, part in parts.items()} == {
+            part.material: f"{piece.body_name}_{part.material}" for part in piece.parts
+        }
+
+
+def test_annotations_of_a_cut_piece_leave_the_world_with_it(
+    fruit_world, fruit, slanted_plane
+):
+    """
+    The world holds one annotation for each piece the fruit is in now and for each of
+    their parts, and none of a piece that was cut.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    fruit.cut(slanted_plane)
+    mirror.update(fruit=fruit)
+    world = mirror.world
+    assert sorted(
+        annotation.root.name.name for annotation in world.semantic_annotations
+    ) == sorted(body.name.name for body in world.bodies if body is not mirror.root)
+
+
+def test_stored_world_keeps_what_the_pieces_are(cutting, fruit_world, fruit):
+    """
+    A world of avocado pieces stored in a database comes back with the annotation of
+    each piece and its parts.
+    """
+    from semantic_digital_twin.orm.ormatic_interface import Base, WorldMappingDAO
+
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    fruit.separate(fruit.pieces[0], cutting.FruitMaterial.PIT)
+    mirror.update(fruit=fruit)
+    session = Session(create_engine("sqlite:///:memory:"))
+    Base.metadata.create_all(bind=session.bind)
+    session.add(to_dao(mirror.world))
+    session.commit()
+    restored = session.scalar(select(WorldMappingDAO)).from_dao()
+    session.close()
+    assert sorted(
+        (
+            annotation.root.name.name,
+            sorted(parts_annotated(cutting, annotation)),
+            sorted(
+                part.root.name.name
+                for part in parts_annotated(cutting, annotation).values()
+            ),
+        )
+        for annotation in restored.get_semantic_annotations_by_type(AvocadoPiece)
+    ) == sorted(
+        (
+            piece.body_name,
+            sorted(part.material for part in piece.parts),
+            sorted(f"{piece.body_name}_{part.material}" for part in piece.parts),
+        )
+        for piece in fruit.pieces
+    )
 
 
 # %% the pieces as a USD stage
@@ -1241,7 +1368,7 @@ def stage_of_cut_fruit(
     fruit.cut(slanted_plane)
     move_every_piece(fruit)
     mirror = fruit_world.FruitWorld()
-    mirror.update(fruit)
+    mirror.update(fruit=fruit)
     path = tmp_path / "pieces.usda"
     floor_height = 0.02
     fruit_stage.FruitStage(mirror, floor_height).write(path)

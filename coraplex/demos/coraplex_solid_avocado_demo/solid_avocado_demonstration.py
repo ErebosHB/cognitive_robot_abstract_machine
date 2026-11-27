@@ -535,7 +535,7 @@ class SolidAvocadoDemonstration(ABC):
         self.world_updated_at = self.simulated_time
         if self.fruit_world is None:
             return
-        self.fruit_world.update(self.fruit)
+        self.fruit_world.update(fruit=self.fruit)
 
     def simulate(self, duration: float) -> None:
         """

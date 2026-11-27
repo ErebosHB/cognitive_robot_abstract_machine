@@ -114,8 +114,24 @@ The world, built by `fruit_world.py`, holds:
   `<piece>_pit`, shaped and coloured like the part and weightless, as the piece carries
   the mass.
 
-When a cut is finished, the cut piece's bodies leave the world and the new pieces'
-bodies join it. The poses follow the simulation every 0.05 s of simulated time
+Each piece's body is annotated with what it is, using the annotations of
+`semantic_digital_twin.semantic_annotations`: the whole avocado before the first cut as
+an `Avocado` (a `Fruit`), every piece cut or taken out of it as an `AvocadoPiece`. Its
+`skin`, `flesh` and `pit` fields hold the `AvocadoSkin`, `AvocadoFlesh` and `AvocadoPit`
+annotations of the part bodies it has, and are `None` for a part it lacks. The world,
+annotations included, can be stored in a database through the `semantic_digital_twin`
+ORM, for KnowRob or anything else to query:
+
+```python
+from semantic_digital_twin.semantic_annotations.semantic_annotations import AvocadoPiece
+
+for piece in world.get_semantic_annotations_by_type(AvocadoPiece):
+    if piece.pit is not None:
+        print(piece.root.name.name, "holds the pit")
+```
+
+When a cut is finished, the cut piece's bodies and annotations leave the world and the
+new pieces' bodies and annotations join it. The poses follow the simulation every 0.05 s of simulated time
 (`world_update_interval`) and once more at the end of a run. Pass `fruit_world=None` to
 a demonstration to keep no world.
 
@@ -199,9 +215,10 @@ BSD-3-Clause licensed; see `NOTICE.md` and `LICENSE.txt` there.
 ## Tests
 
 `test/coraplex_test/test_avocado_cutting.py` covers cutting, holding, separating,
-scooping, hinges, gripping, the random pit, the world and the USD stage; the USD tests
-are skipped where `usd-core` is not installed. All four demos also run
-headless in the CI matrix of `.github/workflows/examples_and_demos.yml`.
+scooping, hinges, gripping, the random pit, the world, its annotations, storing it in a
+database and the USD stage; the USD tests are skipped where `usd-core` is not
+installed. All four demos also run headless in the CI matrix of
+`.github/workflows/examples_and_demos.yml`.
 
 ```bash
 python -m pytest test/coraplex_test/test_avocado_cutting.py
