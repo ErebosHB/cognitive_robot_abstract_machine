@@ -125,7 +125,9 @@ class FruitWorld:
         :param fruit: The fruit, its scene compiled with the piece's body in it.
         :return: The connection of the piece's body to :attr:`root`.
         """
-        body = Body(name=PrefixedName(piece.body_name))
+        # A plain string, as the whole fruit's name may be an enum member of the demos,
+        # which a process reading the world without their modules cannot rebuild.
+        body = Body(name=PrefixedName(str(piece.body_name)))
         distribution = piece.mass_distribution()
         body.inertial = Inertial(
             mass=distribution.mass,
@@ -163,7 +165,7 @@ class FruitWorld:
         )
         self.world.add_semantic_annotation_recursively(
             annotation_type(
-                name=PrefixedName(piece.body_name),
+                name=body.name,
                 root=body,
                 skin=parts.get(FruitMaterial.SKIN),
                 flesh=parts.get(FruitMaterial.FLESH),

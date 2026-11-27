@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import importlib
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
@@ -25,7 +26,7 @@ from semantic_digital_twin.semantic_annotations.semantic_annotations import (
 )
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from typing_extensions import Any, Iterator
+from typing_extensions import Any, Callable, Iterator
 
 # %% the demo's modules and the scene
 
@@ -1323,6 +1324,149 @@ def test_stored_world_keeps_what_the_pieces_are(cutting, fruit_world, fruit):
         )
         for piece in fruit.pieces
     )
+
+
+# %% the pieces on ROS
+
+
+@pytest.fixture
+def fruit_world_publisher(cutting: ModuleType) -> ModuleType:
+    """
+    The ``fruit_world_publisher`` module of the avocado demos, which needs ROS 2.
+    """
+    pytest.importorskip("rclpy")
+    return importlib.import_module("fruit_world_publisher")
+
+
+def wait_until(condition: Callable[[], bool], timeout: float = 10.0) -> None:
+    """
+    Wait until a condition holds, as a message on ROS takes a moment to arrive.
+
+    :param condition: The condition.
+    :param timeout: How long to wait at most, in seconds.
+    """
+    deadline = time.monotonic() + timeout
+    while not condition() and time.monotonic() < deadline:
+        time.sleep(0.05)
+
+
+def test_names_in_a_demonstrations_world_are_plain_text(scooping_demo):
+    """
+    Every name in a demonstration's world is a plain string, of no type of the demos,
+    so a process without their modules, such as one joining the world over ROS, can
+    read it.
+    """
+    demonstration = scooping_demo.AvocadoScoopingDemonstration(
+        headless=True, random_pit=None
+    )
+    demonstration.fruit_world.update(fruit=demonstration.fruit)
+    world = demonstration.fruit_world.world
+    names = [entity.name.name for entity in world.bodies] + [
+        annotation.name.name for annotation in world.semantic_annotations
+    ]
+    assert {type(name) for name in names} == {str}
+
+
+def test_world_joined_over_ros_follows_the_pieces(
+    rclpy_node, cutting, fruit_world, fruit_world_publisher, fruit
+):
+    """
+    A world joined over ROS while the avocado is whole gets the pieces it is cut into,
+    annotated with their parts, where the pieces are.
+    """
+    world_fetcher = pytest.importorskip(
+        "semantic_digital_twin.adapters.ros.world_fetcher"
+    )
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    fruit_world_publisher.FruitWorldPublisher(fruit_world=mirror, node=rclpy_node)
+    joined = world_fetcher.join_shared_world(rclpy_node)
+    fruit.separate(fruit.pieces[0], cutting.FruitMaterial.PIT)
+    move_every_piece(fruit)
+    mirror.update(fruit=fruit)
+
+    def pieces_joined() -> list[Any]:
+        """
+        :return: The annotations of the pieces the joined world has now.
+        """
+        return joined.get_semantic_annotations_by_type(AvocadoPiece)
+
+    wait_until(lambda: len(pieces_joined()) == len(fruit.pieces))
+    assert sorted(
+        (
+            annotation.root.name.name,
+            sorted(
+                part.root.name.name
+                for part in parts_annotated(cutting, annotation).values()
+            ),
+        )
+        for annotation in pieces_joined()
+    ) == sorted(
+        (
+            piece.body_name,
+            sorted(f"{piece.body_name}_{part.material}" for part in piece.parts),
+        )
+        for piece in fruit.pieces
+    )
+
+    def positions_joined() -> list[np.ndarray]:
+        """
+        :return: Where each piece's body is in the joined world now.
+        """
+        return [
+            joined.compute_forward_kinematics_np(
+                joined.root, joined.get_body_by_name(piece.body_name)
+            )[:3, 3]
+            for piece in fruit.pieces
+        ]
+
+    expected = [fruit.pose_of(piece).position for piece in fruit.pieces]
+    wait_until(lambda: np.allclose(positions_joined(), expected))
+    assert np.array(positions_joined()) == pytest.approx(np.array(expected))
+
+
+def test_frames_of_the_pieces_and_their_parts_are_published(
+    rclpy_node, fruit_world, fruit_world_publisher, fruit, slanted_plane
+):
+    """
+    Each piece's body has a frame on ``tf``, and each of its parts' bodies, fixed to
+    it, a frame on ``tf_static``.
+    """
+    qos = pytest.importorskip("rclpy.qos")
+    tf_publisher = pytest.importorskip(
+        "semantic_digital_twin.adapters.ros.tf_publisher"
+    )
+    tf_messages = pytest.importorskip("tf2_msgs.msg")
+    mirror = fruit_world.FruitWorld()
+    publisher = fruit_world_publisher.FruitWorldPublisher(
+        fruit_world=mirror, node=rclpy_node
+    )
+    frames = set()
+
+    def take_frames(message: Any) -> None:
+        """
+        :param message: Transforms received; their frames are taken down.
+        """
+        frames.update(transform.child_frame_id for transform in message.transforms)
+
+    rclpy_node.create_subscription(
+        tf_messages.TFMessage, publisher.tf_publisher.tf_topic, take_frames, 10
+    )
+    rclpy_node.create_subscription(
+        tf_messages.TFMessage,
+        tf_publisher.TfTopic.STATIC,
+        take_frames,
+        qos.QoSProfile(depth=1, durability=qos.DurabilityPolicy.TRANSIENT_LOCAL),
+    )
+    fruit.cut(slanted_plane)
+    mirror.update(fruit=fruit)
+    expected = {
+        publisher.tf_publisher.frame_names.preferred_name(body)
+        for body in mirror.world.bodies
+        if body is not mirror.root
+    }
+    wait_until(lambda: expected <= frames)
+    assert expected <= frames
 
 
 # %% the pieces as a USD stage

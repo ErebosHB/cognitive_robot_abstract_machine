@@ -139,6 +139,42 @@ a demonstration to keep no world.
 > along with the piece: its origin is where the avocado's base was, not the piece's
 > centre. The meshes are given in that frame.
 
+## Publishing the pieces on ROS 2
+
+`publish_on_ros.py` runs a demonstration while it publishes the avocado's world on ROS 2,
+for KnowRob or any other process to follow. It takes the demos' options:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+python publish_on_ros.py scooping --seed 9
+```
+
+| Published on                          | What                                                              |
+|---------------------------------------|-------------------------------------------------------------------|
+| `/semantic_digital_twin/world_sync`   | Every change: pieces and annotations added or removed, poses.     |
+| `/semantic_digital_twin/fetch_world`  | A service handing out the whole world, to join it at any time.    |
+| `tf`                                  | The frame of each piece.                                          |
+| `tf_static`                           | The frame of each part, fixed to its piece.                       |
+
+When the demonstration has ended, the script keeps publishing the pieces it ended with
+until Enter is pressed. A process with `semantic_digital_twin` joins the world, and
+from then on keeps it in step, like this:
+
+```python
+from semantic_digital_twin.adapters.ros.background_node import get_node, init_node
+from semantic_digital_twin.adapters.ros.world_fetcher import join_shared_world
+from semantic_digital_twin.semantic_annotations.semantic_annotations import AvocadoPiece
+
+init_node("avocado_listener")
+world = join_shared_world(get_node())
+for piece in world.get_semantic_annotations_by_type(AvocadoPiece):
+    print(piece.root.name.name, piece.pit is not None)
+```
+
+The meshes travel with the world, so the listener needs neither these demos nor their
+files. KnowRob does not read the world's own messages; a bridge that joins the world
+like this and tells KnowRob about each piece is still to be written.
+
 ## Opening the pieces in Isaac Sim
 
 `export_to_usd.py` runs a demonstration headless and writes the pieces it ends with to a
@@ -199,6 +235,9 @@ of the other pieces.
 | `fruit_world.py`                 | The pieces as a `semantic_digital_twin` world.           |
 | `fruit_stage.py`                 | The pieces of that world as a USD stage for Isaac Sim.   |
 | `export_to_usd.py`               | Run a demonstration and write its pieces to USD.         |
+| `fruit_world_publisher.py`       | The pieces' world published on ROS 2.                    |
+| `publish_on_ros.py`              | Run a demonstration and publish its pieces on ROS 2.     |
+| `demonstrations.py`              | The four demonstrations, chosen by name.                 |
 | `solid_avocado_demonstration.py` | What every demo shares: scene, viewer, laying aside.     |
 | `held_avocado_demonstration.py`  | The avocado on poles, and halving it.                    |
 | `*_demo.py`                      | The four demonstrations.                                 |
@@ -216,7 +255,7 @@ BSD-3-Clause licensed; see `NOTICE.md` and `LICENSE.txt` there.
 
 `test/coraplex_test/test_avocado_cutting.py` covers cutting, holding, separating,
 scooping, hinges, gripping, the random pit, the world, its annotations, storing it in a
-database and the USD stage; the USD tests are skipped where `usd-core` is not
+database, publishing it on ROS 2 and the USD stage; the USD tests are skipped where `usd-core` is not
 installed. All four demos also run headless in the CI matrix of
 `.github/workflows/examples_and_demos.yml`.
 
