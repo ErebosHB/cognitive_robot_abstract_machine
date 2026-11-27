@@ -13,7 +13,7 @@ import pytest
 from semantic_digital_twin.datastructures.prefixed_name import PrefixedName
 from semantic_digital_twin.semantic_annotations.semantic_annotations import (
     Avocado,
-    AvocadoPit,
+    Pit,
 )
 from semantic_digital_twin.world import World
 from semantic_digital_twin.world_description.connections import FixedConnection
@@ -82,7 +82,7 @@ def avocado_world(bridge_module: ModuleType, session: Any) -> Iterator[AvocadoWo
         avocado = Avocado(
             name=avocado_body.name,
             root=avocado_body,
-            pit=AvocadoPit(name=pit_body.name, root=pit_body),
+            pit=Pit(name=pit_body.name, root=pit_body),
         )
         world.add_semantic_annotation_recursively(avocado)
     bridge = bridge_module.KnowRobBridge(_world=world, session=session)
@@ -152,7 +152,7 @@ def test_annotation_removed_from_the_world_is_forgotten(session, avocado_world):
     world = avocado_world.world
     with world.modify_world():
         world.remove_semantic_annotation(avocado_world.avocado.pit)
-    assert session.ask(query="rdf:type(?pit, sdt:'AvocadoPit')") == []
+    assert session.ask(query="rdf:type(?pit, sdt:'Pit')") == []
 
 
 def test_stopped_bridge_leaves_nothing_behind(session, avocado_world):

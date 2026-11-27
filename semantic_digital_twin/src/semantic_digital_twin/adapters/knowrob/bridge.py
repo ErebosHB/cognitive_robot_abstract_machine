@@ -20,11 +20,10 @@ from krrood.patterns.mixin import Mixin
 from krrood.patterns.path_enumeration import PathEnumeration
 from semantic_digital_twin.adapters.ros.tf_publisher import TfFrameNames
 from semantic_digital_twin.callbacks.callback import ModelChangeCallback
-from semantic_digital_twin.part_finding.relationships import PartRelationshipInspector
 from semantic_digital_twin.semantic_annotations.mixins import (
     HasRootKinematicStructureEntity,
-    PartWholeRelationship,
 )
+from semantic_digital_twin.semantic_annotations.part_whole.relationship import HasParts
 from semantic_digital_twin.world_description.world_entity import SemanticAnnotation
 from typing_extensions import Any
 
@@ -343,17 +342,14 @@ class KnowRobBridge(ModelChangeCallback):
             )
             for annotation_class in self.classes_of(annotation_class=type(annotation))
         ]
-        if isinstance(annotation, PartWholeRelationship):
+        if isinstance(annotation, HasParts):
             statements.extend(
                 Statement(
                     subject=iri,
                     predicate=Vocabulary.HAS_PART,
                     value=Namespace.INDIVIDUALS.iri(name=part.name.name),
                 )
-                for relationship in PartRelationshipInspector.all_of_type(
-                    type(annotation)
-                )
-                for part in relationship.parts_of(annotation)
+                for part in annotation.parts
             )
         if isinstance(annotation, HasRootKinematicStructureEntity):
             statements.append(

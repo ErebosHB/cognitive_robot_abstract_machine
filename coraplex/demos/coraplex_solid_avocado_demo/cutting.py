@@ -1356,7 +1356,7 @@ class CuttableFruit:
                 objtype=mujoco.mjtObj.mjOBJ_BODY,
                 name1=first.body_name,
                 name2=second.body_name,
-                data=[*anchor, *anchor, *np.zeros(5)],
+                data=np.pad([*anchor, *anchor], (0, mujoco.mjNEQDATA - 6)),
                 solref=[self.hinge_time_constant, 1.0],
             )
         self.spec.add_exclude(bodyname1=first.body_name, bodyname2=second.body_name)

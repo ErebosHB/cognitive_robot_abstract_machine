@@ -14,7 +14,10 @@ import pytest
 from cramph.node import EndedByOwner
 from cramph.data_types import ObservationStateValue
 from cramph.exceptions import CyclicNodeDependencyError, PrerequisiteNotExpandedError
-from giskardpy.motion_statechart.exceptions import NoProgressError
+from giskardpy.motion_statechart.exceptions import (
+    NoProgressError,
+    PositionLimitBlockedError,
+)
 from giskardpy.motion_statechart.tasks.drive_tasks import DifferentialDriveBaseGoal
 from cramph.composites import Parallel, Sequence
 from giskardpy.motion_statechart.graph_node import EndMotion, MotionStatechartNode
@@ -46,6 +49,7 @@ from cramph.executor import StatechartExecutor
 from semantic_digital_twin.world_description.connections import OmniDrive
 from giskardpy.motion_statechart.context import MotionControlContext
 from ..motion_control_context import add_to_statechart_with_motion_control
+from semantic_digital_twin.world_description.kinematic_chain import KinematicChain
 
 # %% helpers
 
@@ -65,8 +69,10 @@ def unreachable_arm_goal(world: World) -> CartesianPosition:
     limits and then stops converging.
     """
     return CartesianPosition(
-        root_link=world.get_kinematic_structure_entity_by_name("base_footprint"),
-        tip_link=world.get_kinematic_structure_entity_by_name("r_gripper_tool_frame"),
+        kinematic_chain=KinematicChain(
+            root=world.get_kinematic_structure_entity_by_name("base_footprint"),
+            tip=world.get_kinematic_structure_entity_by_name("r_gripper_tool_frame"),
+        ),
         goal_point=Point3(
             5,
             0,
@@ -159,19 +165,25 @@ class TestStallDetection:
 
         executor.compile(statechart=motion_statechart)
 
-        with pytest.raises(NoProgressError) as exception_info:
+        with pytest.raises(PositionLimitBlockedError) as exception_info:
             executor.tick_until_end(timeout=2000)
 
         assert goal.unique_name in str(exception_info.value)
 
-    def test_a_task_jittering_in_place_stalls(self, *, cylinder_bot_world: World):
+    def test_a_task_jittering_in_place_stalls(
+        self, *, cylinder_bot_world: World
+    ) -> None:
         """
         A task pushed back every cycle, as an arm held off by a collision is, keeps
-        moving without getting any closer to its goal, so the motion is cancelled.
+        moving without getting any closer to its goal, so the motion is cancelled with a
+        plain :class:`NoProgressError`, since no degree of freedom is at a position
+        limit.
         """
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            kinematic_chain=KinematicChain(
+                root=cylinder_bot_world.root,
+                tip=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            ),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
         progressing = StillProgressing(monitored_node=goal, timeout=STALL_TIMEOUT)
@@ -192,13 +204,15 @@ class TestStallDetection:
             / motion_control.qp_controller_config.control_time_step.total_seconds()
         )
 
-        with pytest.raises(NoProgressError):
+        with pytest.raises(NoProgressError) as exception_info:
             for cycle in range(cycles):
                 executor.tick()
                 cylinder_bot_world.state[drive.x.id].position = JITTER_POSITIONS[
                     cycle % len(JITTER_POSITIONS)
                 ]
                 cylinder_bot_world.notify_state_change()
+
+        assert type(exception_info.value) is NoProgressError
 
     def test_reachable_goal_is_never_reported_as_stalled(
         self, *, cylinder_bot_world: World
@@ -216,8 +230,10 @@ class TestStallDetection:
         )
         motion_statechart = Statechart(context=executor.context)
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            kinematic_chain=KinematicChain(
+                root=cylinder_bot_world.root,
+                tip=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            ),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
         motion_statechart.add_node(node=goal)
@@ -294,14 +310,12 @@ class TestStallDetection:
         )
         reachable = CartesianPosition(
             name="reachable",
-            root_link=base_footprint,
-            tip_link=tip,
+            kinematic_chain=KinematicChain(root=base_footprint, tip=tip),
             goal_point=Point3(0, 0, 0.1, reference_frame=tip),
         )
         unreachable = CartesianPosition(
             name="unreachable",
-            root_link=base_footprint,
-            tip_link=tip,
+            kinematic_chain=KinematicChain(root=base_footprint, tip=tip),
             goal_point=Point3(5, 0, 0, reference_frame=base_footprint),
         )
         executor = StatechartExecutor(
@@ -322,7 +336,7 @@ class TestStallDetection:
 
         assert progressing.monitored_tasks == [reachable, unreachable]
 
-        with pytest.raises(NoProgressError) as exception_info:
+        with pytest.raises(PositionLimitBlockedError) as exception_info:
             executor.tick_until_end(timeout=2000)
 
         assert exception_info.value.stalled_tasks == [unreachable]
@@ -347,14 +361,12 @@ class TestStallDetection:
         )
         holding = CartesianPosition(
             name="holding",
-            root_link=base_footprint,
-            tip_link=other_tip,
+            kinematic_chain=KinematicChain(root=base_footprint, tip=other_tip),
             goal_point=Point3(0, 0, 0, reference_frame=other_tip),
         )
         unreachable = CartesianPosition(
             name="unreachable",
-            root_link=base_footprint,
-            tip_link=tip,
+            kinematic_chain=KinematicChain(root=base_footprint, tip=tip),
             goal_point=Point3(5, 0, 0, reference_frame=base_footprint),
         )
         executor = StatechartExecutor(
@@ -373,7 +385,7 @@ class TestStallDetection:
 
         executor.compile(statechart=motion_statechart)
 
-        with pytest.raises(NoProgressError) as exception_info:
+        with pytest.raises(PositionLimitBlockedError) as exception_info:
             executor.tick_until_end(timeout=2000)
 
         assert exception_info.value.stalled_tasks == [unreachable]
@@ -393,8 +405,7 @@ class TestStallDetection:
         """
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         arrived = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=bot,
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
             goal_point=Point3(0, 0, 0, reference_frame=bot),
         )
         progressing = StillProgressing(monitored_node=arrived, timeout=STALL_TIMEOUT)
@@ -433,8 +444,10 @@ class TestStallDetection:
         )
         motion_statechart = Statechart(context=executor.context)
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            kinematic_chain=KinematicChain(
+                root=cylinder_bot_world.root,
+                tip=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            ),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
         blocker = ConstFalseNode()
@@ -464,8 +477,10 @@ class TestStallDetection:
         """
         timeout = timedelta(days=1, milliseconds=500)
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            kinematic_chain=KinematicChain(
+                root=cylinder_bot_world.root,
+                tip=cylinder_bot_world.get_kinematic_structure_entity_by_name("bot"),
+            ),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
         progressing = StillProgressing(monitored_node=goal, timeout=timeout)
@@ -495,8 +510,7 @@ class TestStallDetection:
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         tasks = [
             CartesianPosition(
-                root_link=cylinder_bot_world.root,
-                tip_link=bot,
+                kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
                 goal_point=Point3(x, 0, 0, reference_frame=cylinder_bot_world.root),
             )
             for x in (1, 2, 3)
@@ -531,8 +545,7 @@ class TestStallDetection:
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         arrived = CartesianPosition(
             name="arrived",
-            root_link=cylinder_bot_world.root,
-            tip_link=bot,
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
             goal_point=Point3(0, 0, 0, reference_frame=bot),
         )
         monitor = NoMonitoredTaskApproachingItsGoal(monitored_tasks=[arrived])
@@ -612,11 +625,17 @@ class ScriptedErrorRun:
     """
 
     def __post_init__(self):
+        """
+        Create the tasks, the monitor watching them and the executor, and compile the
+        motion.
+        """
         self.tasks = [
             CartesianPosition(
                 name=f"goal at {goal_x}",
-                root_link=self.world.root,
-                tip_link=self.world.get_kinematic_structure_entity_by_name("bot"),
+                kinematic_chain=KinematicChain(
+                    root=self.world.root,
+                    tip=self.world.get_kinematic_structure_entity_by_name("bot"),
+                ),
                 goal_point=Point3(goal_x, 0, 0, reference_frame=self.world.root),
                 threshold=TASK_THRESHOLD,
             )
@@ -794,6 +813,10 @@ class TestConvergenceRule:
 
 
 class TestErrorDrivesObservation:
+    """
+    How the error of a task decides what it observes.
+    """
+
     def test_error_is_the_distance_to_the_goal(self, *, cylinder_bot_world: World):
         """
         CartesianPosition reports the distance between tip and goal as its error.
@@ -801,7 +824,8 @@ class TestErrorDrivesObservation:
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         goal_point = Point3(1, 0, 0, reference_frame=cylinder_bot_world.root)
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root, tip_link=bot, goal_point=goal_point
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
+            goal_point=goal_point,
         )
 
         add_to_statechart_with_motion_control(goal, cylinder_bot_world)
@@ -820,8 +844,7 @@ class TestErrorDrivesObservation:
         """
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=bot,
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
 
@@ -840,8 +863,7 @@ class TestErrorDrivesObservation:
         """
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=bot,
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
         executor = StatechartExecutor(
@@ -885,8 +907,9 @@ def position_task_at_its_goal(world: World) -> CartesianPosition:
     still drives the bot.
     """
     return CartesianPosition(
-        root_link=world.root,
-        tip_link=world.get_kinematic_structure_entity_by_name("bot"),
+        kinematic_chain=KinematicChain(
+            root=world.root, tip=world.get_kinematic_structure_entity_by_name("bot")
+        ),
         goal_point=Point3(GOAL_DISTANCE, 0, 0, reference_frame=world.root),
         threshold=THRESHOLD_WIDER_THAN_THE_GOAL_DISTANCE,
     )
@@ -898,8 +921,9 @@ def trajectory_task_at_its_goal(world: World) -> CartesianPositionTrajectory:
     differentiated and keeps changing as the bot follows the trajectory.
     """
     return CartesianPositionTrajectory(
-        root_link=world.root,
-        tip_link=world.get_kinematic_structure_entity_by_name("bot"),
+        kinematic_chain=KinematicChain(
+            root=world.root, tip=world.get_kinematic_structure_entity_by_name("bot")
+        ),
         goal_points=[
             Point3(GOAL_DISTANCE * x / 100, 0, 0, reference_frame=world.root)
             for x in range(100)
@@ -962,7 +986,7 @@ class TestNothingToConverge:
         """
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         hold_orientation = HoldOrientation(
-            root_link=cylinder_bot_world.root, tip_link=bot
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot)
         )
         progressing = StillProgressing(
             monitored_node=hold_orientation, timeout=STALL_TIMEOUT
@@ -999,6 +1023,10 @@ class TestNothingToConverge:
 
 
 class TestNodeDependencies:
+    """
+    How the nodes a node depends on are ordered and checked.
+    """
+
     def test_a_dependency_is_built_first_even_when_added_later(
         self, *, cylinder_bot_world: World
     ):
@@ -1034,8 +1062,7 @@ class TestNodeDependencies:
         """
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         goal = CartesianPosition(
-            root_link=cylinder_bot_world.root,
-            tip_link=bot,
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
             goal_point=Point3(1, 0, 0, reference_frame=cylinder_bot_world.root),
         )
         sequence = Sequence(nodes=[goal])
@@ -1076,6 +1103,10 @@ class TestNodeDependencies:
 
 
 class TestTrajectoryProgress:
+    """
+    How progress is judged for a task following a trajectory.
+    """
+
     def test_a_trajectory_being_followed_is_progressing(
         self, *, cylinder_bot_world: World
     ):
@@ -1085,8 +1116,7 @@ class TestTrajectoryProgress:
         """
         bot = cylinder_bot_world.get_kinematic_structure_entity_by_name("bot")
         trajectory = CartesianPositionTrajectory(
-            root_link=cylinder_bot_world.root,
-            tip_link=bot,
+            kinematic_chain=KinematicChain(root=cylinder_bot_world.root, tip=bot),
             goal_points=[
                 Point3(x / 100, 0, 0, reference_frame=cylinder_bot_world.root)
                 for x in range(100)

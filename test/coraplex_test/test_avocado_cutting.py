@@ -20,10 +20,10 @@ from krrood.ormatic.data_access_objects.helper import to_dao
 from krrood.ormatic.utils import create_engine
 from semantic_digital_twin.semantic_annotations.semantic_annotations import (
     Avocado,
-    AvocadoFlesh,
     AvocadoPiece,
-    AvocadoPit,
-    AvocadoSkin,
+    Flesh,
+    Peel,
+    Pit,
 )
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -1233,7 +1233,7 @@ def parts_annotated(cutting: ModuleType, annotation: Any) -> dict[Any, Any]:
     :return: The annotation of each part it has, by the part's material.
     """
     parts = {
-        cutting.FruitMaterial.SKIN: annotation.skin,
+        cutting.FruitMaterial.SKIN: annotation.peel,
         cutting.FruitMaterial.FLESH: annotation.flesh,
         cutting.FruitMaterial.PIT: annotation.pit,
     }
@@ -1252,9 +1252,9 @@ def test_whole_avocado_is_an_avocado_of_skin_flesh_and_pit(cutting, fruit_world,
     assert avocado.root is mirror.body_of(piece)
     parts = parts_annotated(cutting, avocado)
     assert {material: type(part) for material, part in parts.items()} == {
-        cutting.FruitMaterial.SKIN: AvocadoSkin,
-        cutting.FruitMaterial.FLESH: AvocadoFlesh,
-        cutting.FruitMaterial.PIT: AvocadoPit,
+        cutting.FruitMaterial.SKIN: Peel,
+        cutting.FruitMaterial.FLESH: Flesh,
+        cutting.FruitMaterial.PIT: Pit,
     }
     assert {material: part.root.name.name for material, part in parts.items()} == {
         part.material: f"{piece.body_name}_{part.material}" for part in piece.parts

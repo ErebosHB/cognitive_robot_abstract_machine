@@ -30,32 +30,44 @@ from semantic_digital_twin.exceptions import (
 from semantic_digital_twin.reasoning.predicates import InsideOf
 from semantic_digital_twin.robots.exceptions import MissingMobileBaseError
 from semantic_digital_twin.robots.robot_part_mixins import HasMobileBase
-from semantic_digital_twin.semantic_annotations.part_whole import (
+from semantic_digital_twin.semantic_annotations.part_whole.relationship_marker import (
     IsPartWholeRelationship,
 )
 from semantic_digital_twin.semantic_annotations.mixins import (
-    HasCounterTop,
-    HasCabinets,
     HasSupportingSurface,
     HasRootRegion,
+    HasCaseAsRootBody,
+    HasMovableJoint,
+    IsPerceivable,
+    HasRootBody,
+    IsStorageSpace,
+    IsGraspable,
+    HasDrawnGraspsByDefault,
+)
+from semantic_digital_twin.semantic_annotations.part_whole.furniture_parts import (
+    HasCounterTop,
+    HasCabinets,
     HasDrawers,
     HasDoors,
     HasHandle,
     HasHandles,
-    HasCaseAsRootBody,
-    HasMovableJoint,
     HasApertures,
-    IsPerceivable,
-    HasRootBody,
-    IsStorageSpace,
     HasLegs,
     HasSink,
     HasShelfLayers,
-    HasGraspCandidates,
     HasRim,
-    HasDrawnGraspsByDefault,
-    HasAvocadoParts,
 )
+from semantic_digital_twin.semantic_annotations.part_whole.fruit_parts import (
+    HasCore,
+    HasFlesh,
+    HasPeel,
+    HasPit,
+    HasPith,
+    HasSeedChamber,
+    HasSeeds,
+    HasStem,
+)
+from semantic_digital_twin.semantic_annotations.qualities.mixins import HasRipeness
 from semantic_digital_twin.grasping.grasp_candidates import GraspCandidate
 from semantic_digital_twin.grasping.grasp_strategies import (
     GraspABar,
@@ -110,7 +122,7 @@ class Furniture(SemanticAnnotation, ABC):
 
 
 @dataclass(eq=False)
-class Handle(HasGraspCandidates):
+class Handle(IsGraspable):
     """
     A handle is a physical entity that can be grasped by a hand or a robotic gripper to
     open or close an object.
@@ -944,21 +956,21 @@ class Wall(HasApertures):
 
 
 @dataclass(eq=False)
-class Container(HasGraspCandidates):
+class Container(IsGraspable):
     """
     An object that holds contents and has an opening they go in and out through.
     """
 
 
 @dataclass(eq=False)
-class Cookware(HasGraspCandidates):
+class Cookware(IsGraspable):
     """
     An object used to cook with.
     """
 
 
 @dataclass(eq=False)
-class Tableware(HasGraspCandidates):
+class Tableware(IsGraspable):
     """
     An object a table is set with for a meal.
     """
@@ -972,7 +984,10 @@ class Bottle(Container):
 
 
 @dataclass(eq=False)
-class Statue(HasGraspCandidates): ...
+class Statue(IsGraspable):
+    """
+    A sculpture small enough to be picked up.
+    """
 
 
 @dataclass(eq=False)
@@ -1078,7 +1093,7 @@ class Bowl(HasRim, HasSupportingSurface, Container, Tableware, IsPerceivable):
 
 # Food Items
 @dataclass(eq=False)
-class Food(HasGraspCandidates):
+class Food(IsGraspable):
     """
     A Group class for Food.
     """
@@ -1175,6 +1190,13 @@ class SaltContainer(Container, IsPerceivable):
     """
 
 
+@dataclass(eq=False, kw_only=True)
+class UnknownObject(HasRootBody, IsPerceivable):
+    """
+    An object perception found that no more specific semantic annotation describes.
+    """
+
+
 @dataclass(eq=False)
 class Produce(Food):
     """
@@ -1185,10 +1207,88 @@ class Produce(Food):
     pass
 
 
-@dataclass(eq=False)
-class Fruit(Produce):
+@dataclass(eq=False, kw_only=True)
+class Fruit(Produce, HasRipeness):
     """
     Fruit.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class FruitPart(HasRootBody):
+    """
+    An anatomical part of a fruit, such as its peel or a seed.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Peel(FruitPart):
+    """
+    The outer layer of a fruit, its skin or rind (botanically the exocarp, Plant
+    Ontology PO:0009085).
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Flesh(FruitPart):
+    """
+    The soft tissue between the peel and the inside of a fruit, which is usually eaten
+    (botanically mostly the mesocarp, Plant Ontology PO:0009087).
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class CitrusSegment(Flesh):
+    """
+    One of the wedge-shaped portions the flesh of a citrus fruit divides into, each
+    filled with juice sacs inside a thin membrane (botanically a fruit locule, Plant
+    Ontology PO:0025270).
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Core(FruitPart):
+    """
+    The tough centre of a fruit such as an apple that holds its seeds (botanically the
+    endocarp, Plant Ontology PO:0009086).
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Seed(FruitPart):
+    """
+    A single seed that lies loose in a fruit's flesh or core (Plant Ontology
+    PO:0009010).
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Stem(FruitPart):
+    """
+    The stalk a fruit hung from on its plant.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Pit(FruitPart):
+    """
+    The single large, hard seed or stone at the centre of a fruit such as an avocado or
+    a peach.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class SeedChamber(FruitPart):
+    """
+    The soft central tissue of a fruit such as a cucumber in which its small seeds are
+    embedded.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Pith(FruitPart):
+    """
+    The pale, firmer centre of a fruit such as a strawberry.
     """
 
 
@@ -1220,60 +1320,84 @@ class Carrot(Vegetable):
     """
 
 
-@dataclass(eq=False)
-class Apple(Fruit):
+@dataclass(eq=False, kw_only=True)
+class Apple(Fruit, HasPeel, HasFlesh, HasCore, HasSeeds, HasStem):
     """
     An apple.
     """
 
 
-@dataclass(eq=False)
-class Banana(Fruit):
+@dataclass(eq=False, kw_only=True)
+class Avocado(Fruit, HasPeel, HasFlesh, HasPit):
+    """
+    An avocado.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class AvocadoPiece(Food, HasPeel, HasFlesh, HasPit):
+    """
+    A piece cut or taken out of an avocado, such as a half, a slice, a strip of its peel
+    or the pit.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Banana(Fruit, HasPeel, HasFlesh):
     """
     A banana.
     """
 
 
-@dataclass(eq=False)
-class Orange(Fruit):
+@dataclass(eq=False, kw_only=True)
+class Cucumber(Fruit, HasPeel, HasFlesh, HasSeedChamber):
+    """
+    A cucumber, a fruit in the botanical sense.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class CitrusFruit(Fruit, HasPeel):
+    """
+    A citrus fruit, such as an orange or a lemon, whose flesh is divided into segments
+    (botanically a hesperidium, Plant Ontology PO:0030109).
+    """
+
+    citrus_segments: list[CitrusSegment] = field(
+        default_factory=list,
+        hash=False,
+        metadata=IsPartWholeRelationship().as_dict(),
+    )
+    """
+    The segments the flesh of the citrus fruit is divided into.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class Orange(CitrusFruit):
     """
     An orange.
     """
 
 
 @dataclass(eq=False, kw_only=True)
-class Avocado(HasAvocadoParts, Fruit):
+class Peach(Fruit, HasPeel, HasFlesh, HasPit, HasStem):
     """
-    A whole avocado, not cut yet.
-    """
-
-
-@dataclass(eq=False, kw_only=True)
-class AvocadoPiece(HasAvocadoParts, Food):
-    """
-    A piece cut or taken out of an avocado, such as a half, a slice, a strip of skin or
-    the pit.
+    A peach.
     """
 
 
 @dataclass(eq=False, kw_only=True)
-class AvocadoSkin(HasRootBody):
+class Strawberry(Fruit, HasPeel, HasFlesh, HasPith):
     """
-    The skin of an avocado, or the part of it a piece has.
-    """
-
-
-@dataclass(eq=False, kw_only=True)
-class AvocadoFlesh(HasRootBody):
-    """
-    The flesh of an avocado, or the part of it a piece has.
+    A strawberry.
     """
 
 
 @dataclass(eq=False, kw_only=True)
-class AvocadoPit(HasRootBody):
+class Watermelon(Fruit, HasPeel, HasFlesh, HasSeeds):
     """
-    The pit of an avocado; it is never cut.
+    A watermelon.
     """
 
 
@@ -1393,7 +1517,10 @@ class WallDecor(Decor):
 
 
 @dataclass(eq=False)
-class Cloth(HasGraspCandidates): ...
+class Cloth(IsGraspable):
+    """
+    A piece of fabric, such as a towel or a rag.
+    """
 
 
 @dataclass(eq=False)
@@ -1451,7 +1578,7 @@ class Vase(Container):
 
 
 @dataclass(eq=False)
-class Book(HasGraspCandidates):
+class Book(IsGraspable):
     """
     A book.
     """
@@ -1526,21 +1653,21 @@ class Spoon(Cutlery, IsPerceivable): ...
 
 
 @dataclass(eq=False)
-class Pencil(HasGraspCandidates):
+class Pencil(IsGraspable):
     """
     A pencil.
     """
 
 
 @dataclass(eq=False)
-class Pen(HasGraspCandidates):
+class Pen(IsGraspable):
     """
     A pen.
     """
 
 
 @dataclass(eq=False)
-class ShapeSortingPiece(HasGraspCandidates):
+class ShapeSortingPiece(IsGraspable):
     """
     A loose piece of a shape-sorting toy, which drops through the hole of its
     own outline.
@@ -1589,7 +1716,7 @@ class ShapeSortingPiece(HasGraspCandidates):
 
 
 @dataclass(eq=False)
-class Baseball(HasGraspCandidates):
+class Baseball(IsGraspable):
     """
     A baseball.
     """
@@ -1625,7 +1752,7 @@ class Agent(HasRootBody):
 
 
 @dataclass(eq=False)
-class Human(Agent):
+class Human(Agent, IsPerceivable):
     """
     Represents a human agent in the environment.
 
@@ -1638,7 +1765,7 @@ class Human(Agent):
 
 
 @dataclass(eq=False)
-class Parcel(HasGraspCandidates):
+class Parcel(IsGraspable):
     """
     A parcel, as handled in a warehouse.
     """
@@ -1782,7 +1909,7 @@ class Cooktop(HasRootBody):
 
 
 @dataclass(eq=False)
-class Tool(HasGraspCandidates, ABC):
+class Tool(IsGraspable, ABC):
     """
     A tool that is held by a robot's end effector to act on other bodies.
     """
@@ -1873,7 +2000,7 @@ class Whisk(ToolWithHandle):
         return [
             AlignmentPair(
                 tip_normal=Vector3(-1, 0, 0, reference_frame=self.root),
-                goal_normal=Vector3(0, 0, 1, reference_frame=target),
+                reference_normal=Vector3(0, 0, 1, reference_frame=target),
             )
         ]
 
@@ -1888,11 +2015,11 @@ class CuttingKnife(ToolWithHandle):
         return [
             AlignmentPair(
                 tip_normal=Vector3(1, 0, 0, reference_frame=self.root),
-                goal_normal=Vector3(0, 1, 0, reference_frame=target),
+                reference_normal=Vector3(0, 1, 0, reference_frame=target),
             ),
             AlignmentPair(
                 tip_normal=Vector3(0, 0, 1, reference_frame=self.root),
-                goal_normal=Vector3(0, 0, 1, reference_frame=target),
+                reference_normal=Vector3(0, 0, 1, reference_frame=target),
             ),
         ]
 
@@ -1907,7 +2034,7 @@ class PouringCup(Tool, Container):
         return [
             AlignmentPair(
                 tip_normal=Vector3(0, 0, 1, reference_frame=self.root),
-                goal_normal=Vector3(0, 0, 1, reference_frame=target),
+                reference_normal=Vector3(0, 0, 1, reference_frame=target),
             )
         ]
 
@@ -1926,13 +2053,13 @@ class Sponge(Tool):
             return [
                 AlignmentPair(
                     tip_normal=Vector3(0, 0, 1, reference_frame=self.root),
-                    goal_normal=Vector3(0, 0, -1, reference_frame=target),
+                    reference_normal=Vector3(0, 0, -1, reference_frame=target),
                 )
             ]
         return [
             AlignmentPair(
                 tip_normal=Vector3(0, 0, -1, reference_frame=self.root),
-                goal_normal=self._pose_surface_normal(target),
+                reference_normal=self._pose_surface_normal(target),
             )
         ]
 

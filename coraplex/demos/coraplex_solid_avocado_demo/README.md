@@ -117,8 +117,8 @@ The world, built by `fruit_world.py`, holds:
 Each piece's body is annotated with what it is, using the annotations of
 `semantic_digital_twin.semantic_annotations`: the whole avocado before the first cut as
 an `Avocado` (a `Fruit`), every piece cut or taken out of it as an `AvocadoPiece`. Its
-`skin`, `flesh` and `pit` fields hold the `AvocadoSkin`, `AvocadoFlesh` and `AvocadoPit`
-annotations of the part bodies it has, and are `None` for a part it lacks. The world,
+`peel`, `flesh` and `pit` fields hold the `Peel`, `Flesh` and `Pit` annotations of the
+part bodies it has, and are `None` for a part it lacks. The world,
 annotations included, can be stored in a database through the `semantic_digital_twin`
 ORM, for KnowRob or anything else to query:
 
@@ -188,7 +188,7 @@ python ask_knowrob.py
 ```
 
 ```text
-dul:hasPart(?piece, ?pit), rdf:type(?pit, sdt:'AvocadoPit')
+dul:hasPart(?piece, ?pit), rdf:type(?pit, sdt:'Pit')
   ?piece = https://github.com/cram2/.../world#avocado_piece_3, ?pit = https://github.com/cram2/.../world#avocado_piece_3_pit
 1 answers.
 ```

@@ -11,10 +11,10 @@ from krrood_spatial_math.spatial_types import HomogeneousTransformationMatrix, P
 from semantic_digital_twin.datastructures.prefixed_name import PrefixedName
 from semantic_digital_twin.semantic_annotations.semantic_annotations import (
     Avocado,
-    AvocadoFlesh,
     AvocadoPiece,
-    AvocadoPit,
-    AvocadoSkin,
+    Flesh,
+    Peel,
+    Pit,
 )
 from semantic_digital_twin.world import Body, World
 from semantic_digital_twin.world_description.connections import (
@@ -176,7 +176,7 @@ class FruitWorld:
             annotation_type(
                 name=body.name,
                 root=body,
-                skin=parts.get(FruitMaterial.SKIN),
+                peel=parts.get(FruitMaterial.SKIN),
                 flesh=parts.get(FruitMaterial.FLESH),
                 pit=parts.get(FruitMaterial.PIT),
             )
@@ -185,7 +185,7 @@ class FruitWorld:
 
     def add_part(
         self, *, piece: FruitPiece, part: FruitPart, fruit: CuttableFruit, body: Body
-    ) -> AvocadoSkin | AvocadoFlesh | AvocadoPit:
+    ) -> Peel | Flesh | Pit:
         """
         Add the body of a piece's part to the world, fixed to the piece's body.
 
@@ -193,7 +193,7 @@ class FruitWorld:
         :param part: One of its parts.
         :param fruit: The fruit, whose materials colour the part.
         :param body: The piece's body.
-        :return: The annotation of the part's body as the skin, flesh or pit it is.
+        :return: The annotation of the part's body as the peel, flesh or pit it is.
         """
         part_body = Body(name=PrefixedName(f"{piece.body_name}_{part.material}"))
         shape = Mesh.from_trimesh(
@@ -208,9 +208,9 @@ class FruitWorld:
         self.world.add_connection(FixedConnection(parent=body, child=part_body))
         match part.material:
             case FruitMaterial.SKIN:
-                annotation_type = AvocadoSkin
+                annotation_type = Peel
             case FruitMaterial.FLESH:
-                annotation_type = AvocadoFlesh
+                annotation_type = Flesh
             case FruitMaterial.PIT:
-                annotation_type = AvocadoPit
+                annotation_type = Pit
         return annotation_type(name=part_body.name, root=part_body)

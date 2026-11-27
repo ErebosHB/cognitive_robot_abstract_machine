@@ -32,7 +32,7 @@ def main(node_name: str = "knowrob_bridge") -> None:
     print(
         "KnowRob follows the avocado's pieces. Type a query per line, for example\n"
         "  rdf:type(?piece, sdt:'AvocadoPiece')\n"
-        "  dul:hasPart(?piece, ?pit), rdf:type(?pit, sdt:'AvocadoPit')\n"
+        "  dul:hasPart(?piece, ?pit), rdf:type(?pit, sdt:'Pit')\n"
         "  rdf:type(?food, sdt:'Food'), knowrob:frameName(?food, ?frame)\n"
         "and an empty line to stop."
     )
