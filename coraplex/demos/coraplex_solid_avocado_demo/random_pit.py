@@ -13,7 +13,8 @@ import mujoco
 import numpy as np
 import trimesh
 
-from cutting import FruitMaterial, FruitPart
+from cutting import FruitPart
+from fruit_material import FruitMaterial
 from exceptions import PitDoesNotFit
 
 # %% the random pit
@@ -22,8 +23,10 @@ from exceptions import PitDoesNotFit
 @dataclass
 class RandomPit:
     """
-    How far a random pit may differ from the solid avocado's own. The fruit's frame has
-    its origin at the base and its z axis along the long axis to the stem.
+    How far a random pit may differ from the solid avocado's own.
+
+    The fruit's frame has its origin at the base and its z axis along the long axis to
+    the stem.
     """
 
     size_range: tuple[float, float] = (0.85, 1.1)

@@ -14,9 +14,16 @@ from semantic_digital_twin.semantic_annotations.qualities.relationship_marker im
     IsQualityRelationship,
 )
 from semantic_digital_twin.semantic_annotations.qualities.quality import (
+    BruisingPressure,
+    CuttingResistance,
+    Firmness,
     MassDensity,
     MaterialElasticity,
+    PeelStrength,
+    ReleaseTorque,
     Ripeness,
+    ScoopingResistance,
+    WorstBruisePressure,
 )
 from semantic_digital_twin.semantic_annotations.qualities.relationship import (
     HasQualities,
@@ -38,6 +45,23 @@ class HasRipeness(HasQualities, Mixin):
     )
     """
     How far the semantic annotation has ripened, or ``None`` when that is unknown.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class HasFirmness(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations whose firmness is measured as a whole, such as
+    a fruit.
+    """
+
+    firmness: Firmness | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    How firm the semantic annotation is, or ``None`` when that is unknown.
     """
 
 
@@ -75,4 +99,111 @@ class HasMaterialElasticity(HasMassDensity, Mixin):
     """
     The elasticity of the semantic annotation's material, or ``None`` when that is
     unknown.
+    """
+
+
+# %% Resistance to tools
+
+
+@dataclass(eq=False, kw_only=True)
+class HasCuttingResistance(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations of material a blade has to cut its way
+    through.
+    """
+
+    cutting_resistance: CuttingResistance | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    How hard the material resists a blade, or ``None`` when that is unknown.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class HasScoopingResistance(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations of material a spoon can scoop out.
+    """
+
+    scooping_resistance: ScoopingResistance | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    How hard the material resists a spoon, or ``None`` when that is unknown.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class HasPeelStrength(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations of a peel that can be pulled off what it
+    covers.
+    """
+
+    peel_strength: PeelStrength | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    How hard the peel holds on, or ``None`` when that is unknown.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class HasReleaseTorque(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations of a pit that is twisted free of the flesh
+    it sticks in.
+    """
+
+    release_torque: ReleaseTorque | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    How hard the pit holds on, or ``None`` when that is unknown.
+    """
+
+
+# %% Bruising
+
+
+@dataclass(eq=False, kw_only=True)
+class HasBruisingPressure(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations of tissue a hard enough press bruises.
+    """
+
+    bruising_pressure: BruisingPressure | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    How hard a press has to be to bruise the tissue, or ``None`` when that is
+    unknown.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class HasWorstBruisePressure(HasQualities, Mixin):
+    """
+    A mixin class for semantic annotations of tissue that records the worst press that
+    bruised it.
+    """
+
+    worst_bruise_pressure: WorstBruisePressure | None = field(
+        default=None,
+        hash=False,
+        metadata=IsQualityRelationship().as_dict(),
+    )
+    """
+    The worst press that has bruised the tissue, or ``None`` while it is not bruised.
     """

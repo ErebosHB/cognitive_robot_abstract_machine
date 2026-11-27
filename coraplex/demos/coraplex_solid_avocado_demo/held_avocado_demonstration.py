@@ -12,7 +12,8 @@ import manifold3d
 import mujoco
 import numpy as np
 
-from cutting import FruitMaterial, FruitPiece
+from cutting import FruitPiece
+from fruit_material import FruitMaterial
 from exceptions import FruitNotCut
 from knife_strokes import StrokeAroundPit
 from solid_avocado_demonstration import SolidAvocadoDemonstration
@@ -25,6 +26,7 @@ class HeldAvocadoDemonstration(SolidAvocadoDemonstration, ABC):
     """
     The avocado lies on its side, its long axis along the world's x axis and its stem
     pointing that way, on two upright poles whose tips are stuck into its underside.
+
     Its frame's x axis points down.
     """
 
@@ -136,8 +138,8 @@ class HalvedPieces:
 @dataclass
 class HalvingAvocadoDemonstration(HeldAvocadoDemonstration, ABC):
     """
-    The knife first halves the held avocado level round its pit; the upper half and
-    then the pit are laid aside.
+    The knife first halves the held avocado level round its pit; the upper half and then
+    the pit are laid aside.
     """
 
     halving: StrokeAroundPit = field(

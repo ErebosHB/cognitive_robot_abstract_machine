@@ -16,8 +16,13 @@ import manifold3d
 import mujoco
 import numpy as np
 import pytest
+from krrood.adapters.json_serializer import from_json, to_json
 from krrood.ormatic.data_access_objects.helper import to_dao
 from krrood.ormatic.utils import create_engine
+from semantic_digital_twin.semantic_annotations.qualities.quality import (
+    MassDensity,
+    Ripeness,
+)
 from semantic_digital_twin.semantic_annotations.semantic_annotations import (
     Avocado,
     AvocadoPiece,
@@ -91,8 +96,8 @@ class KnifeInScene:
 @dataclass
 class SpoonInScene:
     """
-    The spoon the scooping tests lead through the fruit: a mocap body whose frame is
-    in the middle of a small bowl.
+    The spoon the scooping tests lead through the fruit: a mocap body whose frame is in
+    the middle of a small bowl.
     """
 
     body_name: str = "spoon"
@@ -133,6 +138,9 @@ def cutting() -> Iterator[ModuleType]:
         "random_pit",
         "fruit_world",
         "fruit_stage",
+        "texture",
+        "adhesion",
+        "fruit_material",
     )
     with pytest.MonkeyPatch.context() as patch:
         patch.syspath_prepend(str(DemoPaths().demo_directory()))
@@ -174,12 +182,14 @@ def floating_fruit(
     knife: KnifeInScene,
     holders: list[manifold3d.Manifold],
     spoon: SpoonInScene | None = None,
+    fruit_texture: Any = None,
 ) -> Any:
     """
     :param cutting: The ``cutting`` module.
     :param knife: The knife to put next to the fruit.
     :param holders: The solids that hold the fruit in place.
     :param spoon: The spoon to put next to the fruit too, if any.
+    :param fruit_texture: The texture the fruit is built with, if any.
     :return: The whole solid avocado floating without gravity, its frame at the world's
         origin with the long axis along z, next to the knife.
     """
@@ -191,7 +201,9 @@ def floating_fruit(
     model = spec.compile()
     data = mujoco.MjData(model)
     mujoco.mj_forward(model, data)
-    return cutting.CuttableFruit(spec, model, data, "avocado", holders=holders)
+    return cutting.CuttableFruit(
+        spec, model, data, "avocado", holders=holders, texture=fruit_texture
+    )
 
 
 @pytest.fixture
@@ -543,8 +555,8 @@ def test_pieces_of_a_cut_through_the_skin_only_stay_held(cutting, held_fruit):
 
 def test_parts_left_uncut_stay_together(cutting, fruit):
     """
-    A plane just beside the axis holds most of the flesh on one side and most of the
-    pit on the other; scoring the skin along it leaves flesh and pit in one piece.
+    A plane just beside the axis holds most of the flesh on one side and most of the pit
+    on the other; scoring the skin along it leaves flesh and pit in one piece.
     """
     materials = cutting.FruitMaterial
     plane = cutting.CuttingPlane([0.002, 0.0, 0.05], [1.0, 0.0, 0.0])
@@ -702,8 +714,8 @@ def hinged_fruit(fruit: Any, hinge_planes: list[Any]) -> list[Any]:
 
 def test_hinge_cuts_segments_joined_along_each_cut(fruit, hinge_planes, hinged_fruit):
     """
-    Hinging the avocado along two planes cuts it into three segments, each joined to
-    the next about a line in the plane between them.
+    Hinging the avocado along two planes cuts it into three segments, each joined to the
+    next about a line in the plane between them.
     """
     assert len(hinged_fruit) == 3
     for first, second, plane in zip(hinged_fruit, hinged_fruit[1:], hinge_planes):
@@ -793,8 +805,8 @@ def fruit_with_spoon(
 @dataclass
 class SpoonWay:
     """
-    A straight way for the spoon along the x axis through the flesh between the pit
-    and the stem, its bowl's back facing the negative y axis.
+    A straight way for the spoon along the x axis through the flesh between the pit and
+    the stem, its bowl's back facing the negative y axis.
     """
 
     height: float = 0.085
@@ -850,8 +862,8 @@ def test_spoon_led_through_the_flesh_scoops_what_its_bowl_held(
     cutting, fruit_with_spoon, spoon
 ):
     """
-    A spoon led through the flesh and out again scoops nothing until it comes out,
-    then the flesh its bowl held on the way, and nothing else.
+    A spoon led through the flesh and out again scoops nothing until it comes out, then
+    the flesh its bowl held on the way, and nothing else.
     """
     way = SpoonWay()
     made = way.lead(cutting, fruit_with_spoon, spoon, -0.05, 0.05)
@@ -912,8 +924,8 @@ def test_bowl_in_the_flesh_is_not_blocked(cutting, fruit, spoon):
 
 def test_bowl_reaching_the_skin_is_blocked_when_it_scoops_flesh(cutting, fruit, spoon):
     """
-    A bowl reaching into the skin is stopped when it scoops flesh only, and not when
-    it scoops the skin too.
+    A bowl reaching into the skin is stopped when it scoops flesh only, and not when it
+    scoops the skin too.
     """
     skin = fruit.pieces[0].part_of(cutting.FruitMaterial.SKIN).solid
     vertices = skin.to_mesh().vert_properties[:, :3]
@@ -962,8 +974,8 @@ def test_spoon_slides_along_the_skin_in_its_way(cutting, scooping_demo):
 @pytest.fixture
 def random_pit(cutting: ModuleType) -> ModuleType:
     """
-    The ``random_pit`` module of the avocado demos, imported while :func:`cutting`
-    makes their folder importable.
+    The ``random_pit`` module of the avocado demos, imported while :func:`cutting` makes
+    their folder importable.
     """
     return importlib.import_module("random_pit")
 
@@ -1198,8 +1210,8 @@ def test_demonstration_keeps_its_world_in_step_with_the_simulation(scooping_demo
 
 def test_world_builds_no_collision_shapes_of_its_own(fruit_world, fruit, slanted_plane):
     """
-    The world leaves checking collisions to MuJoCo: its own collision detector builds
-    no shapes for the pieces as they come and go.
+    The world leaves checking collisions to MuJoCo: its own collision detector builds no
+    shapes for the pieces as they come and go.
     """
     mirror = fruit_world.FruitWorld()
     mirror.update(fruit=fruit)
@@ -1242,8 +1254,8 @@ def parts_annotated(cutting: ModuleType, annotation: Any) -> dict[Any, Any]:
 
 def test_whole_avocado_is_an_avocado_of_skin_flesh_and_pit(cutting, fruit_world, fruit):
     """
-    Before it is cut, the avocado's body is an avocado whose parts are the bodies of
-    its skin, flesh and pit.
+    Before it is cut, the avocado's body is an avocado whose parts are the bodies of its
+    skin, flesh and pit.
     """
     mirror = fruit_world.FruitWorld()
     mirror.update(fruit=fruit)
@@ -1266,8 +1278,8 @@ def test_pieces_cut_from_the_avocado_are_avocado_pieces_of_their_parts(
     cutting, fruit_world, fruit
 ):
     """
-    Once the pit is taken out, there is no whole avocado any more, but an avocado
-    piece for each piece, whose parts are the bodies of the parts the piece has.
+    Once the pit is taken out, there is no whole avocado any more, but an avocado piece
+    for each piece, whose parts are the bodies of the parts the piece has.
     """
     mirror = fruit_world.FruitWorld()
     mirror.update(fruit=fruit)
@@ -1366,9 +1378,9 @@ def wait_until(condition: Callable[[], bool], timeout: float = 10.0) -> None:
 
 def test_names_in_a_demonstrations_world_are_plain_text(scooping_demo):
     """
-    Every name in a demonstration's world is a plain string, of no type of the demos,
-    so a process without their modules, such as one joining the world over ROS, can
-    read it.
+    Every name in a demonstration's world is a plain string, of no type of the demos, so
+    a process without their modules, such as one joining the world over ROS, can read
+    it.
     """
     demonstration = scooping_demo.AvocadoScoopingDemonstration(
         headless=True, random_pit=None
@@ -1443,8 +1455,8 @@ def test_frames_of_the_pieces_and_their_parts_are_published(
     rclpy_node, fruit_world, fruit_world_publisher, fruit, slanted_plane
 ):
     """
-    Each piece's body has a frame on ``tf``, and each of its parts' bodies, fixed to
-    it, a frame on ``tf_static``.
+    Each piece's body has a frame on ``tf``, and each of its parts' bodies, fixed to it,
+    a frame on ``tf_static``.
     """
     qos = pytest.importorskip("rclpy.qos")
     tf_publisher = pytest.importorskip(
@@ -1575,8 +1587,8 @@ def test_knowrob_knows_each_piece_with_its_parts(
     cutting, knowrob_bridge, knowrob_session, fruit_in_knowrob
 ):
     """
-    Once the pit is taken out, KnowRob knows each piece as an avocado piece that has
-    the parts the piece has.
+    Once the pit is taken out, KnowRob knows each piece as an avocado piece that has the
+    parts the piece has.
     """
     fruit = fruit_in_knowrob.fruit
     fruit.separate(fruit.pieces[0], cutting.FruitMaterial.PIT)
@@ -1683,7 +1695,8 @@ def stage_of_cut_fruit(
 
 def test_stage_has_a_rigid_body_where_each_piece_is(stage_of_cut_fruit):
     """
-    Each piece is a rigid body of the stage, where the piece is, weighing what it weighs.
+    Each piece is a rigid body of the stage, where the piece is, weighing what it
+    weighs.
     """
     pxr = pytest.importorskip("pxr")
     fruit = stage_of_cut_fruit.fruit
@@ -1774,3 +1787,867 @@ def test_stage_is_simulated_on_a_floor_under_gravity(stage_of_cut_fruit):
         .ExtractTranslation()[2]
     )
     assert height == pytest.approx(stage_of_cut_fruit.floor_height)
+
+
+# %% the texture over ripening
+
+
+@pytest.fixture
+def texture(cutting: ModuleType) -> ModuleType:
+    """
+    The ``texture`` module of the avocado demos, imported while :func:`cutting` makes
+    their folder importable.
+    """
+    return importlib.import_module("texture")
+
+
+def texture_properties(texture: ModuleType) -> dict[str, Any]:
+    """
+    :param texture: The ``texture`` module.
+    :return: Each property of the default texture over ripening, by its name.
+    """
+    defaults = texture.AvocadoTexture()
+    return {
+        name: value
+        for name, value in vars(defaults).items()
+        if isinstance(value, texture.TextureProperty)
+    }
+
+
+def test_properties_run_from_hard_to_overripe(texture):
+    """
+    Each property has its hard value in a fruit as firm as a hard one and its overripe
+    value in a fruit as firm as an overripe one.
+    """
+    defaults = texture.AvocadoTexture()
+    assert defaults.softening(firmness=defaults.hard_firmness) == 0.0
+    assert defaults.softening(firmness=defaults.overripe_firmness) == 1.0
+    for texture_property in texture_properties(texture).values():
+        assert texture_property.value_at(softening=0.0) == pytest.approx(
+            texture_property.when_hard
+        )
+        assert texture_property.value_at(softening=1.0) == pytest.approx(
+            texture_property.when_overripe
+        )
+
+
+def test_riper_fruit_has_softer_material(texture):
+    """
+    Of two fruits drawn from one seed, the softer has the weaker flesh, skin and hold on
+    its pit, property by property.
+    """
+    defaults = texture.AvocadoTexture()
+    hard, ripe = (
+        texture.FruitTexture(texture=defaults, firmness=firmness, seed=3)
+        for firmness in (150.0, 12.0)
+    )
+    for name in texture_properties(texture):
+        assert getattr(ripe, name) < getattr(hard, name)
+
+
+def test_stage_follows_firmness(texture):
+    """
+    A fruit as firm as where a stage of ripeness begins is at that stage; a fruit at
+    least as firm as a hard one has not started ripening, and one at most as firm as an
+    overripe one has ended it.
+    """
+    defaults = texture.AvocadoTexture()
+    for stage, firmness in defaults.stage_firmness.items():
+        assert defaults.ripeness(firmness=firmness).stage == stage
+    for firmness in (defaults.hard_firmness, 2.0 * defaults.hard_firmness):
+        ripeness = defaults.ripeness(firmness=firmness)
+        assert ripeness.value.lower == Ripeness.scale.lower
+    for firmness in (defaults.overripe_firmness, 0.5 * defaults.overripe_firmness):
+        ripeness = defaults.ripeness(firmness=firmness)
+        assert ripeness.value.upper == Ripeness.scale.upper
+
+
+def test_same_seed_gives_the_same_fruit(texture):
+    """
+    A fruit of random ripeness drawn twice from one seed is the same fruit, and as firm
+    as a fruit can be between hard and overripe.
+    """
+    defaults = texture.AvocadoTexture()
+    first, second = (
+        texture.FruitTexture.random(texture=defaults, seed=11) for _ in range(2)
+    )
+    assert first == second
+    assert defaults.overripe_firmness <= first.firmness <= defaults.hard_firmness
+
+
+def test_texture_round_trips_through_json(texture):
+    """
+    A texture over ripening written to JSON and read back is the same, as a calibration
+    file stores it.
+    """
+    defaults = texture.AvocadoTexture()
+    assert from_json(to_json(defaults)) == defaults
+
+
+# %% pieces that stick together
+
+
+@pytest.fixture
+def ripe_fruit(cutting: ModuleType, knife: KnifeInScene, texture: ModuleType) -> Any:
+    """
+    The whole solid avocado of :func:`floating_fruit`, free and ripe.
+    """
+    fruit = floating_fruit(cutting, knife, [])
+    fruit.texture = texture.FruitTexture(
+        texture=texture.AvocadoTexture(), firmness=15.0, seed=5
+    )
+    return fruit
+
+
+def pull_apart(fruit: Any, adhesion: Any, force: float, torque: float) -> bool:
+    """
+    :param fruit: A fruit whose pieces float without gravity.
+    :param adhesion: One of its adhesions.
+    :param force: The force in newtons pulling the two pieces apart along x.
+    :param torque: The torque in newton metres twisting them apart about x.
+    :return: Whether the adhesion broke within 0.2 s.
+    """
+    model = fruit.model
+    for step in range(round(0.2 / model.opt.timestep)):
+        data = fruit.data
+        for name, sign in ((adhesion.held, 1.0), (adhesion.holder, -1.0)):
+            body_id = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, name)
+            data.xfrc_applied[body_id] = sign * np.array(
+                [force, 0.0, 0.0, torque, 0.0, 0.0]
+            )
+        mujoco.mj_step(model, data)
+        if adhesion in fruit.break_adhesions():
+            return True
+    return False
+
+
+def test_halves_cut_round_the_pit_stick_together(cutting, ripe_fruit, slanted_plane):
+    """
+    The half without the pit sticks to the half the pit stays in.
+    """
+    halves = ripe_fruit.cut(slanted_plane)
+    pit = cutting.FruitMaterial.PIT
+    with_pit = next(piece for piece in halves if pit in piece.materials())
+    without_pit = next(piece for piece in halves if pit not in piece.materials())
+    assert [(adhesion.held, adhesion.holder) for adhesion in ripe_fruit.adhesions] == [
+        (without_pit.body_name, with_pit.body_name)
+    ]
+
+
+def test_halves_hold_under_a_light_pull(ripe_fruit, slanted_plane):
+    """
+    Pulled apart by a fifth of what their adhesion bears, the halves stay together.
+    """
+    ripe_fruit.cut(slanted_plane)
+    adhesion = ripe_fruit.adhesions[0]
+    assert not pull_apart(ripe_fruit, adhesion, 0.2 * adhesion.break_force, 0.0)
+    assert ripe_fruit.adhesions == [adhesion]
+
+
+def test_halves_come_apart_under_a_hard_pull(ripe_fruit, slanted_plane):
+    """
+    Pulled apart by twice what their adhesion bears, the halves come apart.
+    """
+    ripe_fruit.cut(slanted_plane)
+    adhesion = ripe_fruit.adhesions[0]
+    assert pull_apart(ripe_fruit, adhesion, 2.0 * adhesion.break_force, 0.0)
+    assert ripe_fruit.adhesions == []
+
+
+def test_twist_separates_the_halves(ripe_fruit, slanted_plane):
+    """
+    Twisted against each other by twice the torque that frees the pit, the halves come
+    apart.
+    """
+    ripe_fruit.cut(slanted_plane)
+    adhesion = ripe_fruit.adhesions[0]
+    assert pull_apart(ripe_fruit, adhesion, 0.0, 2.0 * adhesion.break_torque)
+
+
+def test_harder_fruit_holds_its_pit_more_firmly(cutting, knife, texture, slanted_plane):
+    """
+    The halves of a hard fruit take more to twist apart than those of a ripe one.
+    """
+    torques = []
+    for firmness in (150.0, 12.0):
+        fruit = floating_fruit(cutting, knife, [])
+        fruit.texture = texture.FruitTexture(
+            texture=texture.AvocadoTexture(), firmness=firmness, seed=5
+        )
+        fruit.cut(slanted_plane)
+        torques.append(fruit.adhesions[0].break_torque)
+    assert torques[0] > torques[1]
+
+
+def test_pit_taken_out_sticks_in_both_halves(cutting, ripe_fruit, slanted_plane):
+    """
+    The pit separated from its half sticks to that half and to the other half, whose
+    flesh also touches it, and the halves no longer stick to each other.
+    """
+    halves = ripe_fruit.cut(slanted_plane)
+    pit_material = cutting.FruitMaterial.PIT
+    with_pit = next(piece for piece in halves if pit_material in piece.materials())
+    other = next(piece for piece in halves if piece is not with_pit)
+    pit = ripe_fruit.separate(with_pit, pit_material)
+    rest = next(piece for piece in ripe_fruit.pieces if piece not in (pit, other))
+    assert {(adhesion.held, adhesion.holder) for adhesion in ripe_fruit.adhesions} == {
+        (pit.body_name, rest.body_name),
+        (other.body_name, pit.body_name),
+    }
+
+
+def test_piece_moved_away_by_hand_tears_off(cutting, ripe_fruit, slanted_plane):
+    """
+    A half gripped and moved away, which no force stops, tears off the other.
+    """
+    ripe_fruit.cut(slanted_plane)
+    adhesion = ripe_fruit.adhesions[0]
+    held = ripe_fruit.piece_named(body_name=adhesion.held)
+    ripe_fruit.grip(held)
+    mocap_id = ripe_fruit.model.body_mocapid[ripe_fruit.body_id(held)]
+    ripe_fruit.data.mocap_pos[mocap_id] += [0.0, 0.0, 2 * adhesion.break_distance]
+    mujoco.mj_step(ripe_fruit.model, ripe_fruit.data)
+    assert ripe_fruit.break_adhesions() == [adhesion]
+
+
+def test_fruit_without_texture_sticks_nowhere(fruit, slanted_plane):
+    """
+    Cut without a texture, the halves do not stick together.
+    """
+    fruit.cut(slanted_plane)
+    assert fruit.adhesions == []
+
+
+@pytest.fixture
+def ripe_held_fruit(
+    cutting: ModuleType,
+    knife: KnifeInScene,
+    texture: ModuleType,
+    pole: manifold3d.Manifold,
+) -> Any:
+    """
+    The whole solid avocado of :func:`floating_fruit`, held by :func:`pole` and ripe.
+    """
+    fruit = floating_fruit(cutting, knife, [pole])
+    fruit.texture = texture.FruitTexture(
+        texture=texture.AvocadoTexture(), firmness=15.0, seed=5
+    )
+    return fruit
+
+
+def test_scored_skin_sticks_to_the_flesh(cutting, ripe_held_fruit):
+    """
+    The skin scored off a held ripe fruit sticks to the piece with the flesh, as
+    strongly as the skin's peel strength over the strip's width.
+    """
+    skin = cutting.FruitMaterial.SKIN
+    plane = cutting.CuttingPlane([0.0, 0.0, 0.05], [0.0, 1.0, 0.0])
+    made = ripe_held_fruit.cut(plane, materials=frozenset({skin}))
+    skin_only = next(piece for piece in made if piece.materials() == {skin})
+    rest = next(piece for piece in made if piece is not skin_only)
+    [adhesion] = ripe_held_fruit.adhesions
+    assert (adhesion.held, adhesion.holder) == (skin_only.body_name, rest.body_name)
+    lowest, highest = skin_only.outline.bounds
+    width = np.sort(highest - lowest)[1]
+    assert adhesion.break_force == pytest.approx(
+        ripe_held_fruit.texture.peel_strength * width
+    )
+
+
+def test_peeled_skin_comes_off(cutting, ripe_held_fruit):
+    """
+    The scored skin gripped and pulled away from the flesh comes off it.
+    """
+    skin = cutting.FruitMaterial.SKIN
+    plane = cutting.CuttingPlane([0.0, 0.0, 0.05], [0.0, 1.0, 0.0])
+    made = ripe_held_fruit.cut(plane, materials=frozenset({skin}))
+    skin_only = next(piece for piece in made if piece.materials() == {skin})
+    [adhesion] = ripe_held_fruit.adhesions
+    ripe_held_fruit.grip(skin_only)
+    mocap_id = ripe_held_fruit.model.body_mocapid[ripe_held_fruit.body_id(skin_only)]
+    ripe_held_fruit.data.mocap_pos[mocap_id] += [0.0, 2 * adhesion.break_distance, 0.0]
+    mujoco.mj_step(ripe_held_fruit.model, ripe_held_fruit.data)
+    assert ripe_held_fruit.break_adhesions() == [adhesion]
+
+
+# %% giving under a press
+
+
+def contact_softness(fruit: Any, piece: Any) -> list[float]:
+    """
+    :param fruit: A fruit with a texture.
+    :param piece: One of its pieces.
+    :return: For each convex shape the piece collides through, the square of the time
+        constant of its contacts over the piece's mass, which is in proportion to how far
+        a press sinks into the piece per newton.
+    """
+    mass = piece.mass_distribution().mass
+    return [
+        geom.solref[0] ** 2 / mass
+        for geom in fruit.spec.body(piece.body_name).geoms
+        if geom.classname.name == fruit.collision_class
+    ]
+
+
+def test_pieces_give_under_a_press_as_far_per_newton_as_the_whole_fruit(
+    cutting, knife, texture, slanted_plane
+):
+    """
+    The convex shapes of every piece cut from a fruit give under a press as far per
+    newton as those of the whole fruit, however much lighter the piece is.
+    """
+    fruit = floating_fruit(
+        cutting,
+        knife,
+        [],
+        fruit_texture=texture.FruitTexture(
+            texture=texture.AvocadoTexture(), firmness=15.0, seed=5
+        ),
+    )
+    (whole,) = fruit.pieces
+    whole_softness = contact_softness(fruit, whole)
+    fruit.cut(slanted_plane)
+    for piece in fruit.pieces:
+        softness = contact_softness(fruit, piece)
+        assert softness == pytest.approx([whole_softness[0]] * len(softness))
+
+
+# %% bruising
+
+
+@dataclass(kw_only=True)
+class WeightOnFruit:
+    """
+    A weight lying on the whole solid avocado, which lies on its side on the floor.
+    """
+
+    fruit: Any
+    """
+    The avocado.
+    """
+
+    def rest(self, *, duration: float) -> list[Any]:
+        """
+        :param duration: How long the weight lies on the fruit, in seconds.
+        :return: The bruises the fruit has then.
+        """
+        for _ in range(round(duration / self.fruit.model.opt.timestep)):
+            mujoco.mj_step(self.fruit.model, self.fruit.data)
+            self.fruit.record_bruises()
+        return self.fruit.bruises
+
+
+@pytest.fixture
+def weight_on_fruit(cutting: ModuleType) -> Callable[..., WeightOnFruit]:
+    """
+    :return: A function that lays a flat weight of a given mass, in kilograms, on the
+        whole solid avocado of a given texture.
+    """
+
+    def lay_weight(texture_of_fruit: Any, mass: float) -> WeightOnFruit:
+        """
+        :param texture_of_fruit: The texture of the avocado.
+        :param mass: The mass of the weight, in kilograms.
+        :return: The weight lying on the avocado.
+        """
+        spec = mujoco.MjSpec.from_file(str(DemoPaths().solid_avocado()))
+        spec.worldbody.add_geom(type=mujoco.mjtGeom.mjGEOM_PLANE, size=[1, 1, 0.1])
+        avocado = spec.body("avocado")
+        avocado.pos = [0.0, 0.0, 0.034]
+        avocado.quat = [np.sqrt(0.5), np.sqrt(0.5), 0.0, 0.0]
+        weight = spec.worldbody.add_body(name="weight", pos=[0.0, 0.05, 0.078])
+        weight.add_freejoint()
+        weight.add_geom(
+            type=mujoco.mjtGeom.mjGEOM_BOX, size=[0.05, 0.08, 0.01], mass=mass
+        )
+        model = spec.compile()
+        data = mujoco.MjData(model)
+        mujoco.mj_forward(model, data)
+        return WeightOnFruit(
+            fruit=cutting.CuttableFruit(
+                spec, model, data, "avocado", texture=texture_of_fruit
+            )
+        )
+
+    return lay_weight
+
+
+def overripe(texture: ModuleType) -> Any:
+    """
+    :param texture: The ``texture`` module.
+    :return: The texture of an overripe fruit.
+    """
+    return texture.FruitTexture(texture=texture.AvocadoTexture(), firmness=8.0, seed=2)
+
+
+def test_light_weight_leaves_an_overripe_fruit_whole(texture, weight_on_fruit):
+    """
+    An overripe fruit under a weight of 100 g is not bruised.
+    """
+    assert weight_on_fruit(overripe(texture), 0.1).rest(duration=0.8) == []
+
+
+def test_heavy_weight_bruises_an_overripe_fruit_where_it_presses(
+    texture, weight_on_fruit
+):
+    """
+    An overripe fruit under a weight of 30 kg is bruised harder than its flesh bears, on
+    its top, where the weight presses it, too.
+    """
+    pressed = weight_on_fruit(overripe(texture), 30.0)
+    bruises = pressed.rest(duration=0.8)
+    fruit = pressed.fruit
+    assert min(bruise.pressure for bruise in bruises) > fruit.texture.bruising_pressure
+    pose = fruit.pose_of(fruit.pieces[0])
+    heights = pose.to_world(np.array([bruise.point for bruise in bruises]))[:, 2]
+    assert heights.max() > pose.position[2]
+
+
+def test_pieces_of_a_fruit_pressing_on_each_other_do_not_bruise_it(
+    cutting, knife, texture
+):
+    """
+    The tip cut off a fruit and pushed into the rest presses harder than the flesh
+    bears, yet the pieces do not bruise each other, as the convex shapes of a fruit's
+    pieces may overlap where they bridge a cavity.
+    """
+    tender = texture.FruitTexture(
+        texture=texture.AvocadoTexture(
+            bruising_pressure=texture.TextureProperty(
+                when_hard=1.0e3, when_overripe=1.0e3
+            )
+        ),
+        firmness=15.0,
+        seed=5,
+    )
+    fruit = floating_fruit(cutting, knife, [], fruit_texture=tender)
+    plane = cutting.CuttingPlane([0.0, 0.0, 0.085], [0.0, 0.0, 1.0])
+    fruit.cut(plane)
+    tip = next(
+        piece
+        for piece in fruit.pieces
+        if (piece.mass_distribution().centre - plane.point) @ plane.normal > 0
+    )
+    joint_id = fruit.model.body_jntadr[fruit.body_id(tip)]
+    fruit.data.qpos[fruit.model.jnt_qposadr[joint_id] + 2] -= 0.004
+    mujoco.mj_step(fruit.model, fruit.data)
+    pressures = [
+        tender.contact_pressure(force=patch.force, radius=fruit.contact_radius)
+        for patch in fruit.contact_patches().values()
+    ]
+    assert max(pressures) > tender.bruising_pressure
+    assert fruit.record_bruises() == []
+
+
+def test_weight_bruising_an_overripe_fruit_leaves_a_hard_one_whole(
+    texture, weight_on_fruit
+):
+    """
+    The weight that bruises an overripe fruit leaves a hard fruit unbruised.
+    """
+    hard = texture.FruitTexture(
+        texture=texture.AvocadoTexture(), firmness=150.0, seed=2
+    )
+    assert weight_on_fruit(hard, 30.0).rest(duration=0.8) == []
+
+
+# %% the material's resistance
+
+
+@pytest.fixture
+def resistance(cutting: ModuleType) -> ModuleType:
+    """
+    The ``resistance`` module of the avocado demos, imported while :func:`cutting` makes
+    their folder importable.
+    """
+    return importlib.import_module("resistance")
+
+
+def firm_as(texture: ModuleType, fruit: Any, firmness: float) -> Any:
+    """
+    :param texture: The ``texture`` module.
+    :param fruit: A fruit.
+    :param firmness: How firm it is to be, in newtons.
+    :return: The fruit, with the texture of that firmness.
+    """
+    fruit.texture = texture.FruitTexture(
+        texture=texture.AvocadoTexture(), firmness=firmness, seed=7
+    )
+    return fruit
+
+
+@dataclass(kw_only=True)
+class KnifeAcross:
+    """
+    A way for the knife's edge, along the x axis, across the avocado above its pit,
+    pushing along the negative y axis with its blade in the plane square to the long
+    axis.
+    """
+
+    height: float = 0.09
+    """
+    How far along the avocado's long axis the blade's plane lies, in metres.
+    """
+
+    reach: float = 0.05
+    """
+    How far from the long axis the edge starts and ends, in metres.
+    """
+
+    speed: float = 0.05
+    """
+    How fast the edge pushes, in metres per second.
+    """
+
+    def largest_force(
+        self,
+        *,
+        cutting: ModuleType,
+        resistance: ModuleType,
+        fruit: Any,
+        knife: KnifeInScene,
+        drawing_speed: float,
+    ) -> float:
+        """
+        :param drawing_speed: How fast the edge draws along itself meanwhile, in
+            metres per second.
+        :return: The largest force in newtons the fruit puts up against the knife on
+            the way.
+        """
+        model, data = fruit.model, fruit.data
+        mocap_id = model.body_mocapid[
+            mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "knife")
+        ]
+        pushing = resistance.CuttingResistance(
+            fruit=fruit,
+            tool_body="knife",
+            blade=cutting.KnifeBlade(knife.site_name, knife.edge_length),
+        )
+        steps = round(2 * self.reach / self.speed / model.opt.timestep)
+        largest = 0.0
+        for step in range(steps + 1):
+            time = step * model.opt.timestep
+            data.mocap_pos[mocap_id] = [
+                drawing_speed * time,
+                self.reach - self.speed * time,
+                self.height,
+            ]
+            data.mocap_quat[mocap_id] = [1.0, 0.0, 0.0, 0.0]
+            mujoco.mj_step(model, data)
+            largest = max(largest, float(np.linalg.norm(pushing.apply())))
+        return largest
+
+
+def test_knife_meets_more_resistance_in_a_hard_fruit(
+    cutting, resistance, texture, knife, held_fruit, pole
+):
+    """
+    Pushed across at the same speed, the knife meets more force in a hard fruit than in
+    a ripe one, and some force in both.
+    """
+    forces = []
+    for firmness in (150.0, 12.0):
+        fruit = firm_as(texture, floating_fruit(cutting, knife, [pole]), firmness)
+        forces.append(
+            KnifeAcross().largest_force(
+                cutting=cutting,
+                resistance=resistance,
+                fruit=fruit,
+                knife=knife,
+                drawing_speed=0.0,
+            )
+        )
+    assert forces[0] > forces[1] > 0.0
+
+
+def test_slicing_takes_less_force_than_pushing(
+    cutting, resistance, texture, knife, pole
+):
+    """
+    Drawn along its edge as fast as it pushes, the knife meets less force than pushed
+    straight.
+    """
+    forces = [
+        KnifeAcross().largest_force(
+            cutting=cutting,
+            resistance=resistance,
+            fruit=firm_as(texture, floating_fruit(cutting, knife, [pole]), 40.0),
+            knife=knife,
+            drawing_speed=drawing_speed,
+        )
+        for drawing_speed in (0.0, KnifeAcross().speed)
+    ]
+    assert forces[1] < forces[0]
+
+
+def test_fruit_without_texture_does_not_resist(cutting, resistance, knife, held_fruit):
+    """
+    A fruit without a texture puts up no force against the knife.
+    """
+    assert (
+        KnifeAcross().largest_force(
+            cutting=cutting,
+            resistance=resistance,
+            fruit=held_fruit,
+            knife=knife,
+            drawing_speed=0.0,
+        )
+        == 0.0
+    )
+
+
+def knife_pushed_with(
+    cutting: ModuleType,
+    resistance: ModuleType,
+    fruit_texture: Any,
+    force: float,
+    pole: manifold3d.Manifold,
+) -> float:
+    """
+    :param fruit_texture: The texture of the held fruit.
+    :param force: How hard a free knife, its edge against the fruit's side, is pushed
+        into the fruit, in newtons.
+    :return: Where along the y axis the edge is after 0.5 s, in metres.
+    """
+    spec = mujoco.MjSpec.from_file(str(DemoPaths().solid_avocado()))
+    spec.option.gravity = [0, 0, 0]
+    knife = spec.worldbody.add_body(name="knife", pos=[0.0, 0.03, KnifeAcross().height])
+    knife.add_freejoint()
+    knife.add_site(name="blade_edge")
+    knife.add_geom(
+        type=mujoco.mjtGeom.mjGEOM_BOX,
+        size=[0.1, 0.02, 0.001],
+        pos=[0.0, 0.02, 0.0],
+        mass=0.1,
+        contype=0,
+        conaffinity=0,
+    )
+    model = spec.compile()
+    data = mujoco.MjData(model)
+    mujoco.mj_forward(model, data)
+    fruit = cutting.CuttableFruit(
+        spec, model, data, "avocado", holders=[pole], texture=fruit_texture
+    )
+    pushing = resistance.CuttingResistance(
+        fruit=fruit, tool_body="knife", blade=cutting.KnifeBlade("blade_edge", 0.2)
+    )
+    knife_id = mujoco.mj_name2id(fruit.model, mujoco.mjtObj.mjOBJ_BODY, "knife")
+    along_y = fruit.model.body_dofadr[knife_id] + 1
+    for _ in range(round(0.5 / fruit.model.opt.timestep)):
+        pushing.apply()
+        fruit.data.qfrc_applied[along_y] = -force
+        mujoco.mj_step(fruit.model, fruit.data)
+    return float(fruit.data.xpos[knife_id, 1])
+
+
+def test_weak_push_stalls_the_knife_in_the_fruit(cutting, resistance, texture, pole):
+    """
+    A knife pushed with a newton into a hard fruit stops in it before the long axis,
+    while one pushed with 200 N goes through.
+    """
+    hard = texture.FruitTexture(
+        texture=texture.AvocadoTexture(), firmness=150.0, seed=7
+    )
+    assert knife_pushed_with(cutting, resistance, hard, 1.0, pole) > 0.0
+    assert knife_pushed_with(cutting, resistance, hard, 200.0, pole) < -0.03
+
+
+def test_spoon_meets_more_resistance_in_a_hard_fruit(
+    cutting, resistance, texture, knife, spoon
+):
+    """
+    Led along the same way through the flesh, the spoon meets more force in a hard fruit
+    than in a ripe one, and some force in both.
+    """
+    way = SpoonWay()
+    forces = []
+    for firmness in (150.0, 12.0):
+        fruit = firm_as(texture, floating_fruit(cutting, knife, [], spoon), firmness)
+        model, data = fruit.model, fruit.data
+        mocap_id = model.body_mocapid[
+            mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, spoon.body_name)
+        ]
+        scooping = resistance.ScoopingResistance(
+            fruit=fruit,
+            tool_body=spoon.body_name,
+            bowl=cutting.SpoonBowl(spoon.body_name, spoon.bowl_size, spoon.reach),
+        )
+        largest = 0.0
+        for offset in np.linspace(-0.01, 0.01, 40):
+            data.mocap_pos[mocap_id] = [offset, way.side, way.height]
+            data.mocap_quat[mocap_id] = [1.0, 0.0, 0.0, 0.0]
+            mujoco.mj_step(model, data)
+            largest = max(largest, float(np.linalg.norm(scooping.apply())))
+        forces.append(largest)
+    assert forces[0] > forces[1] > 0.0
+
+
+# %% the physics in the world of the pieces and in KnowRob
+
+
+def test_annotations_state_the_texture(cutting, fruit_world, ripe_fruit):
+    """
+    The whole avocado's annotation states how firm and ripe the fruit is, and its parts'
+    annotations their density and how their material gives way, in the single precision
+    the qualities hold their values in.
+    """
+    single_precision = 1e-6
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=ripe_fruit)
+    texture = ripe_fruit.texture
+    (piece,) = ripe_fruit.pieces
+    avocado = mirror.annotations[piece]
+    assert avocado.ripeness == texture.ripeness
+    stated = [
+        (avocado.firmness, texture.firmness),
+        (avocado.peel.cutting_resistance, texture.skin_cutting_resistance),
+        (avocado.peel.peel_strength, texture.peel_strength),
+        (avocado.flesh.cutting_resistance, texture.flesh_cutting_resistance),
+        (avocado.flesh.scooping_resistance, texture.scooping_resistance),
+        (avocado.flesh.bruising_pressure, texture.bruising_pressure),
+        (avocado.pit.release_torque, texture.release_torque),
+    ]
+    assert [quality.value.lower for quality, _ in stated] == pytest.approx(
+        [value for _, value in stated], rel=single_precision
+    )
+    elasticity = avocado.flesh.material_elasticity
+    assert (
+        elasticity.youngs_modulus.lower,
+        elasticity.poissons_ratio.lower,
+    ) == pytest.approx(
+        (texture.elastic_modulus, texture.texture.poisson_ratio), rel=single_precision
+    )
+    parts = parts_annotated(cutting, avocado)
+    assert {
+        material: part.mass_density.value.lower for material, part in parts.items()
+    } == pytest.approx(
+        {part.material: part.density for part in piece.parts}, rel=single_precision
+    )
+
+
+def test_annotations_stick_while_the_pieces_do(fruit_world, ripe_fruit, slanted_plane):
+    """
+    After the cut round the pit, the annotation of the half without the pit sticks to
+    that of the half with it; once they are pulled apart, it no longer does.
+    """
+    mirror = fruit_world.FruitWorld()
+    ripe_fruit.cut(slanted_plane)
+    mirror.update(fruit=ripe_fruit)
+    adhesion = ripe_fruit.adhesions[0]
+    held, holder = (
+        mirror.annotations[ripe_fruit.piece_named(body_name=name)]
+        for name in (adhesion.held, adhesion.holder)
+    )
+    assert held.adheres_to == [holder]
+    pull_apart(ripe_fruit, adhesion, 2.0 * adhesion.break_force, 0.0)
+    mirror.update(fruit=ripe_fruit)
+    assert held.adheres_to == []
+
+
+def test_bruise_reaches_the_annotation_of_the_flesh(
+    texture, fruit_world, weight_on_fruit
+):
+    """
+    The flesh of a fruit bruised under a weight states its worst bruise.
+    """
+    pressed = weight_on_fruit(overripe(texture), 30.0)
+    bruises = pressed.rest(duration=0.8)
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=pressed.fruit)
+    flesh = mirror.annotations[pressed.fruit.pieces[0]].flesh
+    assert flesh.worst_bruise_pressure.value.lower == pytest.approx(
+        max(bruise.pressure for bruise in bruises), rel=1e-6
+    )
+
+
+def test_knowrob_knows_the_halves_stick_together_until_pulled_apart(
+    knowrob_bridge, knowrob_session, fruit_world, ripe_fruit, slanted_plane
+):
+    """
+    KnowRob knows the half without the pit is linked to the half with it while they
+    stick together, and no longer once they are pulled apart.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=ripe_fruit)
+    bridge = knowrob_bridge.KnowRobBridge(_world=mirror.world, session=knowrob_session)
+    try:
+        ripe_fruit.cut(slanted_plane)
+        mirror.update(fruit=ripe_fruit)
+        adhesion = ripe_fruit.adhesions[0]
+        query = "soma:isLinkedTo(?piece, ?other)"
+        assert knowrob_session.ask(query=query) == [
+            {
+                "?piece": individual(knowrob_bridge, adhesion.held),
+                "?other": individual(knowrob_bridge, adhesion.holder),
+            }
+        ]
+        pull_apart(ripe_fruit, adhesion, 2.0 * adhesion.break_force, 0.0)
+        mirror.update(fruit=ripe_fruit)
+        assert knowrob_session.ask(query=query) == []
+    finally:
+        bridge.stop()
+
+
+def test_knowrob_knows_which_parts_a_knife_can_cut(
+    knowrob_bridge, knowrob_session, fruit_world, ripe_fruit
+):
+    """
+    KnowRob knows a knife can cut the avocado's peel and flesh, and not its pit.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=ripe_fruit)
+    bridge = knowrob_bridge.KnowRobBridge(_world=mirror.world, session=knowrob_session)
+    try:
+        answers = knowrob_session.ask(
+            query="soma:hasDisposition(?part, ?disposition), "
+            "rdf:type(?disposition, soma:'Cuttability')"
+        )
+        avocado = mirror.annotations[ripe_fruit.pieces[0]]
+        assert {answer["?part"] for answer in answers} == {
+            individual(knowrob_bridge, part.name.name)
+            for part in (avocado.peel, avocado.flesh)
+        }
+    finally:
+        bridge.stop()
+
+
+def test_knowrob_knows_how_ripe_the_avocado_is_and_how_dense_its_parts_are(
+    knowrob_bridge, knowrob_session, fruit_world, ripe_fruit
+):
+    """
+    KnowRob knows the stage of ripeness the avocado is at, and the mass density of each
+    of its parts.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=ripe_fruit)
+    bridge = knowrob_bridge.KnowRobBridge(_world=mirror.world, session=knowrob_session)
+    try:
+        avocado = mirror.annotations[ripe_fruit.pieces[0]]
+        stage = knowrob_bridge.Namespace.CLASSES.camel_case_iri(
+            words=ripe_fruit.texture.ripeness.stage.name
+        )
+        answers = knowrob_session.ask(
+            query="dul:hasRegion(?avocado, ?region), "
+            f"rdf:type(?region, sdt:'{stage.rpartition('#')[2]}')"
+        )
+        assert [answer["?avocado"] for answer in answers] == [
+            individual(knowrob_bridge, avocado.name.name)
+        ]
+        answers = knowrob_session.ask(
+            query="dul:hasRegion(?part, ?region), "
+            f"rdf:type(?region, sdt:'{MassDensity.__name__}'), "
+            "dul:hasRegionDataValue(?region, ?density)"
+        )
+        assert {
+            answer["?part"]: float(answer["?density"]) for answer in answers
+        } == pytest.approx(
+            {
+                individual(
+                    knowrob_bridge, part.name.name
+                ): part.mass_density.value.lower
+                for part in (avocado.peel, avocado.flesh, avocado.pit)
+            },
+            rel=1e-6,
+        )
+    finally:
+        bridge.stop()

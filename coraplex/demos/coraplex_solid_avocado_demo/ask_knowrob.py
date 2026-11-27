@@ -34,6 +34,9 @@ def main(node_name: str = "knowrob_bridge") -> None:
         "  rdf:type(?piece, sdt:'AvocadoPiece')\n"
         "  dul:hasPart(?piece, ?pit), rdf:type(?pit, sdt:'Pit')\n"
         "  rdf:type(?food, sdt:'Food'), knowrob:frameName(?food, ?frame)\n"
+        "  dul:hasRegion(?avocado, ?ripeness), rdf:type(?ripeness, sdt:'Ripe')\n"
+        "  soma:hasDisposition(?part, ?d), rdf:type(?d, soma:'Cuttability')\n"
+        "  soma:isLinkedTo(?piece, ?other)\n"
         "and an empty line to stop."
     )
     for line in sys.stdin:

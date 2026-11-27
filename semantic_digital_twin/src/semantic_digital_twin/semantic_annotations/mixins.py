@@ -543,6 +543,41 @@ class HasDrawnGraspsByDefault(IsGraspable, Mixin):
         return self.drawn_grasp_candidates()
 
 
+@dataclass(eq=False, kw_only=True)
+class IsCuttable(HasRootBody, Mixin):
+    """
+    A mixin class for semantic annotations of material a knife can cut, such as the peel
+    and the flesh of a fruit.
+    """
+
+
+@dataclass(eq=False, kw_only=True)
+class IsAdherent(HasRootBody, Mixin):
+    """
+    A mixin class for semantic annotations of something that can stick to others, as a
+    pit sticks in the flesh round it, until it is twisted, pulled or moved off them.
+    """
+
+    adheres_to: list[IsAdherent] = field(default_factory=list, hash=False)
+    """
+    What this sticks to now.
+    """
+
+    @synchronized_attribute_modification
+    def stick_to(self, *, other: IsAdherent) -> None:
+        """
+        :param other: What this has come to stick to.
+        """
+        self.adheres_to.append(other)
+
+    @synchronized_attribute_modification
+    def come_off(self, *, other: IsAdherent) -> None:
+        """
+        :param other: What this sticks to and has been twisted, pulled or moved off.
+        """
+        self.adheres_to.remove(other)
+
+
 @dataclass(eq=False)
 class HasRootRegion(HasRootKinematicStructureEntity[Region], Mixin):
     """

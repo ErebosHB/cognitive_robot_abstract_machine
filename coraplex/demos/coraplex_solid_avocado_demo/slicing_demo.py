@@ -1,8 +1,9 @@
 """
 A knife cuts the solid avocado, held by two poles, into slices: it halves the avocado
 level round the pit, the upper half is laid aside and the pit taken out, and the held
-half is sliced crosswise, its slices falling onto the board. Then the upper half is
-pushed onto the poles in its place and sliced the same way.
+half is sliced crosswise, its slices falling onto the board.
+
+Then the upper half is pushed onto the poles in its place and sliced the same way.
 """
 
 from __future__ import annotations
@@ -72,8 +73,8 @@ class AvocadoSlicingDemonstration(HalvingAvocadoDemonstration):
         )
     )
     """
-    Where on the board the ends of the lower half, at the base and at the stem, are
-    laid when they come off the poles, in the world, in metres.
+    Where on the board the ends of the lower half, at the base and at the stem, are laid
+    when they come off the poles, in the world, in metres.
     """
 
     slice_spacing: float = 0.045
@@ -186,7 +187,10 @@ class AvocadoSlicingDemonstration(HalvingAvocadoDemonstration):
 
 
 def main(
-    headless: bool = False, playback_speed: float = 1.0, pit_seed: int | None = None
+    headless: bool = False,
+    playback_speed: float = 1.0,
+    pit_seed: int | None = None,
+    firmness: float | None = None,
 ) -> SlicingOutcome:
     """
     Run the demonstration and report what it achieved.
@@ -195,13 +199,19 @@ def main(
     :param playback_speed: How many seconds of simulated time the viewer shows per
         second of wall-clock time.
     :param pit_seed: The seed of the avocado's random pit; None draws one.
+    :param firmness: How firm the avocado is, in newtons; None draws a firmness from the
+        seed.
     :return: What the demonstration achieved.
     """
     demonstration = AvocadoSlicingDemonstration(
-        headless=headless, playback_speed=playback_speed, pit_seed=pit_seed
+        headless=headless,
+        playback_speed=playback_speed,
+        pit_seed=pit_seed,
+        firmness=firmness,
     )
     outcome = demonstration.run()
     print(f"The pit came from seed {demonstration.pit_seed}.")
+    print(demonstration.texture_report())
     volumes = ", ".join(f"{volume * 1e6:.1f}" for volume in outcome.slice_volumes)
     print(
         f"Cut the held avocado into {len(outcome.slice_volumes)} slices of {volumes} "
@@ -225,5 +235,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=None, help="the seed of the random pit"
     )
+    parser.add_argument(
+        "--firmness",
+        type=float,
+        default=None,
+        help="how firm the avocado is in newtons, from 200 (hard) to 7 (overripe)",
+    )
     arguments = parser.parse_args()
-    main(arguments.headless, arguments.speed, arguments.seed)
+    main(arguments.headless, arguments.speed, arguments.seed, arguments.firmness)

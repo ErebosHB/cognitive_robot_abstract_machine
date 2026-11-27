@@ -26,12 +26,19 @@ class Demonstration(StrEnum):
     SCOOPING = "scooping"
 
     def create(
-        self, *, headless: bool, playback_speed: float = 1.0, pit_seed: int | None
+        self,
+        *,
+        headless: bool,
+        playback_speed: float = 1.0,
+        pit_seed: int | None,
+        firmness: float | None = None,
     ) -> SolidAvocadoDemonstration:
         """
         :param headless: Whether to run without a viewer.
         :param playback_speed: Simulated seconds shown per second in the viewer.
         :param pit_seed: The seed of the avocado's random pit; None draws one.
+        :param firmness: How firm the avocado is, in newtons; None draws a firmness
+            from the seed.
         :return: The demonstration, set up but not run yet.
         """
         match self:
@@ -44,5 +51,8 @@ class Demonstration(StrEnum):
             case Demonstration.SCOOPING:
                 demonstration_type = AvocadoScoopingDemonstration
         return demonstration_type(
-            headless=headless, playback_speed=playback_speed, pit_seed=pit_seed
+            headless=headless,
+            playback_speed=playback_speed,
+            pit_seed=pit_seed,
+            firmness=firmness,
         )

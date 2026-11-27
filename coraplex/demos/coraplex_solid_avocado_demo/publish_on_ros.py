@@ -26,6 +26,7 @@ def main(
     headless: bool,
     playback_speed: float,
     pit_seed: int | None,
+    firmness: float | None = None,
     node_name: str = "solid_avocado",
 ) -> None:
     """
@@ -35,11 +36,16 @@ def main(
     :param headless: Whether to run without a viewer.
     :param playback_speed: Simulated seconds shown per second in the viewer.
     :param pit_seed: The seed of the avocado's random pit; None draws one.
+    :param firmness: How firm the avocado is, in newtons; None draws a firmness from the
+        seed.
     :param node_name: The name of the ROS 2 node the world is published on.
     """
     init_node(node_name)
     running = demonstration.create(
-        headless=headless, playback_speed=playback_speed, pit_seed=pit_seed
+        headless=headless,
+        playback_speed=playback_speed,
+        pit_seed=pit_seed,
+        firmness=firmness,
     )
     publisher = FruitWorldPublisher(fruit_world=running.fruit_world, node=get_node())
     print(
@@ -76,5 +82,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=None, help="the seed of the random pit"
     )
+    parser.add_argument(
+        "--firmness",
+        type=float,
+        default=None,
+        help="how firm the avocado is in newtons, from 200 (hard) to 7 (overripe)",
+    )
     arguments = parser.parse_args()
-    main(arguments.demonstration, arguments.headless, arguments.speed, arguments.seed)
+    main(
+        arguments.demonstration,
+        arguments.headless,
+        arguments.speed,
+        arguments.seed,
+        arguments.firmness,
+    )

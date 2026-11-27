@@ -1,8 +1,9 @@
 """
 A knife cuts a solid avocado lying on a cutting board: a slanted slice off the stem end,
-then in half lengthwise round the pit, which no knife cuts. The pieces are laid aside
-and the pit is taken out. The avocado is one body of skin, flesh and pit until the blade
-has gone all the way through it; see :mod:`cutting`.
+then in half lengthwise round the pit, which no knife cuts.
+
+The pieces are laid aside and the pit is taken out. The avocado is one body of skin,
+flesh and pit until the blade has gone all the way through it; see :mod:`cutting`.
 """
 
 from __future__ import annotations
@@ -13,7 +14,7 @@ from dataclasses import dataclass, field
 import mujoco
 import numpy as np
 
-from cutting import FruitMaterial
+from fruit_material import FruitMaterial
 from exceptions import FruitNotCut
 from knife_strokes import DownwardStroke, KnifeStroke, StrokeAroundPit
 from solid_avocado_demonstration import SolidAvocadoDemonstration
@@ -104,16 +105,24 @@ class AvocadoCuttingDemonstration(SolidAvocadoDemonstration):
         ]
     )
     """
-    The steps, in order. The avocado lies on its side, its frame's x axis pointing down;
-    the second stroke halves it level, through the pit's middle.
+    The steps, in order.
+
+    The avocado lies on its side, its frame's x axis pointing down; the second stroke
+    halves it level, through the pit's middle.
+    """
+
+    tools_push_pieces: bool = False
+    """
+    See :attr:`SolidAvocadoDemonstration.tools_push_pieces`; off, as nothing holds the
+    avocado lying free on the board, and the knife would push it away from its cut.
     """
 
     pit_set_aside: np.ndarray = field(
         default_factory=lambda: np.array([0.0, 0.0, -0.09])
     )
     """
-    How far the pit is laid aside when it is taken out, in the frame of the whole
-    fruit, in metres; only its horizontal part counts.
+    How far the pit is laid aside when it is taken out, in the frame of the whole fruit,
+    in metres; only its horizontal part counts.
     """
 
     def place_avocado(self, avocado: mujoco.MjsBody) -> None:
@@ -160,7 +169,10 @@ class AvocadoCuttingDemonstration(SolidAvocadoDemonstration):
 
 
 def main(
-    headless: bool = False, playback_speed: float = 1.0, pit_seed: int | None = None
+    headless: bool = False,
+    playback_speed: float = 1.0,
+    pit_seed: int | None = None,
+    firmness: float | None = None,
 ) -> CuttingOutcome:
     """
     Run the demonstration and report what it achieved.
@@ -169,13 +181,19 @@ def main(
     :param playback_speed: How many seconds of simulated time the viewer shows per
         second of wall-clock time.
     :param pit_seed: The seed of the avocado's random pit; None draws one.
+    :param firmness: How firm the avocado is, in newtons; None draws a firmness from the
+        seed.
     :return: What the demonstration achieved.
     """
     demonstration = AvocadoCuttingDemonstration(
-        headless=headless, playback_speed=playback_speed, pit_seed=pit_seed
+        headless=headless,
+        playback_speed=playback_speed,
+        pit_seed=pit_seed,
+        firmness=firmness,
     )
     outcome = demonstration.run()
     print(f"The pit came from seed {demonstration.pit_seed}.")
+    print(demonstration.texture_report())
     volumes = ", ".join(f"{volume * 1e6:.0f}" for volume in outcome.piece_volumes)
     print(
         f"Cut the avocado into pieces of {volumes} cm³, every cut within "
@@ -199,5 +217,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=None, help="the seed of the random pit"
     )
+    parser.add_argument(
+        "--firmness",
+        type=float,
+        default=None,
+        help="how firm the avocado is in newtons, from 200 (hard) to 7 (overripe)",
+    )
     arguments = parser.parse_args()
-    main(arguments.headless, arguments.speed, arguments.seed)
+    main(arguments.headless, arguments.speed, arguments.seed, arguments.firmness)

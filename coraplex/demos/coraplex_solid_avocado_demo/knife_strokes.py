@@ -12,7 +12,8 @@ import mujoco
 import numpy as np
 from typing_extensions import TYPE_CHECKING, Iterator
 
-from cutting import BodyPose, CuttableFruit, CuttingPlane, FruitMaterial, FruitPiece
+from cutting import BodyPose, CuttableFruit, CuttingPlane, FruitPiece
+from fruit_material import FruitMaterial
 
 if TYPE_CHECKING:
     from solid_avocado_demonstration import SolidAvocadoDemonstration
@@ -179,8 +180,7 @@ class OutlineCircuit:
 
     first_direction: np.ndarray
     """
-    The direction in the plane from :attr:`centre` to where the edge starts going
-    round.
+    The direction in the plane from :attr:`centre` to where the edge starts going round.
     """
 
     outline: np.ndarray

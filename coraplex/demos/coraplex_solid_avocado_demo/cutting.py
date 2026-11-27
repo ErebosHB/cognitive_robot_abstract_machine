@@ -8,26 +8,18 @@ segments joined by hinges.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum
 
 import manifold3d
 import mujoco
 import numpy as np
 import trimesh
 
+from adhesion import Adhesion
 from exceptions import FruitPartNotFound, FruitPartNotSolid, PiecesNotHinged
+from fruit_material import FruitMaterial
+from texture import FruitTexture
 
-# %% materials, planes and knives
-
-
-class FruitMaterial(StrEnum):
-    """
-    What a part of a fruit is made of; the value ends the name of the part's geom.
-    """
-
-    SKIN = "skin"
-    FLESH = "flesh"
-    PIT = "pit"
+# %% planes and knives
 
 
 @dataclass
@@ -53,6 +45,16 @@ class CuttingPlane:
         self.point = np.asarray(self.point, dtype=float)
         self.normal = np.asarray(self.normal, dtype=float)
         self.normal = self.normal / np.linalg.norm(self.normal)
+
+    def lies_near(self, *, other: CuttingPlane, tolerance: float) -> bool:
+        """
+        :param other: Another plane in the same frame.
+        :param tolerance: How far, in metres and in radians, it may lie from this one.
+        :return: Whether it is turned and shifted from this one by no more than that.
+        """
+        tilt = float(np.linalg.norm(other.normal - self.normal))
+        shift = abs(float((other.point - self.point) @ self.normal))
+        return tilt <= tolerance and shift <= tolerance
 
     def seen_from(self, pose: BodyPose) -> CuttingPlane:
         """
@@ -116,6 +118,20 @@ class BodyPose:
         """
         rotation = self.rotation()
         return np.column_stack([rotation.T, -rotation.T @ self.position])
+
+    def placement_in(self, *, frame: BodyPose) -> np.ndarray:
+        """
+        :param frame: The pose of another body.
+        :return: The 3x4 matrix that moves solids from this body's frame into the
+            other body's frame.
+        """
+        to_frame = frame.removal()
+        return np.column_stack(
+            [
+                to_frame[:, :3] @ self.rotation(),
+                to_frame[:, :3] @ self.position + to_frame[:, 3],
+            ]
+        )
 
 
 @dataclass
@@ -423,9 +439,7 @@ class Incision:
             plane of this cut.
         :return: Whether a blade in that plane carries on with this cut.
         """
-        tilt = float(np.linalg.norm(plane.normal - self.plane.normal))
-        shift = abs(float((plane.point - self.plane.point) @ self.plane.normal))
-        return tilt <= tolerance and shift <= tolerance
+        return self.plane.lies_near(other=plane, tolerance=tolerance)
 
 
 # %% parts and pieces
@@ -451,6 +465,74 @@ class MassDistribution:
     """
     The inertia matrix about :attr:`centre`, in the body's axes.
     """
+
+
+@dataclass(kw_only=True)
+class ContactPatch:
+    """
+    Where two convex geoms press together: one patch, however many contacts MuJoCo
+    reports in it.
+    """
+
+    force: float = 0.0
+    """
+    The normal force the geoms press together with over the patch, in newtons.
+    """
+
+    weighted_position: np.ndarray = field(default_factory=lambda: np.zeros(3))
+    """
+    The sum of the position of each contact in the patch, in the world, in metres,
+    times its normal force.
+    """
+
+    def add_contact(self, *, force: float, position: np.ndarray) -> None:
+        """
+        :param force: The normal force of a contact in the patch, in newtons.
+        :param position: Where the contact is, in the world, in metres.
+        """
+        self.force += force
+        self.weighted_position += force * position
+
+    @property
+    def centre(self) -> np.ndarray:
+        """
+        :return: Where the patch presses, in the world, in metres: the position of its
+            contacts, weighted by their normal forces.
+        """
+        return self.weighted_position / self.force
+
+
+@dataclass(kw_only=True)
+class Bruise:
+    """
+    A place where a press has bruised a fruit's flesh.
+    """
+
+    point: np.ndarray
+    """
+    Where, in the frame of the fruit, in metres.
+    """
+
+    pressure: float
+    """
+    The contact pressure of the press, in pascals.
+    """
+
+    reach: float = 0.004
+    """
+    How far in metres from :attr:`point`, which lies on the surface pressed, the
+    bruise reaches into the fruit.
+    """
+
+    def affects(self, *, part: FruitPart) -> bool:
+        """
+        :param part: A part of a piece of the fruit.
+        :return: Whether the bruise reaches into the part.
+        """
+        reached = manifold3d.Manifold.sphere(self.reach, 12).translate(
+            self.point.tolist()
+        )
+        return (part.solid ^ reached).volume() > 0.0
 
 
 @dataclass
@@ -631,6 +713,13 @@ class FruitPiece:
                 return part
         raise FruitPartNotFound(f"{self.body_name}_{material}")
 
+    def parts_of(self, *, materials: frozenset[FruitMaterial]) -> list[FruitPart]:
+        """
+        :param materials: Materials.
+        :return: The piece's parts of those materials.
+        """
+        return [part for part in self.parts if part.material in materials]
+
     def volume(self) -> float:
         """
         :return: The volume of the piece's parts in cubic metres.
@@ -762,7 +851,7 @@ class CuttableFruit:
     go past to cut the piece.
     """
 
-    incision_tolerance: float = 1e-3
+    incision_tolerance: float = 2e-3
     """
     How far, in metres and in radians, a blade's plane may drift from the plane of the
     cut it has begun in a piece and still carry on with it.
@@ -796,6 +885,67 @@ class CuttableFruit:
     """
     How fast in seconds a hinge between pieces pulls them back together where they
     drift apart; MuJoCo's time constant of the hinge's constraints.
+    """
+
+    texture: FruitTexture | None = None
+    """
+    How firm the fruit is and how its material behaves; None for a fruit whose pit
+    sticks to nothing and whose flesh bruises nowhere.
+    """
+
+    touching_distance: float = 0.001
+    """
+    How close in metres the parts of two pieces have to lie to touch, so that a piece
+    sticking to one of them sticks to the other.
+    """
+
+    contact_impedance: float = 0.9
+    """
+    The share of a light press a contact of a fruit with a :attr:`texture` resists at
+    once; the rest it resists as it sinks in.
+    """
+
+    crushed_impedance: float = 0.99
+    """
+    The share of a press a contact of a fruit with a :attr:`texture` resists at once
+    once the press goes as deep as the standard press, where the fruit stiffens.
+    """
+
+    fastest_contact_steps: int = 2
+    """
+    How many simulation steps a contact takes at least to resolve, the least MuJoCo
+    keeps stable.
+    """
+
+    contact_radius: float = 0.03
+    """
+    The radius of curvature in metres the fruit's surface is taken to have where it is
+    pressed, which sets how large the area of a contact is for its force.
+    """
+
+    sections: dict[tuple[str, FruitMaterial], PlaneSection | None] = field(
+        init=False, default_factory=dict
+    )
+    """
+    The section through the part of each material of each piece in the plane a blade
+    lay in when it last asked which material it is in, by the name of the piece's body
+    and the material; None where the plane missed the part.
+    """
+
+    adhesions: list[Adhesion] = field(init=False, default_factory=list)
+    """
+    The pieces that stick together now.
+    """
+
+    scoops: list[str] = field(init=False, default_factory=list)
+    """
+    The names of the bodies of the pieces a spoon's bowl has scooped out, which take
+    in the room the bowl swept and so lie in the bowl.
+    """
+
+    bruises: list[Bruise] = field(init=False, default_factory=list)
+    """
+    Where the fruit's flesh has been bruised so far.
     """
 
     incisions: dict[str, Incision] = field(init=False, default_factory=dict)
@@ -888,6 +1038,47 @@ class CuttableFruit:
                 self.spec.delete(joint)
             self.model, self.data = self.spec.recompile(self.model, self.data)
             mujoco.mj_forward(self.model, self.data)
+        self.soften_contacts()
+
+    def soften_contacts(self) -> None:
+        """
+        Let the convex shapes the pieces collide through give under a press as the
+        whole fruit does, as soft as :attr:`texture` makes it; nothing changes without
+        a texture.
+        """
+        if self.texture is None:
+            return
+        time_constant = self.contact_time_constant(piece=self.pieces[0])
+        geoms = [self.spec.find_default(self.collision_class).geom] + [
+            geom
+            for geom in self.spec.body(self.body_name).geoms
+            if geom.classname.name == self.collision_class
+        ]
+        for geom in geoms:
+            geom.solref = [time_constant, 1.0]
+            geom.solimp[:3] = [
+                self.contact_impedance,
+                self.crushed_impedance,
+                self.texture.texture.press_depth,
+            ]
+        self.model, self.data = self.spec.recompile(self.model, self.data)
+        mujoco.mj_forward(self.model, self.data)
+
+    def contact_time_constant(self, *, piece: FruitPiece) -> float:
+        """
+        :param piece: A piece of this fruit, which has a :attr:`texture`.
+        :return: How fast in seconds the contacts of the piece's convex shapes push it
+            back out, so that a steady press sinks into it as far per newton as the
+            standard press does into the whole fruit, however light the piece; no faster
+            than :attr:`fastest_contact_steps` allow.
+        """
+        return max(
+            self.texture.contact_time_constant(
+                mass=piece.mass_distribution().mass,
+                impedance=self.contact_impedance,
+            ),
+            self.fastest_contact_steps * self.model.opt.timestep,
+        )
 
     def mesh_in_body_frame(self, geom_id: int) -> trimesh.Trimesh:
         """
@@ -986,7 +1177,8 @@ class CuttableFruit:
         """
         Cut pieces of the fruit in two along a plane. The pieces of a held piece stay
         held when the cut leaves a material a knife could cut whole, as they stay stuck
-        to it.
+        to it; for a fruit with a :attr:`texture`, they also stick to the piece they
+        touch, as skin scored off the flesh does until it is peeled.
 
         :param plane: The plane to cut along, in the world.
         :param pieces: The pieces to cut; every piece if None.
@@ -1002,6 +1194,9 @@ class CuttableFruit:
             if successors:
                 stuck = leaves_material_whole and self.is_held(piece)
                 self.replace(piece, successors, pose, stuck)
+                self.stick_round_pit(pieces=successors)
+                if stuck:
+                    self.stick_peel(pieces=successors, materials=materials)
                 made.extend((successor, pose) for successor in successors)
         if made:
             self.recompile(made)
@@ -1130,6 +1325,10 @@ class CuttableFruit:
             [other.moved_whole() for other in piece.parts if other is not part]
         )
         self.replace(piece, [separated, remaining], pose, self.is_held(piece))
+        if material in self.uncuttable:
+            self.stick(
+                adhesion=self.stuck_to_pit(held=separated, holder=remaining, pit=part)
+            )
         self.recompile([(separated, pose), (remaining, pose)])
         return separated
 
@@ -1154,13 +1353,7 @@ class CuttableFruit:
         scooped = []
         for piece in list(self.pieces if pieces is None else pieces):
             pose = self.pose_of(piece)
-            to_piece = pose.removal()
-            bowl_in_piece = np.column_stack(
-                [
-                    to_piece[:, :3] @ bowl_pose.rotation(),
-                    to_piece[:, :3] @ bowl_pose.position + to_piece[:, 3],
-                ]
-            )
+            bowl_in_piece = bowl_pose.placement_in(frame=pose)
             centre = bowl_in_piece[:, 3]
             sweep = self.sweeps.get(piece.body_name)
             if sweep is not None and (
@@ -1194,6 +1387,7 @@ class CuttableFruit:
             )
             if carved is not None:
                 scooped.append(carved)
+                self.scoops.append(carved.body_name)
         return scooped
 
     def bowl_blocked(
@@ -1466,6 +1660,305 @@ class CuttableFruit:
             negligible_volume=self.negligible_volume,
         )
 
+    def materials_along(
+        self, *, piece: FruitPiece, plane: CuttingPlane, points: np.ndarray
+    ) -> dict[FruitMaterial, np.ndarray]:
+        """
+        :param piece: A piece of this fruit.
+        :param plane: A plane in the world, such as a blade's.
+        :param points: Points of the plane in the world, one row each, such as along a
+            cutting edge.
+        :return: For each material of the piece, which of the points lie in its part.
+        """
+        pose = self.pose_of(piece)
+        local_plane = plane.seen_from(pose)
+        local_points = (points - pose.position) @ pose.rotation()
+        lowest, highest = piece.outline.bounds
+        nearby = np.all((local_points >= lowest) & (local_points <= highest), axis=1)
+        inside = {}
+        for material in piece.materials():
+            inside[material] = np.zeros(len(points), dtype=bool)
+            if not nearby.any():
+                continue
+            section = self.section_in(piece=piece, material=material, plane=local_plane)
+            if section is None:
+                continue
+            coordinates = (local_points[nearby] - section.plane.point) @ (
+                section.in_plane_axes.T
+            )
+            inside[material][nearby] = section.contains(coordinates)
+        return inside
+
+    def section_in(
+        self, *, piece: FruitPiece, material: FruitMaterial, plane: CuttingPlane
+    ) -> PlaneSection | None:
+        """
+        :param piece: A piece of this fruit.
+        :param material: One of its materials.
+        :param plane: A plane in the frame of the piece's body.
+        :return: The section the plane cuts out of the piece's part of that material,
+            the one last worked out while the plane lies within
+            :attr:`incision_tolerance` of where it lay then; None if it misses it.
+        """
+        key = (piece.body_name, material)
+        if key in self.sections:
+            known = self.sections[key]
+            known_plane = known.plane if known is not None else None
+            if known_plane is not None and known_plane.lies_near(
+                other=plane, tolerance=self.incision_tolerance
+            ):
+                return known
+        section = piece.section(plane, {material})
+        self.sections[key] = section
+        return section
+
+    # %% sticking and bruising
+
+    def stick_round_pit(self, *, pieces: list[FruitPiece]) -> None:
+        """
+        Let each of the pieces a cut made that touches the pit in another of them stick
+        to that other, as halves cut round a pit stick together until twisted apart.
+
+        :param pieces: The pieces one cut made of one piece.
+        """
+        for holder in pieces:
+            pits = holder.parts_of(materials=self.uncuttable)
+            if not pits:
+                continue
+            for held in pieces:
+                if held is not holder and self.touches(first=held.parts, second=pits):
+                    self.stick(
+                        adhesion=self.stuck_to_pit(
+                            held=held, holder=holder, pit=pits[0]
+                        )
+                    )
+
+    def stick_peel(
+        self, *, pieces: list[FruitPiece], materials: frozenset[FruitMaterial]
+    ) -> None:
+        """
+        Let each of the pieces a cut through some materials only made that is of those
+        materials only stick to one of them it touches that has other materials, as a
+        strip of skin scored off the flesh sticks to it until peeled; nothing happens
+        for a fruit without a :attr:`texture`.
+
+        :param pieces: The pieces one cut made of one held piece.
+        :param materials: The materials the cut went through.
+        """
+        if self.texture is None:
+            return
+        for held in pieces:
+            if not held.materials() <= materials:
+                continue
+            holder = next(
+                (
+                    other
+                    for other in pieces
+                    if not other.materials() <= materials
+                    and self.touches(first=held.parts, second=other.parts)
+                ),
+                None,
+            )
+            if holder is None:
+                continue
+            lowest, highest = held.outline.bounds
+            width = float(np.sort(highest - lowest)[1])
+            force = self.texture.peel_strength * width
+            self.stick(
+                adhesion=Adhesion(
+                    held=held.body_name,
+                    holder=holder.body_name,
+                    through=materials,
+                    anchor=held.mass_distribution().centre,
+                    break_force=force,
+                    break_torque=force * width / 2,
+                    time_constant=self.hinge_time_constant,
+                )
+            )
+
+    def piece_named(self, *, body_name: str) -> FruitPiece:
+        """
+        :param body_name: The name of the body of a piece of this fruit.
+        :return: The piece.
+        :raises FruitPartNotFound: If no piece has a body of that name.
+        """
+        for piece in self.pieces:
+            if piece.body_name == body_name:
+                return piece
+        raise FruitPartNotFound(body_name)
+
+    def touches(self, *, first: list[FruitPart], second: list[FruitPart]) -> bool:
+        """
+        :param first: Parts of pieces of this fruit.
+        :param second: Other parts of them.
+        :return: Whether one of the first lies within :attr:`touching_distance` of one
+            of the second, as they lay in the fruit.
+        """
+        return any(
+            mine.solid.min_gap(theirs.solid, self.touching_distance)
+            < self.touching_distance
+            for mine in first
+            for theirs in second
+        )
+
+    def stuck_to_pit(
+        self, *, held: FruitPiece, holder: FruitPiece, pit: FruitPart
+    ) -> Adhesion | None:
+        """
+        :param held: A piece that sticks to the pit or the flesh round it.
+        :param holder: The piece it sticks to.
+        :param pit: The pit, in one of the two pieces.
+        :return: The adhesion between them, as strong as the fruit's flesh holds its
+            pit; None if the fruit has no :attr:`texture`.
+        """
+        if self.texture is None:
+            return None
+        lowest, highest = FruitPart.triangle_mesh_of(pit.solid).bounds
+        radius = float(np.min(highest - lowest)) / 2
+        torque = self.texture.release_torque
+        return Adhesion(
+            held=held.body_name,
+            holder=holder.body_name,
+            through=self.uncuttable,
+            anchor=(lowest + highest) / 2,
+            break_force=torque / radius,
+            break_torque=torque,
+            time_constant=self.hinge_time_constant,
+        )
+
+    def stick(self, *, adhesion: Adhesion | None) -> None:
+        """
+        Let two pieces stick together from the next compilation of :attr:`spec` on.
+
+        :param adhesion: How they stick; nothing happens if None.
+        """
+        if adhesion is None:
+            return
+        adhesion.add_to(spec=self.spec)
+        self.adhesions.append(adhesion)
+
+    def carry_over(
+        self, *, adhesion: Adhesion, replaced: FruitPiece, successors: list[FruitPiece]
+    ) -> None:
+        """
+        Let each piece cut from a piece that stuck to another stick to that other as
+        before, where a part of what held them together touches the other.
+
+        :param adhesion: How the cut piece stuck.
+        :param replaced: The cut piece.
+        :param successors: The pieces it was cut into.
+        """
+        held = adhesion.held == replaced.body_name
+        other = self.piece_named(body_name=adhesion.holder if held else adhesion.held)
+        for successor in successors:
+            if not (
+                self.touches(
+                    first=successor.parts_of(materials=adhesion.through),
+                    second=other.parts,
+                )
+                or self.touches(
+                    first=successor.parts,
+                    second=other.parts_of(materials=adhesion.through),
+                )
+            ):
+                continue
+            names = (successor.body_name, other.body_name)
+            self.stick(
+                adhesion=adhesion.joining(held=names[not held], holder=names[held])
+            )
+
+    def break_adhesions(self) -> list[Adhesion]:
+        """
+        Let go of every adhesion that carries more than it can or has been stretched
+        apart, after a step, and let the pieces it held touch again.
+
+        .. warning:: When an adhesion between pieces of which one moves under forces
+            breaks, :attr:`model` and :attr:`data` are replaced, as after a cut.
+
+        :return: The adhesions that broke.
+        """
+        broken = [
+            adhesion
+            for adhesion in self.adhesions
+            if adhesion.is_breaking(model=self.model, data=self.data)
+        ]
+        for adhesion in broken:
+            weld_id = mujoco.mj_name2id(
+                self.model, mujoco.mjtObj.mjOBJ_EQUALITY, adhesion.name
+            )
+            self.data.eq_active[weld_id] = False
+            adhesion.remove_from(spec=self.spec)
+            self.adhesions.remove(adhesion)
+        # Only pieces that move under forces have contacts to give back.
+        if any(
+            not self.is_held(self.piece_named(body_name=name))
+            for adhesion in broken
+            for name in (adhesion.held, adhesion.holder)
+        ):
+            self.recompile([])
+        return broken
+
+    def contact_patches(self) -> dict[tuple[int, int], ContactPatch]:
+        """
+        :return: Each patch where two geoms press together after a step, by the ids of
+            the two geoms, the smaller first.
+        """
+        patches = {}
+        force = np.zeros(6)
+        for contact_id in range(self.data.ncon):
+            contact = self.data.contact[contact_id]
+            mujoco.mj_contactForce(self.model, self.data, contact_id, force)
+            if force[0] <= 0:
+                continue
+            first, second = sorted(int(geom_id) for geom_id in contact.geom)
+            patch = patches.setdefault((first, second), ContactPatch())
+            patch.add_contact(force=float(force[0]), position=contact.pos)
+        return patches
+
+    def record_bruises(self) -> list[Bruise]:
+        """
+        Record where a contact patch with something other than this fruit's pieces,
+        whose convex shapes may overlap where they bridge a cavity, presses a piece
+        harder than its flesh bears, after a step; a bruise next to one already recorded
+        deepens that one.
+
+        :return: The bruises recorded or deepened.
+        """
+        if self.texture is None:
+            return []
+        pieces = {self.body_id(piece): piece for piece in self.pieces}
+        recorded = []
+        for geoms, patch in self.contact_patches().items():
+            touched = [pieces.get(self.model.geom_bodyid[geom_id]) for geom_id in geoms]
+            if None not in touched:
+                continue
+            pressure = self.texture.contact_pressure(
+                force=patch.force, radius=self.contact_radius
+            )
+            if pressure <= self.texture.bruising_pressure:
+                continue
+            for piece in touched:
+                if piece is None or FruitMaterial.FLESH not in piece.materials():
+                    continue
+                point = self.pose_of(piece).removal() @ np.append(patch.centre, 1.0)
+                recorded.append(self.deepen_bruise(point=point, pressure=pressure))
+        return recorded
+
+    def deepen_bruise(self, *, point: np.ndarray, pressure: float) -> Bruise:
+        """
+        :param point: Where a press bruises the fruit, in its frame.
+        :param pressure: How hard, in pascals.
+        :return: The bruise already recorded whose reach the point lies in, its
+            pressure raised to this one's if higher; else a new bruise.
+        """
+        for bruise in self.bruises:
+            if np.linalg.norm(bruise.point - point) <= bruise.reach:
+                bruise.pressure = max(bruise.pressure, pressure)
+                return bruise
+        bruise = Bruise(point=point, pressure=pressure)
+        self.bruises.append(bruise)
+        return bruise
+
     # %% rebuilding the model
 
     def replace(
@@ -1484,6 +1977,16 @@ class CuttableFruit:
         :param stuck: Whether they stay held even where they reach into no holder.
         """
         self.incisions.pop(piece.body_name, None)
+        for material in piece.materials():
+            self.sections.pop((piece.body_name, material), None)
+        carried = [
+            adhesion
+            for adhesion in self.adhesions
+            if piece.body_name in (adhesion.held, adhesion.holder)
+        ]
+        for adhesion in carried:
+            adhesion.remove_from(spec=self.spec)
+            self.adhesions.remove(adhesion)
         self.spec.delete(self.spec.body(piece.body_name))
         for mesh_name in piece.mesh_names:
             self.spec.delete(self.spec.mesh(mesh_name))
@@ -1493,11 +1996,14 @@ class CuttableFruit:
             )
         index = self.pieces.index(piece)
         self.pieces[index : index + 1] = successors
+        for adhesion in carried:
+            self.carry_over(adhesion=adhesion, replaced=piece, successors=successors)
 
     def add_body(self, piece: FruitPiece, pose: BodyPose, held: bool) -> None:
         """
         Add a body for a piece to :attr:`spec`: a geom for each part and the convex
-        shapes the piece collides through.
+        shapes the piece collides through, which give under a press as the
+        :meth:`contact_time_constant` of the piece makes them.
 
         :param piece: The piece.
         :param pose: Where the body goes.
@@ -1545,6 +2051,12 @@ class CuttableFruit:
                 type=mujoco.mjtGeom.mjGEOM_MESH,
                 meshname=name,
             )
+        if self.texture is None:
+            return
+        time_constant = self.contact_time_constant(piece=piece)
+        for geom in body.geoms:
+            if geom.classname.name == self.collision_class:
+                geom.solref = [time_constant, 1.0]
 
     def collision_shapes(self, piece: FruitPiece) -> list[trimesh.Trimesh]:
         """
@@ -1664,6 +2176,7 @@ class CuttableFruit:
             with where its body is and how it moves.
         """
         self.model, self.data = self.spec.recompile(self.model, self.data)
+        self.data.eq_active[:] = self.model.eq_active0
         for piece, pose in placed:
             if self.is_held(piece):
                 continue

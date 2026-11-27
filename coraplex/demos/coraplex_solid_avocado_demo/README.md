@@ -34,12 +34,14 @@ after the last step. Every demo takes the same options:
 | `--headless` | Run without a viewer, as fast as the machine allows.                 |
 | `--speed X`  | Simulated seconds shown per second; `0.5` is half speed, `4` faster. |
 | `--seed N`   | Use the random pit of seed `N` again; see below.                     |
+| `--firmness F` | Make the avocado `F` N firm, from 200 (hard) to 7 (overripe); see below. |
 
 At the end each demo prints what it achieved, for example:
 
 ```text
 The pit came from seed 9.
-Cut the avocado into pieces of 20, 120, 34, 85 cm³, every cut within 4 nm of the
+The avocado was 15 N firm (ripe); its material put up at most 60.5 N against the knife, and was bruised in 0 places.
+Cut the avocado into pieces of 21, 120, 34, 84 cm³, every cut within 4 nm of the
 blade's plane, and took the pit out as avocado_piece_5.
 ```
 
@@ -85,6 +87,44 @@ the model's), position (up to 4 mm along the fruit and 2 mm across) and tilt (up
 about 20°). The cavity in the flesh is reshaped to fit the new pit. A pit that would
 come closer than 1 mm to the skin is drawn again. Each run prints its seed, and `--seed`
 repeats that pit; in code, pass `random_pit=None` to use the model's own pit.
+
+### Ripeness
+
+Real avocados differ in ripeness too, and a hard one behaves quite differently from a
+ripe one. Each run gives the avocado a firmness, the force in newtons a flat 5 cm probe
+reaches when pressed 10 mm into the whole fruit. It is drawn from the seed between
+200 N (just picked) and 7 N (overripe), unless `--firmness` sets it. That one number
+sets everything else (`texture.py`); each property runs log-linearly from its value in
+a hard fruit to its value in an overripe one, varied a little from fruit to fruit:
+
+| Behaviour | Hard → overripe | Where |
+|---|---|---|
+| The knife meets the skin's and flesh's cutting resistance over the length of edge in each, less when it slices sideways | flesh 1000 → 90 N/m, skin 1500 → 1000 N/m | `resistance.py` (`CuttingResistance`) |
+| The spoon meets the flesh's scooping resistance on the face of its bowl | 400 → 10 kPa | `resistance.py` (`ScoopingResistance`) |
+| A press sinks into the fruit, and into every piece cut from it, as far per newton as the standard press does, and stiffens beyond it | from the firmness | `CuttableFruit.soften_contacts`, `CuttableFruit.contact_time_constant` |
+| A press harder than the flesh's yield stress bruises it (Hertz contact pressure of the force over each contact patch) | 1.02 → 0.10 MPa | `CuttableFruit.record_bruises` |
+| The halves cut round the pit stick together, and the pit sticks in them, until twisted or pulled apart | 1 → 0.02 N·m | `adhesion.py`, `CuttableFruit.stuck_to_pit` |
+| Scored skin sticks to the flesh until peeled off | 400 → 20 N/m | `CuttableFruit.stick_peel` |
+
+The firmness also places the avocado on the ripeness scale of `semantic_digital_twin`,
+from 0 when hard to 1 when overripe, so that its stage, unripe, ripe or overripe, is
+right: it is ripe below 40 N, firm enough to slice (an estimate), and overripe below
+10 N (Jeong and Huber 2004). The annotations state all of it with the qualities of
+`semantic_digital_twin.semantic_annotations.qualities`: the avocado and every piece
+its `Ripeness` and `Firmness`, every part its `MassDensity` from the model, and the
+peel, flesh and pit how their material gives way (`CuttingResistance`,
+`ScoopingResistance`, `PeelStrength`, `BruisingPressure`, `MaterialElasticity`,
+`ReleaseTorque`), the flesh its `WorstBruisePressure` once bruised. The qualities hold
+their values in single precision.
+
+The forces act on a tool that moves under forces, so a knife pushed less hard than the
+flesh holds stops in it, and their reactions push the free pieces; a hand-led
+(mocap) tool, as in the demos, only reports them. Only the elastic modulus, the yield
+stress and the firmness come from measurements (Fariñas et al. 2021, Baryeh 2000,
+Ngubane et al. 2024); the cutting, scooping, peeling and twisting values are estimates
+that measurements on the robot are to replace. In code, pass `firmness=` to a
+demonstration, or `texture=None` for an avocado of no particular ripeness that behaves
+as before.
 
 ## Using the pieces from your own code
 
@@ -203,9 +243,18 @@ of the world, and forgets an annotation when it leaves the world:
 | `rdfs:subClassOf(sdt:'AvocadoPiece', sdt:'Food')` | The classes of the annotations and the class above each.  |
 | `dul:hasPart(world:avocado_piece_3, world:avocado_piece_3_pit)` | A piece has each part it has.                 |
 | `knowrob:frameName(world:avocado_piece_3, 'avocado_piece_3')` | The tf frame the body is published under, which carries the pose. |
+| `dul:hasRegion(world:avocado_piece_3, ?r), rdf:type(?r, soma:'MassAttribute'), soma:hasMassValue(?r, ?kg)` | The mass of a piece, in kilograms; its parts have none of their own, as the piece's holds theirs. |
+| `dul:hasRegion(?e, ?r), rdf:type(?r, soma:'FrictionAttribute'), soma:hasFrictionValue(?r, ?mu)` | The sliding friction of a body's surface, where its collision shapes declare one. |
+| `dul:hasRegion(?avocado, ?r), rdf:type(?r, sdt:'Ripe')` | The stage of ripeness, `sdt:'Unripe'`, `sdt:'Ripe'` or `sdt:'Overripe'`, each below `sdt:'RipenessStage'`, which is below `sdt:'Ripeness'`. |
+| `dul:hasRegion(?e, ?r), rdf:type(?r, sdt:'Firmness'), dul:hasRegionDataValue(?r, ?n)` | A quality of the annotation, in the unit its class states, likewise `sdt:'Ripeness'`, `'MassDensity'`, `'CuttingResistance'`, `'ScoopingResistance'`, `'PeelStrength'`, `'BruisingPressure'`, `'WorstBruisePressure'` and `'ReleaseTorque'`, and the elasticity as `sdt:'YoungsModulus'` and `sdt:'PoissonsRatio'`. A value known only as a range, such as a ripeness known only by its stage, is left out. |
+| `soma:hasDisposition(?part, ?d), rdf:type(?d, soma:'Cuttability')` | A knife can cut the part: peel and flesh, never the pit. |
+| `soma:isLinkedTo(world:avocado_piece_1, world:avocado_piece_2)` | The piece sticks to the other, until it is twisted, pulled or peeled off. |
 
 `sdt` and `world` are the prefixes of the annotations' classes and of the annotations
-themselves (`Namespace` in the bridge's module). KnowRob runs inside the bridge's
+themselves (`Namespace` in the bridge's module). The bridge states physics with SOMA's
+terms where SOMA has them, and with classes of its own below `dul:'PhysicalAttribute'`
+where it has none; KnowRob answers only properties its ontologies declare, so no new
+property is made up. KnowRob runs inside the bridge's
 process with its in-memory storage, so it knows the pieces only while the bridge runs.
 
 ### Installing KnowRob
@@ -284,7 +333,11 @@ of the other pieces.
 
 | File                             | Contents                                                 |
 |----------------------------------|----------------------------------------------------------|
-| `cutting.py`                     | The cuttable fruit: pieces, parts, cuts, scoops, hinges. |
+| `cutting.py`                     | The cuttable fruit: pieces, parts, cuts, scoops, hinges, adhesions, bruises. |
+| `fruit_material.py`              | What the parts are made of.                              |
+| `texture.py`                     | How the avocado's texture depends on its firmness.       |
+| `resistance.py`                  | The force the material puts up against knife and spoon.  |
+| `adhesion.py`                    | Pieces that stick together until pulled apart.           |
 | `knife_strokes.py`               | The paths the knife's blade takes.                       |
 | `random_pit.py`                  | The random pit and the cavity fitted to it.              |
 | `fruit_world.py`                 | The pieces as a `semantic_digital_twin` world.           |
@@ -310,8 +363,9 @@ BSD-3-Clause licensed; see `NOTICE.md` and `LICENSE.txt` there.
 ## Tests
 
 `test/coraplex_test/test_avocado_cutting.py` covers cutting, holding, separating,
-scooping, hinges, gripping, the random pit, the world, its annotations, storing it in a
-database, publishing it on ROS 2, bridging it to KnowRob and the USD stage; the USD
+scooping, hinges, gripping, the random pit, the texture over ripening, adhesion,
+bruising, the knife's and spoon's resistance, the world, its annotations, storing it in
+a database, publishing it on ROS 2, bridging it to KnowRob and the USD stage; the USD
 and KnowRob tests are skipped where `usd-core` or KnowRob is not installed. All four demos also run headless in the CI matrix of
 `.github/workflows/examples_and_demos.yml`.
 
@@ -327,3 +381,14 @@ python -m pytest test/coraplex_test/test_avocado_cutting.py
   the process exits.
 - The knife, the board, the poles and the spoon are not in the `semantic_digital_twin`
   world; only the avocado's pieces are.
+- The pieces stay rigid: an overripe avocado does not visibly squash or smear, and its
+  give under a press is the contacts' softness.
+- The demos lead the knife and spoon by hand (mocap), so they never stall; and in
+  `cutting_demo.py` the knife does not push the free avocado, as nothing holds it.
+- Scored skin of the held avocado stays held until gripped, so only a hand-led
+  gripper peels it; its adhesion tears once it is moved.
+- Bruising takes the fruit's own curvature only, so a fingertip, which presses on a
+  smaller area, bruises less easily than it should.
+- Only what presses the fruit from outside bruises it, never its own pieces pressing on
+  each other: their convex shapes may overlap where they bridge a cavity, such as a
+  half's pit pressing into the other half.

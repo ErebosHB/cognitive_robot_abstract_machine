@@ -43,6 +43,8 @@ from semantic_digital_twin.semantic_annotations.mixins import (
     IsStorageSpace,
     IsGraspable,
     HasDrawnGraspsByDefault,
+    IsAdherent,
+    IsCuttable,
 )
 from semantic_digital_twin.semantic_annotations.part_whole.furniture_parts import (
     HasCounterTop,
@@ -67,7 +69,16 @@ from semantic_digital_twin.semantic_annotations.part_whole.fruit_parts import (
     HasSeeds,
     HasStem,
 )
-from semantic_digital_twin.semantic_annotations.qualities.mixins import HasRipeness
+from semantic_digital_twin.semantic_annotations.qualities.mixins import (
+    HasBruisingPressure,
+    HasCuttingResistance,
+    HasFirmness,
+    HasPeelStrength,
+    HasReleaseTorque,
+    HasRipeness,
+    HasScoopingResistance,
+    HasWorstBruisePressure,
+)
 from semantic_digital_twin.grasping.grasp_candidates import GraspCandidate
 from semantic_digital_twin.grasping.grasp_strategies import (
     GraspABar,
@@ -1208,7 +1219,7 @@ class Produce(Food):
 
 
 @dataclass(eq=False, kw_only=True)
-class Fruit(Produce, HasRipeness):
+class Fruit(Produce, HasRipeness, HasFirmness):
     """
     Fruit.
     """
@@ -1222,7 +1233,7 @@ class FruitPart(HasRootBody):
 
 
 @dataclass(eq=False, kw_only=True)
-class Peel(FruitPart):
+class Peel(FruitPart, IsCuttable, HasCuttingResistance, HasPeelStrength):
     """
     The outer layer of a fruit, its skin or rind (botanically the exocarp, Plant
     Ontology PO:0009085).
@@ -1230,7 +1241,14 @@ class Peel(FruitPart):
 
 
 @dataclass(eq=False, kw_only=True)
-class Flesh(FruitPart):
+class Flesh(
+    FruitPart,
+    IsCuttable,
+    HasCuttingResistance,
+    HasScoopingResistance,
+    HasBruisingPressure,
+    HasWorstBruisePressure,
+):
     """
     The soft tissue between the peel and the inside of a fruit, which is usually eaten
     (botanically mostly the mesocarp, Plant Ontology PO:0009087).
@@ -1270,7 +1288,7 @@ class Stem(FruitPart):
 
 
 @dataclass(eq=False, kw_only=True)
-class Pit(FruitPart):
+class Pit(FruitPart, HasReleaseTorque):
     """
     The single large, hard seed or stone at the centre of a fruit such as an avocado or
     a peach.
@@ -1335,10 +1353,12 @@ class Avocado(Fruit, HasPeel, HasFlesh, HasPit):
 
 
 @dataclass(eq=False, kw_only=True)
-class AvocadoPiece(Food, HasPeel, HasFlesh, HasPit):
+class AvocadoPiece(
+    Food, HasRipeness, HasFirmness, IsAdherent, HasPeel, HasFlesh, HasPit
+):
     """
     A piece cut or taken out of an avocado, such as a half, a slice, a strip of its peel
-    or the pit.
+    or the pit, as ripe and firm as the avocado it comes from.
     """
 
 

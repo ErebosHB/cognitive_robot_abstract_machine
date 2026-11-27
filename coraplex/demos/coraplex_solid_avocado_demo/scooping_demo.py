@@ -14,9 +14,11 @@ from enum import StrEnum
 import mujoco
 import numpy as np
 
-from cutting import BodyPose, FruitMaterial, FruitPiece, SpoonBowl
+from cutting import BodyPose, FruitPiece, SpoonBowl
+from fruit_material import FruitMaterial
 from exceptions import FruitNotCut
 from held_avocado_demonstration import HalvingAvocadoDemonstration
+from resistance import MaterialResistance, ScoopingResistance
 from solid_avocado_demonstration import SolidAvocadoDemonstration
 
 # %% names and outcome
@@ -284,6 +286,28 @@ class AvocadoScoopingDemonstration(HalvingAvocadoDemonstration):
             conaffinity=0,
         )
 
+    def spoon_bowl(self) -> SpoonBowl:
+        """
+        :return: The bowl of the spoon.
+        """
+        return SpoonBowl(SpoonName.SPOON, self.bowl_size, self.bowl_reach)
+
+    def material_resistances(self) -> list[MaterialResistance]:
+        """
+        :return: The forces of
+            :meth:`SolidAvocadoDemonstration.material_resistances`, and the force the
+            flesh puts up against the spoon's bowl.
+        """
+        return [
+            *super().material_resistances(),
+            ScoopingResistance(
+                fruit=self.fruit,
+                tool_body=SpoonName.SPOON,
+                bowl=self.spoon_bowl(),
+                pushes_pieces=self.tools_push_pieces,
+            ),
+        ]
+
     def run(self) -> ScoopingOutcome:
         """
         Halve the avocado and take one scoop of flesh out of the held half.
@@ -339,7 +363,7 @@ class AvocadoScoopingDemonstration(HalvingAvocadoDemonstration):
         :raises FruitNotCut: If the spoon's way scoops no flesh out.
         """
         arc = self.scoop_arc()
-        bowl = SpoonBowl(SpoonName.SPOON, self.bowl_size, self.bowl_reach)
+        bowl = self.spoon_bowl()
         # Where the circle crosses the cut face; nowhere if it lies wholly above it.
         crossing = np.arccos(np.clip(self.scoop_rise / arc.radius, -1.0, 1.0))
         entry = crossing + self.entry_overrun
@@ -480,7 +504,10 @@ class AvocadoScoopingDemonstration(HalvingAvocadoDemonstration):
 
 
 def main(
-    headless: bool = False, playback_speed: float = 1.0, pit_seed: int | None = None
+    headless: bool = False,
+    playback_speed: float = 1.0,
+    pit_seed: int | None = None,
+    firmness: float | None = None,
 ) -> ScoopingOutcome:
     """
     Run the demonstration and report what it achieved.
@@ -489,13 +516,19 @@ def main(
     :param playback_speed: How many seconds of simulated time the viewer shows per
         second of wall-clock time.
     :param pit_seed: The seed of the avocado's random pit; None draws one.
+    :param firmness: How firm the avocado is, in newtons; None draws a firmness from
+        the seed.
     :return: What the demonstration achieved.
     """
     demonstration = AvocadoScoopingDemonstration(
-        headless=headless, playback_speed=playback_speed, pit_seed=pit_seed
+        headless=headless,
+        playback_speed=playback_speed,
+        pit_seed=pit_seed,
+        firmness=firmness,
     )
     outcome = demonstration.run()
     print(f"The pit came from seed {demonstration.pit_seed}.")
+    print(demonstration.texture_report())
     print(
         f"Scooped {outcome.scooped_flesh * 1e6:.1f} cm³ of flesh out of the held half; "
         f"it rests {outcome.scoop_height * 1000:.0f} mm above the board, and "
@@ -524,5 +557,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=None, help="the seed of the random pit"
     )
+    parser.add_argument(
+        "--firmness",
+        type=float,
+        default=None,
+        help="how firm the avocado is in newtons, from 200 (hard) to 7 (overripe)",
+    )
     arguments = parser.parse_args()
-    main(arguments.headless, arguments.speed, arguments.seed)
+    main(arguments.headless, arguments.speed, arguments.seed, arguments.firmness)

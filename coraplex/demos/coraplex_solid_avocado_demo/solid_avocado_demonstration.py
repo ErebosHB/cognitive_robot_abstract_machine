@@ -31,6 +31,8 @@ from exceptions import CutOffKnifePlane, PiecesScattered, UnstableSimulation
 from fruit_world import FruitWorld
 from knife_strokes import KnifeStroke
 from random_pit import RandomPit
+from resistance import CuttingResistance, MaterialResistance
+from texture import AvocadoTexture, FruitTexture
 
 # %% names
 
@@ -218,6 +220,23 @@ class SolidAvocadoDemonstration(ABC):
     is then kept here.
     """
 
+    texture: AvocadoTexture | None = field(default_factory=AvocadoTexture)
+    """
+    How the avocado's texture depends on its ripeness; None for an avocado of no
+    particular ripeness, which resists no tool, sticks nowhere and bruises nowhere.
+    """
+
+    firmness: float | None = None
+    """
+    How firm the avocado is, in newtons; None draws a firmness from :attr:`pit_seed`.
+    """
+
+    tools_push_pieces: bool = True
+    """
+    Whether the tools push the free pieces they go through back with the force the
+    pieces put up against them.
+    """
+
     fruit_world: FruitWorld | None = field(default_factory=FruitWorld)
     """
     The avocado's pieces as bodies of a semantic digital twin world, kept in step with
@@ -242,6 +261,16 @@ class SolidAvocadoDemonstration(ABC):
     blade: KnifeBlade = field(init=False)
     """
     The blade of the knife.
+    """
+
+    resistances: list[MaterialResistance] = field(init=False, default_factory=list)
+    """
+    The forces the avocado's material puts up against the tools going through it.
+    """
+
+    largest_tool_forces: list[float] = field(init=False, default_factory=list)
+    """
+    The largest force in newtons each of :attr:`resistances` has put up so far.
     """
 
     viewer: mujoco.viewer.Handle | None = field(init=False, default=None)
@@ -337,8 +366,57 @@ class SolidAvocadoDemonstration(ABC):
             mujoco.MjData(model),
             SceneName.AVOCADO,
             holders=self.holders(),
+            texture=self.fruit_texture(),
         )
         self.blade = KnifeBlade(SceneName.BLADE_EDGE, self.blade_size[0])
+        self.resistances = self.material_resistances()
+        self.largest_tool_forces = [0.0 for _ in self.resistances]
+
+    def fruit_texture(self) -> FruitTexture | None:
+        """
+        :return: The texture of the avocado, as firm as :attr:`firmness`, varied by
+            :attr:`pit_seed`; None if there is no :attr:`texture`.
+        """
+        if self.texture is None:
+            return None
+        if self.firmness is None:
+            return FruitTexture.random(texture=self.texture, seed=self.pit_seed)
+        return FruitTexture(
+            texture=self.texture, firmness=self.firmness, seed=self.pit_seed
+        )
+
+    def texture_report(self) -> str:
+        """
+        :return: How firm and ripe the avocado was, the largest force its material put
+            up against each tool, and how many places it was bruised in.
+        """
+        texture = self.fruit.texture
+        if texture is None:
+            return "The avocado had no particular ripeness."
+        forces = ", ".join(
+            f"{force:.1f} N against the {resistance.tool_body}"
+            for resistance, force in zip(self.resistances, self.largest_tool_forces)
+        )
+        return (
+            f"The avocado was {texture.firmness:.0f} N firm "
+            f"({texture.ripeness.stage.name.lower()}); its "
+            f"material put up at most {forces}, and was bruised in "
+            f"{len(self.fruit.bruises)} places."
+        )
+
+    def material_resistances(self) -> list[MaterialResistance]:
+        """
+        :return: The forces the avocado's material puts up against the tools of the
+            scene: against the knife's blade.
+        """
+        return [
+            CuttingResistance(
+                fruit=self.fruit,
+                tool_body=SceneName.KNIFE,
+                blade=self.blade,
+                pushes_pieces=self.tools_push_pieces,
+            )
+        ]
 
     @abstractmethod
     def place_avocado(self, avocado: mujoco.MjsBody) -> None:
@@ -510,13 +588,23 @@ class SolidAvocadoDemonstration(ABC):
 
     def step(self) -> None:
         """
-        Advance the simulation by one step, bring :attr:`fruit_world` up to date once
-        :attr:`world_update_interval` has passed, and show the step.
+        Advance the simulation by one step with the forces the avocado's material puts
+        up against the tools, let go of the pieces pulled apart, record bruises, bring
+        :attr:`fruit_world` up to date once :attr:`world_update_interval` has passed,
+        and show the step.
 
         :raises UnstableSimulation: If MuJoCo reports diverging accelerations.
         """
+        for number, resistance in enumerate(self.resistances):
+            force = float(np.linalg.norm(resistance.apply()))
+            self.largest_tool_forces[number] = max(
+                self.largest_tool_forces[number], force
+            )
         data = self.fruit.data
         mujoco.mj_step(self.fruit.model, data)
+        if self.fruit.break_adhesions():
+            self.show_model()
+        self.fruit.record_bruises()
         if data.warning[mujoco.mjtWarning.mjWARN_BADQACC].number:
             raise UnstableSimulation(data.time)
         self.simulated_time += self.fruit.model.opt.timestep

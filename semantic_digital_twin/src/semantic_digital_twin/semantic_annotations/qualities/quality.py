@@ -17,7 +17,7 @@ from enum import Enum
 from typing_extensions import Self
 
 from krrood.patterns.classproperty import classproperty
-from random_events.interval import Bound, SimpleInterval
+from random_events.interval import Bound, SimpleInterval, singleton
 from semantic_digital_twin.semantic_annotations.qualities.exceptions import (
     QualityOutsideScale,
     RipenessInNoSingleStage,
@@ -29,8 +29,9 @@ from semantic_digital_twin.semantic_annotations.qualities.exceptions import (
 @dataclass(kw_only=True)
 class Quality(ABC):
     """
-    An aspect of exactly one bearer that cannot exist without it and is not a part of it,
-    such as the ripeness of a fruit. Its value changes while the bearer stays the same.
+    An aspect of exactly one bearer that cannot exist without it and is not a part of
+    it, such as the ripeness of a fruit. Its value changes while the bearer stays the
+    same.
 
     .. note:: Dispositions, such as being graspable, are not qualities here; they are
         mixins of the annotations that have them.
@@ -46,6 +47,43 @@ class Quality(ABC):
         """
         if scale.intersection_with(other=value) != value:
             raise QualityOutsideScale(quality=self, value=value, scale=scale)
+
+
+@dataclass(kw_only=True)
+class PhysicalQuantity(Quality, ABC):
+    """
+    A quality that is one positive physical quantity, in the unit its class states, such
+    as a mass density in kilograms per cubic metre.
+    """
+
+    value: SimpleInterval
+    """
+    The quantity on :attr:`scale`: a single point when it was measured, or the range its
+    measurements spread over.
+    """
+
+    def __post_init__(self) -> None:
+        """
+        :raises QualityOutsideScale: If the value reaches beyond :attr:`scale`.
+        """
+        self._reject_value_outside_scale(value=self.value, scale=self.scale)
+
+    @classproperty
+    def scale(cls) -> SimpleInterval:
+        """
+        :return: The scale of the quantity: every positive value.
+        """
+        return SimpleInterval.from_data(
+            lower=0.0, upper=float("inf"), left=Bound.OPEN, right=Bound.OPEN
+        )
+
+    @classmethod
+    def from_measurement(cls, *, value: float) -> Self:
+        """
+        :param value: The measured value, in the unit of the quantity.
+        :return: The quantity, measured at exactly ``value``.
+        """
+        return cls(value=singleton(value).simple_sets[0])
 
 
 # %% Ripeness
@@ -79,6 +117,13 @@ class RipenessStage(Enum):
     """
     The last third of ripening, in which a fruit softens and starts to spoil.
     """
+
+    def holds(self, *, value: SimpleInterval) -> bool:
+        """
+        :param value: A value on :attr:`Ripeness.scale`.
+        :return: Whether the whole value lies within this stage.
+        """
+        return self.value.intersection_with(other=value) == value
 
 
 @dataclass(kw_only=True)
@@ -126,7 +171,7 @@ class Ripeness(Quality):
         :raises RipenessInNoSingleStage: If no single stage holds the whole value.
         """
         for stage in RipenessStage:
-            if stage.value.intersection_with(other=self.value) == self.value:
+            if stage.holds(value=self.value):
                 return stage
         raise RipenessInNoSingleStage(ripeness=self)
 
@@ -135,32 +180,11 @@ class Ripeness(Quality):
 
 
 @dataclass(kw_only=True)
-class MassDensity(Quality):
+class MassDensity(PhysicalQuantity):
     """
     The mass per volume of its bearer's material, in kilograms per cubic metre
     :cite:`wikipedia_density`.
     """
-
-    value: SimpleInterval
-    """
-    The mass density on :attr:`scale`: a single point when it was measured, or the range its
-    measurements spread over.
-    """
-
-    def __post_init__(self) -> None:
-        """
-        :raises QualityOutsideScale: If the value reaches beyond :attr:`scale`.
-        """
-        self._reject_value_outside_scale(value=self.value, scale=self.scale)
-
-    @classproperty
-    def scale(cls) -> SimpleInterval:
-        """
-        :return: The mass density scale: every positive mass density.
-        """
-        return SimpleInterval.from_data(
-            lower=0.0, upper=float("inf"), left=Bound.OPEN, right=Bound.OPEN
-        )
 
 
 @dataclass(kw_only=True)
@@ -178,8 +202,8 @@ class MaterialElasticity(Quality):
 
     youngs_modulus: SimpleInterval
     """
-    The stiffness of the material when stretched or compressed along one axis, in pascals,
-    on :attr:`youngs_modulus_scale`: a single point when measured, or a range
+    The stiffness of the material when stretched or compressed along one axis, in
+    pascals, on :attr:`youngs_modulus_scale`: a single point when measured, or a range
     :cite:`wikipedia_youngs_modulus`.
     """
 
@@ -219,3 +243,65 @@ class MaterialElasticity(Quality):
         return SimpleInterval.from_data(
             lower=-1.0, upper=0.5, left=Bound.OPEN, right=Bound.OPEN
         )
+
+
+# %% Firmness and resistance to tools
+
+
+@dataclass(kw_only=True)
+class Firmness(PhysicalQuantity):
+    """
+    How firm a fruit is as a whole: the force, in newtons, a flat probe 5 cm across
+    reaches when pressed 10 mm into the fruit.
+
+    It falls as the fruit ripens.
+    """
+
+
+@dataclass(kw_only=True)
+class CuttingResistance(PhysicalQuantity):
+    """
+    The force per length of cutting edge, in newtons per metre, with which its bearer's
+    material resists a blade pushing through it.
+    """
+
+
+@dataclass(kw_only=True)
+class ScoopingResistance(PhysicalQuantity):
+    """
+    The pressure, in pascals, with which its bearer's material resists the bowl of a
+    spoon pushing through it.
+    """
+
+
+@dataclass(kw_only=True)
+class PeelStrength(PhysicalQuantity):
+    """
+    The force per width of a strip, in newtons per metre, that pulls its bearer, a peel,
+    off the flesh beneath it.
+    """
+
+
+@dataclass(kw_only=True)
+class ReleaseTorque(PhysicalQuantity):
+    """
+    The torque, in newton metres, that twists its bearer, a pit, free of the flesh it
+    sticks in.
+    """
+
+
+# %% Bruising
+
+
+@dataclass(kw_only=True)
+class BruisingPressure(PhysicalQuantity):
+    """
+    The contact pressure, in pascals, above which a press bruises its bearer's tissue.
+    """
+
+
+@dataclass(kw_only=True)
+class WorstBruisePressure(PhysicalQuantity):
+    """
+    The highest contact pressure, in pascals, that has bruised its bearer's tissue.
+    """

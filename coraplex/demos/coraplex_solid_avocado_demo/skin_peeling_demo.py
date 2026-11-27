@@ -12,7 +12,8 @@ from itertools import pairwise
 
 import numpy as np
 
-from cutting import BodyPose, CuttableFruit, CuttingPlane, FruitMaterial, FruitPiece
+from cutting import BodyPose, CuttableFruit, CuttingPlane, FruitPiece
+from fruit_material import FruitMaterial
 from exceptions import FruitNotCut
 from held_avocado_demonstration import HeldAvocadoDemonstration
 from knife_strokes import ScoringStroke
@@ -59,9 +60,8 @@ class SkinPeelingDemonstration(HeldAvocadoDemonstration):
 
     strip_count: int = 8
     """
-    How many strips the skin is scored into, an even number: each stroke scores it
-    along two opposite lines, all at equal angles round the long axis, none above a
-    pole.
+    How many strips the skin is scored into, an even number: each stroke scores it along
+    two opposite lines, all at equal angles round the long axis, none above a pole.
     """
 
     scoring_depth: float = 0.003
@@ -83,8 +83,8 @@ class SkinPeelingDemonstration(HeldAvocadoDemonstration):
 
     strip_column: float = -0.19
     """
-    Where along the board the end of each strip laid down that was at the base lies,
-    in metres.
+    Where along the board the end of each strip laid down that was at the base lies, in
+    metres.
     """
 
     strip_spacing: float = 0.038
@@ -207,9 +207,9 @@ class SkinPeelingDemonstration(HeldAvocadoDemonstration):
 
     def peel_off(self, hinged: HingedStrip) -> None:
         """
-        Straighten the hinges of a gripped strip one after another from the stem
-        towards the base, so the strip comes off the flesh from its end, until only
-        the segment at the base still lies on it.
+        Straighten the hinges of a gripped strip one after another from the stem towards
+        the base, so the strip comes off the flesh from its end, until only the segment
+        at the base still lies on it.
 
         :param hinged: The strip.
         """
@@ -228,8 +228,8 @@ class SkinPeelingDemonstration(HeldAvocadoDemonstration):
 
     def lay_flat(self, hinged: HingedStrip, outward: np.ndarray, row: float) -> None:
         """
-        Lift a gripped strip off the avocado, straightening its last hinge, and carry
-        it over to lie flat along the board, inside up, just above it.
+        Lift a gripped strip off the avocado, straightening its last hinge, and carry it
+        over to lie flat along the board, inside up, just above it.
 
         :param hinged: The strip, peeled off up to the segment at the base.
         :param outward: The direction in the world from the long axis out to the strip
@@ -418,7 +418,10 @@ class HingedStrip:
 
 
 def main(
-    headless: bool = False, playback_speed: float = 1.0, pit_seed: int | None = None
+    headless: bool = False,
+    playback_speed: float = 1.0,
+    pit_seed: int | None = None,
+    firmness: float | None = None,
 ) -> PeelingOutcome:
     """
     Run the demonstration and report what it achieved.
@@ -427,13 +430,19 @@ def main(
     :param playback_speed: How many seconds of simulated time the viewer shows per
         second of wall-clock time.
     :param pit_seed: The seed of the avocado's random pit; None draws one.
+    :param firmness: How firm the avocado is, in newtons; None draws a firmness from the
+        seed.
     :return: What the demonstration achieved.
     """
     demonstration = SkinPeelingDemonstration(
-        headless=headless, playback_speed=playback_speed, pit_seed=pit_seed
+        headless=headless,
+        playback_speed=playback_speed,
+        pit_seed=pit_seed,
+        firmness=firmness,
     )
     outcome = demonstration.run()
     print(f"The pit came from seed {demonstration.pit_seed}.")
+    print(demonstration.texture_report())
     print(
         f"Peeled {outcome.peeled_strips} strips of skin, "
         f"{outcome.peeled_skin * 1e6:.1f} cm³, off the held avocado; "
@@ -458,5 +467,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--seed", type=int, default=None, help="the seed of the random pit"
     )
+    parser.add_argument(
+        "--firmness",
+        type=float,
+        default=None,
+        help="how firm the avocado is in newtons, from 200 (hard) to 7 (overripe)",
+    )
     arguments = parser.parse_args()
-    main(arguments.headless, arguments.speed, arguments.seed)
+    main(arguments.headless, arguments.speed, arguments.seed, arguments.firmness)
