@@ -28,6 +28,7 @@ from cutting import (
     KnifeBlade,
 )
 from exceptions import CutOffKnifePlane, PiecesScattered, UnstableSimulation
+from fruit_world import FruitWorld
 from knife_strokes import KnifeStroke
 from random_pit import RandomPit
 
@@ -217,6 +218,17 @@ class SolidAvocadoDemonstration(ABC):
     is then kept here.
     """
 
+    fruit_world: FruitWorld | None = field(default_factory=FruitWorld)
+    """
+    The avocado's pieces as bodies of a semantic digital twin world, kept in step with
+    the simulation; None keeps no such world.
+    """
+
+    world_update_interval: float = 0.05
+    """
+    How often in simulated seconds :attr:`fruit_world` is brought up to date.
+    """
+
     camera_target: tuple[float, float, float] = (0.0, 0.0, 0.05)
     """
     The point the viewer's camera looks at, in metres.
@@ -253,6 +265,11 @@ class SolidAvocadoDemonstration(ABC):
     made it.
     """
 
+    world_updated_at: float = field(init=False, default=-np.inf)
+    """
+    When in simulated time :attr:`fruit_world` was last brought up to date, in seconds.
+    """
+
     whole_fruit: BodyPose = field(init=False)
     """
     The pose of the whole avocado once it has come to rest, the frame the strokes are
@@ -279,6 +296,7 @@ class SolidAvocadoDemonstration(ABC):
             self.simulate(self.rest_duration)
             self.whole_fruit = self.fruit.pose_of(self.fruit.pieces[0])
             yield
+            self.update_fruit_world()
             self.linger()
 
     # %% the scene
@@ -492,7 +510,8 @@ class SolidAvocadoDemonstration(ABC):
 
     def step(self) -> None:
         """
-        Advance the simulation by one step and show it.
+        Advance the simulation by one step, bring :attr:`fruit_world` up to date once
+        :attr:`world_update_interval` has passed, and show the step.
 
         :raises UnstableSimulation: If MuJoCo reports diverging accelerations.
         """
@@ -501,11 +520,22 @@ class SolidAvocadoDemonstration(ABC):
         if data.warning[mujoco.mjtWarning.mjWARN_BADQACC].number:
             raise UnstableSimulation(data.time)
         self.simulated_time += self.fruit.model.opt.timestep
+        if self.simulated_time - self.world_updated_at >= self.world_update_interval:
+            self.update_fruit_world()
         if self.viewer is None:
             return
         self.viewer.sync()
         shown_at = self.playback_start + self.simulated_time / self.playback_speed
         time.sleep(max(0.0, shown_at - time.time()))
+
+    def update_fruit_world(self) -> None:
+        """
+        Bring :attr:`fruit_world`, if there is one, up to date with the simulation.
+        """
+        self.world_updated_at = self.simulated_time
+        if self.fruit_world is None:
+            return
+        self.fruit_world.update(self.fruit)
 
     def simulate(self, duration: float) -> None:
         """

@@ -118,6 +118,8 @@ def cutting() -> Iterator[ModuleType]:
         "held_avocado_demonstration",
         "scooping_demo",
         "random_pit",
+        "fruit_world",
+        "fruit_stage",
     )
     with pytest.MonkeyPatch.context() as patch:
         patch.syspath_prepend(str(DemoPaths().demo_directory()))
@@ -1043,3 +1045,299 @@ def test_points_next_to_the_pit_need_not_be_passed(cutting, fruit):
     ).min(axis=1)
     assert 0 < len(reachable) < len(samples)
     assert distances.min() >= fruit.uncuttable_margin
+
+
+# %% the pieces in a semantic digital twin
+
+
+@pytest.fixture
+def fruit_world(cutting: ModuleType) -> ModuleType:
+    """
+    The ``fruit_world`` module of the avocado demos, imported while :func:`cutting`
+    makes their folder importable.
+    """
+    return importlib.import_module("fruit_world")
+
+
+def move_every_piece(fruit: Any) -> None:
+    """
+    :param fruit: A fruit whose pieces are all free; each is moved and turned apart.
+    """
+    model = fruit.model
+    for number, piece in enumerate(fruit.pieces):
+        address = model.jnt_qposadr[model.body_jntadr[fruit.body_id(piece)]]
+        quaternion = np.array([1.0, 0.2 * number, -0.3, 0.1])
+        fruit.data.qpos[address : address + 7] = [
+            0.1 * number,
+            -0.05,
+            0.3,
+            *(quaternion / np.linalg.norm(quaternion)),
+        ]
+    mujoco.mj_forward(model, fruit.data)
+
+
+def test_world_holds_a_body_for_each_piece_and_its_parts(
+    fruit_world, fruit, slanted_plane
+):
+    """
+    Each piece is a body of the world holding a body for each of its parts; the body of
+    a piece that was cut leaves the world with its parts.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit)
+    fruit.cut(slanted_plane)
+    mirror.update(fruit)
+    for piece in fruit.pieces:
+        body = mirror.body_of(piece)
+        assert body.name.name == piece.body_name
+        assert {part.name.name for part in body.child_kinematic_structure_entities} == {
+            f"{piece.body_name}_{part.material}" for part in piece.parts
+        }
+    assert len(mirror.world.bodies) == 1 + sum(
+        1 + len(piece.parts) for piece in fruit.pieces
+    )
+
+
+def test_piece_bodies_are_where_the_pieces_are(fruit_world, fruit, slanted_plane):
+    """
+    After the pieces have moved, each piece's body lies where the piece does.
+    """
+    fruit.cut(slanted_plane)
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit)
+    move_every_piece(fruit)
+    mirror.update(fruit)
+    for piece in fruit.pieces:
+        pose = fruit.pose_of(piece)
+        transform = mirror.world.compute_forward_kinematics_np(
+            mirror.world.root, mirror.body_of(piece)
+        )
+        assert transform[:3, 3] == pytest.approx(pose.position)
+        assert transform[:3, :3] == pytest.approx(pose.rotation())
+
+
+def test_part_bodies_look_like_the_parts(fruit_world, fruit, slanted_plane):
+    """
+    The body of each part has the part's shape.
+    """
+    fruit.cut(slanted_plane)
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit)
+    for piece in fruit.pieces:
+        bodies = {
+            body.name.name: body
+            for body in mirror.body_of(piece).child_kinematic_structure_entities
+        }
+        for part in piece.parts:
+            shapes = bodies[f"{piece.body_name}_{part.material}"].visual.shapes
+            assert len(shapes) == 1
+            assert shapes[0].mesh.volume == pytest.approx(part.solid.volume(), rel=1e-6)
+
+
+def test_piece_bodies_collide_as_the_pieces_do_in_mujoco(
+    fruit_world, fruit, slanted_plane
+):
+    """
+    A piece's body collides through the convex hulls of the geoms the piece collides
+    through in MuJoCo.
+    """
+    fruit.cut(slanted_plane)
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit)
+    model = fruit.model
+    for piece in fruit.pieces:
+        body_id = fruit.body_id(piece)
+        geom_ids = [
+            geom_id
+            for geom_id in range(model.ngeom)
+            if model.geom_bodyid[geom_id] == body_id
+            and (model.geom_contype[geom_id] or model.geom_conaffinity[geom_id])
+        ]
+        volumes = sorted(
+            shape.mesh.volume for shape in mirror.body_of(piece).collision.shapes
+        )
+        expected = sorted(
+            fruit.mesh_in_body_frame(geom_id).convex_hull.volume for geom_id in geom_ids
+        )
+        assert volumes == pytest.approx(expected, rel=1e-6)
+
+
+def test_demonstration_keeps_its_world_in_step_with_the_simulation(scooping_demo):
+    """
+    Once the update interval has passed, a demonstration's world has a body where each
+    piece is.
+    """
+    demonstration = scooping_demo.AvocadoScoopingDemonstration(
+        headless=True, random_pit=None
+    )
+    fruit = demonstration.fruit
+    fruit.release(fruit.pieces[0])
+    timestep = fruit.model.opt.timestep
+    for _ in range(round(demonstration.world_update_interval / timestep) + 1):
+        demonstration.step()
+    mirror = demonstration.fruit_world
+    (piece,) = fruit.pieces
+    transform = mirror.world.compute_forward_kinematics_np(
+        mirror.world.root, mirror.body_of(piece)
+    )
+    assert transform[:3, 3] == pytest.approx(fruit.pose_of(piece).position, abs=1e-3)
+
+
+def test_piece_bodies_weigh_what_the_pieces_weigh(fruit_world, fruit, slanted_plane):
+    """
+    A piece's body has the piece's mass, centre of mass and inertia.
+    """
+    fruit.cut(slanted_plane)
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit)
+    for piece in fruit.pieces:
+        inertial = mirror.body_of(piece).inertial
+        distribution = piece.mass_distribution()
+        assert inertial.mass == pytest.approx(distribution.mass)
+        assert inertial.center_of_mass.to_np()[:3] == pytest.approx(distribution.centre)
+        assert inertial.inertia.data == pytest.approx(distribution.inertia)
+
+
+# %% the pieces as a USD stage
+
+
+@dataclass
+class StageOfCutFruit:
+    """
+    A fruit cut in two, its pieces moved apart, and the USD stage written of its world.
+    """
+
+    fruit: Any
+    """
+    The fruit.
+    """
+
+    mirror: Any
+    """
+    The world of its pieces.
+    """
+
+    stage: Any
+    """
+    The stage, read back from its file.
+    """
+
+    floor_height: float
+    """
+    The height of the floor the stage was written with, in metres.
+    """
+
+
+@pytest.fixture
+def stage_of_cut_fruit(
+    cutting: ModuleType, fruit: Any, slanted_plane: Any, tmp_path: Path
+) -> StageOfCutFruit:
+    """
+    The stage of :class:`StageOfCutFruit`; skipped where USD is not installed.
+    """
+    usd = pytest.importorskip("pxr.Usd")
+    fruit_world = importlib.import_module("fruit_world")
+    fruit_stage = importlib.import_module("fruit_stage")
+    fruit.cut(slanted_plane)
+    move_every_piece(fruit)
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit)
+    path = tmp_path / "pieces.usda"
+    floor_height = 0.02
+    fruit_stage.FruitStage(mirror, floor_height).write(path)
+    return StageOfCutFruit(fruit, mirror, usd.Stage.Open(str(path)), floor_height)
+
+
+def test_stage_has_a_rigid_body_where_each_piece_is(stage_of_cut_fruit):
+    """
+    Each piece is a rigid body of the stage, where the piece is, weighing what it weighs.
+    """
+    pxr = pytest.importorskip("pxr")
+    fruit = stage_of_cut_fruit.fruit
+    for piece in fruit.pieces:
+        prim = stage_of_cut_fruit.stage.GetPrimAtPath(f"/World/{piece.body_name}")
+        assert prim.HasAPI(pxr.UsdPhysics.RigidBodyAPI)
+        transform = pxr.UsdGeom.Xformable(prim).ComputeLocalToWorldTransform(
+            pxr.Usd.TimeCode.Default()
+        )
+        pose = fruit.pose_of(piece)
+        assert np.array(transform.ExtractTranslation()) == pytest.approx(
+            pose.position, abs=1e-6
+        )
+        assert np.array(transform.ExtractRotationMatrix()).T == pytest.approx(
+            pose.rotation(), abs=1e-5
+        )
+        mass = pxr.UsdPhysics.MassAPI(prim)
+        distribution = piece.mass_distribution()
+        assert mass.GetMassAttr().Get() == pytest.approx(distribution.mass, rel=1e-6)
+        assert np.array(mass.GetCenterOfMassAttr().Get()) == pytest.approx(
+            distribution.centre, abs=1e-6
+        )
+
+
+def test_parts_are_meshes_seen_but_not_collided_with(stage_of_cut_fruit):
+    """
+    Each part is a mesh of its piece's rigid body with the part's surface, which is seen
+    and takes no part in collisions.
+    """
+    pxr = pytest.importorskip("pxr")
+    stage = stage_of_cut_fruit.stage
+    for piece in stage_of_cut_fruit.fruit.pieces:
+        for part in piece.parts:
+            name = f"{piece.body_name}_{part.material}"
+            prim = stage.GetPrimAtPath(f"/World/{piece.body_name}/{name}")
+            surface = part.triangle_mesh_of(part.solid)
+            assert len(pxr.UsdGeom.Mesh(prim).GetPointsAttr().Get()) == len(
+                surface.vertices
+            )
+            assert not prim.HasAPI(pxr.UsdPhysics.CollisionAPI)
+
+
+def test_pieces_collide_through_convex_hulls(stage_of_cut_fruit):
+    """
+    Each piece collides through one convex hull per collision shape of its body, which
+    is not seen.
+    """
+    pxr = pytest.importorskip("pxr")
+    stage = stage_of_cut_fruit.stage
+    for piece in stage_of_cut_fruit.fruit.pieces:
+        body = stage_of_cut_fruit.mirror.body_of(piece)
+        colliders = [
+            prim
+            for prim in stage.GetPrimAtPath(
+                f"/World/{piece.body_name}"
+            ).GetAllChildren()
+            if prim.HasAPI(pxr.UsdPhysics.CollisionAPI)
+        ]
+        assert len(colliders) == len(body.collision.shapes)
+        for prim in colliders:
+            assert (
+                pxr.UsdPhysics.MeshCollisionAPI(prim).GetApproximationAttr().Get()
+                == pxr.UsdPhysics.Tokens.convexHull
+            )
+            assert (
+                pxr.UsdGeom.Imageable(prim).GetPurposeAttr().Get()
+                == pxr.UsdGeom.Tokens.guide
+            )
+
+
+def test_stage_is_simulated_on_a_floor_under_gravity(stage_of_cut_fruit):
+    """
+    The stage has a physics scene with gravity and a floor at the given height, in
+    metres with z up.
+    """
+    pxr = pytest.importorskip("pxr")
+    stage = stage_of_cut_fruit.stage
+    assert pxr.UsdGeom.GetStageMetersPerUnit(stage) == 1.0
+    assert pxr.UsdGeom.GetStageUpAxis(stage) == pxr.UsdGeom.Tokens.z
+    scenes = [prim for prim in stage.Traverse() if prim.IsA(pxr.UsdPhysics.Scene)]
+    assert len(scenes) == 1
+    floor = stage.GetPrimAtPath("/World/floor")
+    assert floor.HasAPI(pxr.UsdPhysics.CollisionAPI)
+    assert not floor.HasAPI(pxr.UsdPhysics.RigidBodyAPI)
+    height = (
+        pxr.UsdGeom.Xformable(floor)
+        .ComputeLocalToWorldTransform(pxr.Usd.TimeCode.Default())
+        .ExtractTranslation()[2]
+    )
+    assert height == pytest.approx(stage_of_cut_fruit.floor_height)
