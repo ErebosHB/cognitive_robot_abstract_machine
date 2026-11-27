@@ -1195,6 +1195,19 @@ def test_demonstration_keeps_its_world_in_step_with_the_simulation(scooping_demo
     assert transform[:3, 3] == pytest.approx(fruit.pose_of(piece).position, abs=1e-3)
 
 
+def test_world_builds_no_collision_shapes_of_its_own(fruit_world, fruit, slanted_plane):
+    """
+    The world leaves checking collisions to MuJoCo: its own collision detector builds
+    no shapes for the pieces as they come and go.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    fruit.cut(slanted_plane)
+    mirror.update(fruit=fruit)
+    detector = mirror.world.collision_manager.collision_detector
+    assert detector.body_to_bullet_object == {}
+
+
 def test_piece_bodies_weigh_what_the_pieces_weigh(fruit_world, fruit, slanted_plane):
     """
     A piece's body has the piece's mass, centre of mass and inertia.

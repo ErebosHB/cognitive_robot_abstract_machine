@@ -133,7 +133,8 @@ for piece in world.get_semantic_annotations_by_type(AvocadoPiece):
 When a cut is finished, the cut piece's bodies and annotations leave the world and the
 new pieces' bodies and annotations join it. The poses follow the simulation every 0.05 s of simulated time
 (`world_update_interval`) and once more at the end of a run. Pass `fruit_world=None` to
-a demonstration to keep no world.
+a demonstration to keep no world. The world's own collision detector is paused, as MuJoCo
+checks the collisions; see the docstring of `FruitWorld.world` to resume it.
 
 > **Note:** A piece's frame is the frame of the whole avocado it was cut from, carried
 > along with the piece: its origin is where the avocado's base was, not the piece's

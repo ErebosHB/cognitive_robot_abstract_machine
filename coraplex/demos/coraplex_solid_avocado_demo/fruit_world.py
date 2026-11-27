@@ -46,8 +46,9 @@ class FruitWorld:
         init=False, default_factory=lambda: World(mesh_decomposer=None)
     )
     """
-    The world of the pieces; it decomposes no mesh, as the pieces collide through
-    convex shapes only.
+    The world of the pieces. Its collision detector is paused, as MuJoCo checks the
+    pieces' collisions; to check collisions in it, resume the detector's
+    ``world_model_updater`` and ``world_state_updater`` and call ``on_model_change``.
     """
 
     root: Body = field(init=False)
@@ -63,6 +64,14 @@ class FruitWorld:
     """
 
     def __post_init__(self) -> None:
+        """
+        Pause the world's collision detector and give the world its root.
+        """
+        # Left running, the detector would build the collision shapes of every piece
+        # anew at each cut and move them at each pose update.
+        detector = self.world.collision_manager.collision_detector
+        detector.world_model_updater.pause()
+        detector.world_state_updater.pause()
         self.root = Body(name=PrefixedName("world"))
         with self.world.modify_world():
             self.world.add_kinematic_structure_entity(self.root)
