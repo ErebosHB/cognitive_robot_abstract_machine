@@ -1,0 +1,15 @@
+{
+  "logging": {
+    "console-sink": { "level": "warn" }
+  },
+  "data-sources": [
+    { "path": "owl/knowrob.owl", "format": "rdf-xml" },
+    { "path": "owl/external/DUL.owl", "format": "rdf-xml" }
+  ],
+  "data-backends": [
+    { "name": "pl", "type": "Prolog:rdf_db" }
+  ],
+  "reasoner": [
+    { "name": "pl", "type": "Prolog", "data-backend": "pl" }
+  ]
+}

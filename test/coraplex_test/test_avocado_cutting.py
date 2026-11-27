@@ -5,6 +5,7 @@ Coverage for cutting the solid avocado of the avocado demos along a knife's plan
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import sys
 import time
 from dataclasses import dataclass
@@ -1480,6 +1481,154 @@ def test_frames_of_the_pieces_and_their_parts_are_published(
     }
     wait_until(lambda: expected <= frames)
     assert expected <= frames
+
+
+# %% the pieces in KnowRob
+
+
+@pytest.fixture(scope="module")
+def knowrob_bridge(cutting: ModuleType) -> ModuleType:
+    """
+    The bridge from a world to KnowRob; skips where KnowRob is not installed.
+    """
+    if importlib.util.find_spec("knowrob") is None:
+        pytest.skip("KnowRob is not installed")
+    return importlib.import_module("semantic_digital_twin.adapters.knowrob.bridge")
+
+
+@pytest.fixture(scope="module")
+def knowrob_session(knowrob_bridge: ModuleType) -> Any:
+    """
+    One KnowRob session for the tests of this module; every bridge forgets what it told
+    it when it stops.
+    """
+    return knowrob_bridge.KnowRobSession.start()
+
+
+@dataclass(kw_only=True)
+class FruitInKnowRob:
+    """
+    A fruit, the world of its pieces and a bridge telling KnowRob about them.
+    """
+
+    fruit: Any
+    """
+    The fruit.
+    """
+
+    mirror: Any
+    """
+    The world of its pieces.
+    """
+
+    bridge: Any
+    """
+    The bridge from the world to KnowRob.
+    """
+
+    def update(self) -> None:
+        """
+        Bring the world, and so KnowRob, up to date with the fruit.
+        """
+        self.mirror.update(fruit=self.fruit)
+
+
+@pytest.fixture
+def fruit_in_knowrob(
+    knowrob_bridge, knowrob_session, fruit_world, fruit
+) -> Iterator[FruitInKnowRob]:
+    """
+    The whole fruit, told to KnowRob; the bridge is stopped afterwards.
+    """
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    bridge = knowrob_bridge.KnowRobBridge(_world=mirror.world, session=knowrob_session)
+    yield FruitInKnowRob(fruit=fruit, mirror=mirror, bridge=bridge)
+    bridge.stop()
+
+
+def individual(knowrob_bridge: ModuleType, name: str) -> str:
+    """
+    :param name: The name of an annotation.
+    :return: The IRI KnowRob knows the annotation by.
+    """
+    return knowrob_bridge.Namespace.INDIVIDUALS.iri(name=name)
+
+
+def test_knowrob_knows_the_whole_avocado_until_it_is_cut(
+    cutting, knowrob_bridge, knowrob_session, fruit_in_knowrob
+):
+    """
+    KnowRob knows the whole avocado as an avocado until it is cut, and then no more.
+    """
+    whole = fruit_in_knowrob.fruit.pieces[0]
+    query = "rdf:type(?avocado, sdt:'Avocado')"
+    assert knowrob_session.ask(query=query) == [
+        {"?avocado": individual(knowrob_bridge, whole.body_name)}
+    ]
+    fruit_in_knowrob.fruit.separate(whole, cutting.FruitMaterial.PIT)
+    fruit_in_knowrob.update()
+    assert knowrob_session.ask(query=query) == []
+
+
+def test_knowrob_knows_each_piece_with_its_parts(
+    cutting, knowrob_bridge, knowrob_session, fruit_in_knowrob
+):
+    """
+    Once the pit is taken out, KnowRob knows each piece as an avocado piece that has
+    the parts the piece has.
+    """
+    fruit = fruit_in_knowrob.fruit
+    fruit.separate(fruit.pieces[0], cutting.FruitMaterial.PIT)
+    fruit_in_knowrob.update()
+    answers = knowrob_session.ask(
+        query="rdf:type(?piece, sdt:'AvocadoPiece'), dul:hasPart(?piece, ?part)"
+    )
+    assert {(answer["?piece"], answer["?part"]) for answer in answers} == {
+        (
+            individual(knowrob_bridge, piece.body_name),
+            individual(knowrob_bridge, f"{piece.body_name}_{part.material}"),
+        )
+        for piece in fruit.pieces
+        for part in piece.parts
+    }
+
+
+def test_knowrob_follows_the_pieces_over_ros(
+    rclpy_node,
+    cutting,
+    knowrob_bridge,
+    knowrob_session,
+    fruit_world,
+    fruit_world_publisher,
+    fruit,
+):
+    """
+    A bridge on a world joined over ROS lets KnowRob follow the pieces as they are cut.
+    """
+    world_fetcher = pytest.importorskip(
+        "semantic_digital_twin.adapters.ros.world_fetcher"
+    )
+    mirror = fruit_world.FruitWorld()
+    mirror.update(fruit=fruit)
+    fruit_world_publisher.FruitWorldPublisher(fruit_world=mirror, node=rclpy_node)
+    joined = world_fetcher.join_shared_world(rclpy_node)
+    bridge = knowrob_bridge.KnowRobBridge(_world=joined, session=knowrob_session)
+    fruit.separate(fruit.pieces[0], cutting.FruitMaterial.PIT)
+    mirror.update(fruit=fruit)
+
+    def pieces_known() -> set[str]:
+        """
+        :return: The avocado pieces KnowRob knows now.
+        """
+        answers = knowrob_session.ask(query="rdf:type(?piece, sdt:'AvocadoPiece')")
+        return {answer["?piece"] for answer in answers}
+
+    expected = {individual(knowrob_bridge, piece.body_name) for piece in fruit.pieces}
+    wait_until(lambda: pieces_known() == expected)
+    known = pieces_known()
+    bridge.stop()
+    assert known == expected
 
 
 # %% the pieces as a USD stage

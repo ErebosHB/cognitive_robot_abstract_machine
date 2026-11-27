@@ -173,8 +173,62 @@ for piece in world.get_semantic_annotations_by_type(AvocadoPiece):
 ```
 
 The meshes travel with the world, so the listener needs neither these demos nor their
-files. KnowRob does not read the world's own messages; a bridge that joins the world
-like this and tells KnowRob about each piece is still to be written.
+files.
+
+## Asking KnowRob about the pieces
+
+`ask_knowrob.py` joins the world `publish_on_ros.py` publishes, keeps a
+[KnowRob](https://github.com/knowrob/knowrob) knowledge base knowing what the pieces are
+while they are cut, and answers the KnowRob queries typed in, one per line. Start the
+publisher first, then, in a second terminal:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+python ask_knowrob.py
+```
+
+```text
+dul:hasPart(?piece, ?pit), rdf:type(?pit, sdt:'AvocadoPit')
+  ?piece = https://github.com/cram2/.../world#avocado_piece_3, ?pit = https://github.com/cram2/.../world#avocado_piece_3_pit
+1 answers.
+```
+
+The bridge, `KnowRobBridge` in `semantic_digital_twin.adapters.knowrob.bridge`, works
+for any `semantic_digital_twin` world. It tells KnowRob about every semantic annotation
+of the world, and forgets an annotation when it leaves the world:
+
+| Statement                                  | Meaning                                                  |
+|--------------------------------------------|----------------------------------------------------------|
+| `rdf:type(world:avocado_piece_3, sdt:'AvocadoPiece')` | The annotation is of its class, and of each class above it (`sdt:'Food'`). |
+| `rdfs:subClassOf(sdt:'AvocadoPiece', sdt:'Food')` | The classes of the annotations and the class above each.  |
+| `dul:hasPart(world:avocado_piece_3, world:avocado_piece_3_pit)` | A piece has each part it has.                 |
+| `knowrob:frameName(world:avocado_piece_3, 'avocado_piece_3')` | The tf frame the body is published under, which carries the pose. |
+
+`sdt` and `world` are the prefixes of the annotations' classes and of the annotations
+themselves (`Namespace` in the bridge's module). KnowRob runs inside the bridge's
+process with its in-memory storage, so it knows the pieces only while the bridge runs.
+
+### Installing KnowRob
+
+KnowRob 2 has no ROS 2 interface, so the bridge uses its Python module. It is built
+from source; on Ubuntu 24.04 with ROS 2 Jazzy, four system packages are missing:
+
+```bash
+sudo apt install -y libmongoc-dev libraptor2-dev librdf0-dev swi-prolog-nox
+git clone --branch dev https://github.com/knowrob/knowrob.git ~/knowrob
+cd ~/knowrob && mkdir build && cd build
+cmake .. -DCATKIN=OFF -DCMAKE_BUILD_TYPE=Release -DPython3_EXECUTABLE=/usr/bin/python3 \
+    -DPYTHON_MODULE_LIBDIR=dist-packages -DCMAKE_INSTALL_PREFIX=$HOME/.local/knowrob
+make -j10 knowrob knowrob_py knowrob-terminal && cmake --install .
+echo "$HOME/.local/knowrob/lib/python/dist-packages" \
+    > "$(python -c 'import site; print(site.getsitepackages()[0])')/knowrob_local.pth"
+```
+
+The last line makes `import knowrob` work in the active Python environment; keep
+`~/knowrob`, as KnowRob reads its ontologies and Prolog files from there. The KnowRob
+tests in `test_avocado_cutting.py` and in
+`test/semantic_digital_twin_test/test_adapters/test_knowrob_bridge.py` are skipped where
+KnowRob is not installed.
 
 ## Opening the pieces in Isaac Sim
 
@@ -239,6 +293,7 @@ of the other pieces.
 | `fruit_world_publisher.py`       | The pieces' world published on ROS 2.                    |
 | `publish_on_ros.py`              | Run a demonstration and publish its pieces on ROS 2.     |
 | `demonstrations.py`              | The four demonstrations, chosen by name.                 |
+| `ask_knowrob.py`                 | Join the published world and ask KnowRob about it.       |
 | `solid_avocado_demonstration.py` | What every demo shares: scene, viewer, laying aside.     |
 | `held_avocado_demonstration.py`  | The avocado on poles, and halving it.                    |
 | `*_demo.py`                      | The four demonstrations.                                 |
@@ -256,8 +311,8 @@ BSD-3-Clause licensed; see `NOTICE.md` and `LICENSE.txt` there.
 
 `test/coraplex_test/test_avocado_cutting.py` covers cutting, holding, separating,
 scooping, hinges, gripping, the random pit, the world, its annotations, storing it in a
-database, publishing it on ROS 2 and the USD stage; the USD tests are skipped where `usd-core` is not
-installed. All four demos also run headless in the CI matrix of
+database, publishing it on ROS 2, bridging it to KnowRob and the USD stage; the USD
+and KnowRob tests are skipped where `usd-core` or KnowRob is not installed. All four demos also run headless in the CI matrix of
 `.github/workflows/examples_and_demos.yml`.
 
 ```bash
